@@ -19,6 +19,24 @@ ok( $user->first("abc"), 'set first name' );
 
 is( $user->first, "abc", 'read first name' );
 
+ok ($user->has_first, 'user has first name' );
+
+is( $user->dbic_result->first, 'abc', 'first name set on dbic class' );
+
+ok( !$user->first(undef), 'set first name to undef' );
+
+is( $user->first, undef, 'first name is undef' );
+
+ok( $user->has_first, 'user still has first name' );
+
+ok( !$user->clear_first, 'clear first' );
+
+ok (!$user->has_first, 'user has no first name' );
+
+is( $user->first, undef, 'first name is undef' );
+
+is( $user->dbic_result->first, undef, 'first name undef on dbic class' );
+
 isa_ok( $user->update, 'MySchema::MyApp::User');
 
 $user->delete;

@@ -38,14 +38,15 @@ sub load_classes {
     $schema = ref $schema if ( ref $schema );
 
     foreach my $class (@load) {
-        my $result_dbic  = $schema->create_dbic_result_class($class);
+        my $result_dbic = $schema->create_dbic_result_class($class);
 
-        my $result_moose = $schema->create_moose_result_class($class, $result_dbic);
-        
-        #$result_moose->add_class_attribute( dbic_result_class => ( default => $result_dbic ) );
+        my $result_moose =
+          $schema->create_moose_result_class( $class, $result_dbic );
 
-        $result_moose->meta->add_attribute( dbic_result =>
-              ( is => 'ro', isa => $result_dbic ) );
+#$result_moose->add_class_attribute( dbic_result_class => ( default => $result_dbic ) );
+
+        $result_moose->meta->add_attribute(
+            dbic_result => ( is => 'ro', isa => $result_dbic ) );
 
         # $user isa DBIx::Class::ResultSource
 
@@ -64,30 +65,32 @@ sub create_moose_result_class {
     ( my $table = lc($class) ) =~ s/::/_/g;
     my $result = join( '::', $schema, $class );
 
-    my $instance_metaclass = Moose::Meta::Class->create_anon_class(
-        superclasses => [ $class->meta->instance_metaclass ],
-        roles        => ['MooseX::DBIC::Meta::Role::Instance'],
-        cache        => 1,
-    );
-
-    my $meta_class = Moose::Meta::Class->create_anon_class(
-        superclasses => [ $class->meta->meta->name ],
-        cache        => 1,
-        methods      => {
-            instance_metaclass => sub { $instance_metaclass->name }
-        },
-    );
-
-    $meta_class->name->create(
+    $class->meta->meta->name->create(
         $result,
         superclasses => ['MooseX::DBIC'],
-        methods => { dbic_result_class => sub { $result_dbic } },
-        cache        => 1,
+        methods      => {
+            dbic_result_class => sub { $result_dbic }
+        },
+        cache => 1,
     );
 
     foreach my $attr ( $class->meta->get_all_attributes ) {
+
         #next unless($attr->has_writer);
-        $result->meta->add_attribute($attr);
+        my $accessor_metaclass = Moose::Meta::Class->create_anon_class(
+            superclasses => [ $attr->accessor_metaclass ],
+            roles        => ['MooseX::DBIC::Meta::Role::Method::Accessor'],
+            cache        => 1,
+        );
+        
+        my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
+            superclasses => [ $attr->meta->name ],
+            methods        => { accessor_metaclass => sub { $accessor_metaclass->name } },
+            cache        => 1,
+        );
+
+        $result->meta->add_attribute( bless(
+            $attr, $attribute_metaclass->name ) );
     }
 
     return $result;
