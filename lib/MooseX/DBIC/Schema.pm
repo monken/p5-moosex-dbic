@@ -1,0 +1,121 @@
+package MooseX::DBIC::Schema;
+use Carp;
+use Moose;
+use MooseX::ClassAttribute;
+use MooseX::NonMoose;
+use Moose::Util::MetaRole;
+
+extends 'DBIx::Class::Schema';
+
+class_has result_base_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
+
+sub _build_result_base_class {
+    my ($self) = @_;
+    my $result = Moose::Meta::Class->create_anon_class(
+        superclasses => [qw(DBIx::Class::Core)],
+        cache        => 1,
+    )->name;
+    $result->load_components(qw(RandomColumns InflateColumn::FS TimeStamp));
+    $result->table('foo');
+    $result->add_columns(
+        id => {
+            data_type => 'character',
+            size      => 10,
+            is_random => { size => 10, set => [ 'A' .. 'Z', 1 .. 9 ] },
+        }
+    );
+
+    $result->set_primary_key(qw(id));
+    return $result;
+}
+
+sub load_namespaces {
+    croak 'not yet implemented';
+}
+
+sub load_classes {
+    my ( $schema, @load ) = @_;
+    $schema = ref $schema if ( ref $schema );
+
+    foreach my $class (@load) {
+        my $result_dbic  = $schema->create_dbic_result_class($class);
+
+        my $result_moose = $schema->create_moose_result_class($class, $result_dbic);
+        
+        #$result_moose->add_class_attribute( dbic_result_class => ( default => $result_dbic ) );
+
+        $result_moose->meta->add_attribute( dbic_result =>
+              ( is => 'ro', isa => $result_dbic ) );
+
+        # $user isa DBIx::Class::ResultSource
+
+        $schema->register_class( $class => $result_dbic );
+    }
+}
+
+sub create_moose_result_class {
+    my ( $schema, $class, $result_dbic ) = @_;
+
+    carp 'The name of the class cannot start with DBIC::'
+      if ( $class =~ /^DBIC::/ );
+
+    Class::MOP::load_class($class);
+
+    ( my $table = lc($class) ) =~ s/::/_/g;
+    my $result = join( '::', $schema, $class );
+
+    my $instance_metaclass = Moose::Meta::Class->create_anon_class(
+        superclasses => [ $class->meta->instance_metaclass ],
+        roles        => ['MooseX::DBIC::Meta::Role::Instance'],
+        cache        => 1,
+    );
+
+    my $meta_class = Moose::Meta::Class->create_anon_class(
+        superclasses => [ $class->meta->meta->name ],
+        cache        => 1,
+        methods      => {
+            instance_metaclass => sub { $instance_metaclass->name }
+        },
+    );
+
+    $meta_class->name->create(
+        $result,
+        superclasses => ['MooseX::DBIC'],
+        methods => { dbic_result_class => sub { $result_dbic } },
+        cache        => 1,
+    );
+
+    foreach my $attr ( $class->meta->get_all_attributes ) {
+        #next unless($attr->has_writer);
+        $result->meta->add_attribute($attr);
+    }
+
+    return $result;
+}
+
+sub create_dbic_result_class {
+    my ( $schema, $class ) = @_;
+
+    carp 'The name of the class cannot start with DBIC::'
+      if ( $class =~ /^DBIC::/ );
+
+    Class::MOP::load_class($class);
+
+    ( my $table = lc($class) ) =~ s/::/_/g;
+    my $result = join( '::', $schema, 'DBIC', $class );
+    Moose::Meta::Class->create(
+        $result,
+        superclasses => [ $schema->result_base_class ],
+        cache        => 1,
+    );
+    $result->table($table);
+
+    foreach my $attr ( $class->meta->get_attribute_list ) {
+        $attr = $class->meta->get_attribute($attr);
+        $result->add_columns(
+            $attr->name => { is_nullable => !$attr->is_required } );
+    }
+    return $result;
+}
+
+__PACKAGE__->meta->make_immutable;
