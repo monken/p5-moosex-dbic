@@ -21,4 +21,6 @@ ok($user->update);
 
 ok($user->id, 'id is set');
 
+is($user->first, $user->dbic_result->first );
+
 done_testing;

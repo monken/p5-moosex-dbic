@@ -23,13 +23,7 @@ is( $user->first, "abc", 'read first name' );
 
 ok ($user->has_first, 'user has first name' );
 
-ok( !$user->first(undef), 'set first name to undef' );
-
-is( $user->first, undef, 'first name is undef' );
-
-ok( $user->has_first, 'user still has first name' );
-
-ok( !$user->clear_first, 'clear first' );
+ok( $user->clear_first, 'clear first' );
 
 ok (!$user->has_first, 'user has no first name' );
 
