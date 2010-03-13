@@ -96,17 +96,9 @@ sub create_moose_result_class {
 
     foreach my $attr ( $class->meta->get_all_attributes, $id_attribute ) {
 
-        #next unless($attr->has_writer);
-        my $accessor_metaclass = Moose::Meta::Class->create_anon_class(
-            superclasses => [ $attr->accessor_metaclass ],
-            roles        => ['MooseX::DBIC::Meta::Role::Method::Accessor'],
-            cache        => 1,
-        );
-
         my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
             superclasses => [ $attr->meta->name ],
             methods      => {
-                #accessor_metaclass => sub { $accessor_metaclass->name }
             },
             cache => 1,
         );
