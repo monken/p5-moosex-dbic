@@ -17,7 +17,6 @@ sub _inline_get {
 sub _generate_clearer_method {
     my ($self, $instance) = @_;
     my $slot_name = $self->associated_attribute->slots;
-    warn $slot_name;
     my ( $code, $e ) = $self->_eval_closure(
         {},
         'sub {'
@@ -32,7 +31,6 @@ sub _generate_clearer_method {
 sub _generate_predicate_method_inline {
     my ($self, $instance) = @_;
     my $slot_name = $self->associated_attribute->slots;
-    warn $slot_name;
     my ( $code, $e ) = $self->_eval_closure(
         {},
         'sub {'
@@ -43,5 +41,13 @@ sub _generate_predicate_method_inline {
 
     return $code;
 }
+
+
+sub _inline_has {
+    my ($self, $instance) = @_;
+    my $slot_name = $self->associated_attribute->slots;
+    return sprintf q[exists %s->dbic_result->{_column_data}->{"%s"}], $instance, quotemeta($slot_name);
+}
+
 
 1;

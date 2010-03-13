@@ -1,4 +1,5 @@
-use lib qw(t/lib);
+
+use lib qw(t/lib ../DBIC/lib);
 
 use Test::More;
 use SQL::Translator;
@@ -8,20 +9,19 @@ my $schema = MySchema->connect('dbi:SQLite::memory:');
 
 $schema->deploy;
 
-ok(
-    my $user = MySchema::MyApp::User->new(
-#
-        dbic_result => $schema->resultset('MyApp::User')->create( {} )
-    ),
+ok(my $user = $schema->resultset('MyApp::User')->create({}),
     'create a new user'
 );
+
+ok( my $id = $user->id, 'get id' );
+
+ok(  $id eq $user->id, 'id did not change' );
+
 ok( $user->first("abc"), 'set first name' );
 
 is( $user->first, "abc", 'read first name' );
 
 ok ($user->has_first, 'user has first name' );
-
-is( $user->dbic_result->first, 'abc', 'first name set on dbic class' );
 
 ok( !$user->first(undef), 'set first name to undef' );
 

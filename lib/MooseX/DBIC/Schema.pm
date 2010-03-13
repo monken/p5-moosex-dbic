@@ -15,13 +15,11 @@ sub _build_result_base_class {
         superclasses => [qw(DBIx::Class::Core)],
         cache        => 1,
     )->name;
-    $result->load_components(qw(RandomColumns InflateColumn::FS TimeStamp));
     $result->table('foo');
     $result->add_columns(
         id => {
             data_type => 'character',
             size      => 10,
-            is_random => { size => 10, set => [ 'A' .. 'Z', 1 .. 9 ] },
         }
     );
 
@@ -48,6 +46,18 @@ sub load_classes {
         $result_moose->meta->add_attribute(
             dbic_result => ( is => 'ro', isa => $result_dbic ) );
 
+        $result_dbic->meta->add_method(
+            inflate_result => sub {
+                my $self = shift->next::method(@_);
+                my $moose = $result_moose->new( dbic_result => $self );
+                while(my($k,$v) = each %{$self->{_column_data}}) {
+                    $moose->$k($v) if(defined $v);
+                }
+                $moose->id; # lazy build
+                return $moose;
+            }
+        );
+
         # $user isa DBIx::Class::ResultSource
 
         $schema->register_class( $class => $result_dbic );
@@ -67,14 +77,24 @@ sub create_moose_result_class {
 
     $class->meta->meta->name->create(
         $result,
-        superclasses => ['MooseX::DBIC'],
+        superclasses => [ 'MooseX::DBIC', $class ],
         methods      => {
-            dbic_result_class => sub { $result_dbic }
+            dbic_result_class => sub { $result_dbic },
+            _build_id         => sub {
+                my @chars = ( 'A' .. 'N', 'P' .. 'Z', 0 .. 9 );
+                my $id;
+                $id .= $chars[ int( rand(@chars) ) ] for ( 1 .. 10 );
+                return $id;
+              }
         },
         cache => 1,
     );
 
-    foreach my $attr ( $class->meta->get_all_attributes ) {
+    my $id_attribute =
+      Moose::Meta::Attribute->new(
+        id => ( isa => 'Str', required => 1, is => 'rw', lazy_build => 1 ) );
+
+    foreach my $attr ( $class->meta->get_all_attributes, $id_attribute ) {
 
         #next unless($attr->has_writer);
         my $accessor_metaclass = Moose::Meta::Class->create_anon_class(
@@ -82,15 +102,17 @@ sub create_moose_result_class {
             roles        => ['MooseX::DBIC::Meta::Role::Method::Accessor'],
             cache        => 1,
         );
-        
+
         my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
             superclasses => [ $attr->meta->name ],
-            methods        => { accessor_metaclass => sub { $accessor_metaclass->name } },
-            cache        => 1,
+            methods      => {
+                #accessor_metaclass => sub { $accessor_metaclass->name }
+            },
+            cache => 1,
         );
 
-        $result->meta->add_attribute( bless(
-            $attr, $attribute_metaclass->name ) );
+        $result->meta->add_attribute(
+            bless( $attr, $attribute_metaclass->name ) );
     }
 
     return $result;

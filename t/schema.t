@@ -1,5 +1,5 @@
 
-use lib qw(t/lib);
+use lib qw(t/lib ../DBIC/lib);
 
 use Test::More;
 use SQL::Translator;
@@ -11,12 +11,14 @@ $schema->deploy;
 
 ok(my $user = $schema->resultset('MyApp::User')->create({}));
 
+$user = $schema->resultset('MyApp::User')->first;
+
 isa_ok($user, 'MyApp::User');
 
 ok($user->first('peter'));
 
 ok($user->update);
 
-is($user->id, 1);
+ok($user->id, 'id is set');
 
 done_testing;
