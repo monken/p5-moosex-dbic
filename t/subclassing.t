@@ -11,6 +11,6 @@ my $schema = MySchema->connect( 'dbi:SQLite::memory:' );
 
 $schema->deploy;
 
-ok(my $user = $schema->resultset('MyApp::User')->create({}));
+ok(my $user = $schema->resultset('MyApp::User::Admin')->create({ level => 99 }));
 
 done_testing;
