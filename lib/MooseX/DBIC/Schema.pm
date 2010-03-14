@@ -9,6 +9,17 @@ extends 'DBIx::Class::Schema';
 
 class_has result_base_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
 
+class_has attribute_metaclass => ( is => 'rw', isa => 'Str', lazy_build => 1 );
+
+sub _build_attribute_metaclass {
+
+    return Moose::Meta::Class->create_anon_class(
+        superclasses => ['Moose::Meta::Attribute'],
+        roles        => ['MooseX::DBIC::Meta::Role::Attribute'],
+        cache        => 1,
+    )->name;
+}
+
 sub _build_result_base_class {
     my ($self) = @_;
     my $result = Moose::Meta::Class->create_anon_class(
@@ -16,12 +27,7 @@ sub _build_result_base_class {
         cache        => 1,
     )->name;
     $result->table('foo');
-    $result->add_columns(
-        id => {
-            data_type => 'character',
-            size      => 10,
-        }
-    );
+    $result->add_columns( 'id' );
 
     $result->set_primary_key(qw(id));
     return $result;
@@ -36,12 +42,14 @@ sub load_classes {
     $schema = ref $schema if ( ref $schema );
 
     foreach my $class (@load) {
-        my $result_dbic = $schema->create_dbic_result_class($class);
 
-        my $result_moose =
-          $schema->create_moose_result_class( $class, $result_dbic );
+        my $result_moose = $schema->create_moose_result_class($class);
 
-#$result_moose->add_class_attribute( dbic_result_class => ( default => $result_dbic ) );
+        my $result_dbic =
+          $schema->create_dbic_result_class( $class, $result_moose );
+
+        $result_moose->meta->add_method(
+            dbic_result_class => sub { $result_dbic }, );
 
         $result_moose->meta->add_attribute(
             dbic_result => ( is => 'ro', isa => $result_dbic ) );
@@ -50,22 +58,20 @@ sub load_classes {
             inflate_result => sub {
                 my $self = shift->next::method(@_);
                 my $moose = $result_moose->new( dbic_result => $self );
-                while(my($k,$v) = each %{$self->{_column_data}}) {
-                    $moose->$k($v) if(defined $v);
+                while ( my ( $k, $v ) = each %{ $self->{_column_data} } ) {
+                    $moose->$k($v) if ( defined $v );
                 }
-                $moose->id; # lazy build
+                $moose->id;    # lazy build
                 return $moose;
             }
         );
-
-        # $user isa DBIx::Class::ResultSource
 
         $schema->register_class( $class => $result_dbic );
     }
 }
 
 sub create_moose_result_class {
-    my ( $schema, $class, $result_dbic ) = @_;
+    my ( $schema, $class ) = @_;
 
     carp 'The name of the class cannot start with DBIC::'
       if ( $class =~ /^DBIC::/ );
@@ -79,8 +85,7 @@ sub create_moose_result_class {
         $result,
         superclasses => [ 'MooseX::DBIC', $class ],
         methods      => {
-            dbic_result_class => sub { $result_dbic },
-            _build_id         => sub {
+            _build_id => sub {
                 my @chars = ( 'A' .. 'N', 'P' .. 'Z', 0 .. 9 );
                 my $id;
                 $id .= $chars[ int( rand(@chars) ) ] for ( 1 .. 10 );
@@ -90,15 +95,23 @@ sub create_moose_result_class {
         cache => 1,
     );
 
-    my $id_attribute =
-      Moose::Meta::Attribute->new(
-        id => ( isa => 'Str', required => 1, is => 'rw', lazy_build => 1 ) );
+    my $id_attribute = $schema->attribute_metaclass->new(
+        id => (
+            isa         => 'Str',
+            required    => 1,
+            is          => 'rw',
+            lazy_build  => 1,
+            column_info => { data_type => 'character', size => 10 }
+        )
+    );
 
     foreach my $attr ( $class->meta->get_all_attributes, $id_attribute ) {
-
         my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
-            superclasses => [ $attr->meta->name ],
-            methods      => {
+            superclasses => [ $attr->meta->name, $schema->attribute_metaclass ],
+            roles   => ['MooseX::DBIC::Meta::Role::Attribute'],
+            methods => {
+
+                #accessor_metaclass => sub { $accessor_metaclass->name }
             },
             cache => 1,
         );
@@ -111,7 +124,7 @@ sub create_moose_result_class {
 }
 
 sub create_dbic_result_class {
-    my ( $schema, $class ) = @_;
+    my ( $schema, $class, $moose ) = @_;
 
     carp 'The name of the class cannot start with DBIC::'
       if ( $class =~ /^DBIC::/ );
@@ -127,10 +140,14 @@ sub create_dbic_result_class {
     );
     $result->table($table);
 
-    foreach my $attr ( $class->meta->get_attribute_list ) {
-        $attr = $class->meta->get_attribute($attr);
+    foreach my $attr ( $class->meta->get_attribute_list, 'id' ) {
+        my $attribute = $moose->meta->get_attribute($attr);
         $result->add_columns(
-            $attr->name => { is_nullable => !$attr->is_required } );
+            $attribute->name => {
+                is_nullable => !$attribute->is_required,
+                %{ $attribute->column_info || {} }
+            }
+        );
     }
     return $result;
 }

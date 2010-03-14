@@ -5,22 +5,12 @@ use Test::More;
 use SQL::Translator;
 use MySchema;
 
+
+MySchema->load_classes('MyApp::User::Admin');
 my $schema = MySchema->connect( 'dbi:SQLite::memory:' );
 
 $schema->deploy;
 
 ok(my $user = $schema->resultset('MyApp::User')->create({}));
-
-$user = $schema->resultset('MyApp::User')->first;
-
-isa_ok($user, 'MyApp::User');
-
-ok($user->first('peter'));
-
-ok($user->update);
-
-ok($user->id, 'id is set');
-
-is($user->first, $user->dbic_result->first );
 
 done_testing;

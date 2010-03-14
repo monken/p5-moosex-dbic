@@ -1,5 +1,5 @@
 
-use lib qw(t/lib ../DBIC/lib);
+use lib qw(t/lib ../inflate_result/lib);
 
 use Test::More;
 use SQL::Translator;
