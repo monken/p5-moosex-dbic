@@ -9,8 +9,6 @@ extends 'DBIx::Class::Schema';
 
 class_has result_base_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
 
-class_has attribute_metaclass => ( is => 'rw', isa => 'Str', lazy_build => 1 );
-
 class_has loaded_classes => (
     is      => 'rw',
     isa     => 'ArrayRef[Str]',
@@ -26,17 +24,6 @@ sub is_class_loaded {
     my $schema = shift;
     my $class  = shift;
     return $schema->find_loaded_class( sub { $_ eq $class } );
-}
-
-sub _build_attribute_metaclass {
-
-    return Moose::Meta::Class->create_anon_class(
-        superclasses => ['Moose::Meta::Attribute'],
-        roles        => [
-            qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Column)
-        ],
-        cache => 1,
-    )->name;
 }
 
 sub _build_result_base_class {
@@ -118,7 +105,7 @@ sub create_moose_result_class {
     if ( $class->meta->isa('Moose::Meta::Role') ) {
         foreach my $attr ( $class->meta->get_attribute_list ) {
             $result->meta->add_attribute( $class->meta->get_attribute($attr)
-                  ->attribute_for_class( $schema->attribute_metaclass ) );
+                  ->attribute_for_class( $result->meta->column_attribute_metaclass ) );
         }
     }
     else {
@@ -126,7 +113,7 @@ sub create_moose_result_class {
         foreach my $attr ( $class->meta->get_all_attributes ) {
             my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
                 superclasses =>
-                  [ $attr->meta->name, $schema->attribute_metaclass ],
+                  [ $attr->meta->name, $result->meta->column_attribute_metaclass ],
                 roles => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
                 cache => 1,
             );
