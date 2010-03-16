@@ -1,32 +1,34 @@
 package MooseX::DBIC;
 
 use Moose;
+use MooseX::ClassAttribute;
+use MooseX::DBIC::Meta::Role::Class;
+use Moose::Exporter;
 
-foreach my $method (qw(delete)) {
-    __PACKAGE__->meta->add_method(
-        $method => sub {
-            my $self   = shift;
-            my $return = $self->dbic_result->$method(@_);
-            return ref $return eq $self->dbic_result_class ? $self : $return;
+Moose::Exporter->setup_import_methods( with_meta => ['has_column'] );
 
-        }
+sub init_meta {
+    shift;
+    my %p = @_;
+    return Moose::Util::MetaRole::apply_metaclass_roles(
+        for             => $p{for_class},
+        class_metaroles => {
+            class => ['MooseX::DBIC::Meta::Role::Class'],
+        },
     );
 }
 
-foreach my $method (qw(insert update)) {
-    __PACKAGE__->meta->add_method(
-        $method => sub {
+sub has_column {
+    my $meta    = shift;
+    my $name    = shift;
+    my %options = @_;
 
-            my $self = shift;
-            my $row  = $self->dbic_result;
-            foreach my $attr ( $self->meta->get_attribute_list ) {
-                $row->$attr( $self->$attr ) if ( $row->can($attr) );
-            }
-            $row->$method;
-            return $self;
+    my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
 
-        }
-    );
+    foreach my $attr ( @{$attrs} ) {
+        my $attr = $meta->column_attribute_metaclass->new( $attr, %options );
+        $meta->add_attribute( $attr );
+    }
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

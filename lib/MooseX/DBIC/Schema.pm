@@ -32,8 +32,10 @@ sub _build_attribute_metaclass {
 
     return Moose::Meta::Class->create_anon_class(
         superclasses => ['Moose::Meta::Attribute'],
-        roles        => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
-        cache        => 1,
+        roles        => [
+            qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Column)
+        ],
+        cache => 1,
     )->name;
 }
 
@@ -105,28 +107,12 @@ sub create_moose_result_class {
     Moose::Meta::Class->create(
         $result,
         superclasses => [
-            'MooseX::DBIC', $class->meta->isa('Moose::Meta::Role') ? () : $class
+            'MooseX::DBIC::Result', $class->meta->isa('Moose::Meta::Role') ? () : $class
         ],
-        methods => {
-            _build_id => sub {
-                my @chars = ( 'A' .. 'N', 'P' .. 'Z', 0 .. 9 );
-                my $id;
-                $id .= $chars[ int( rand(@chars) ) ] for ( 1 .. 10 );
-                return $id;
-              }
-        },
         cache => 1,
     );
 
-    my $id_attribute = $schema->attribute_metaclass->new(
-        id => (
-            isa         => 'Str',
-            required    => 1,
-            is          => 'rw',
-            lazy_build  => 1,
-            column_info => { data_type => 'character', size => 10 }
-        )
-    );
+
 
     my @attributes;
     if ( $class->meta->isa('Moose::Meta::Role') ) {
@@ -134,14 +120,14 @@ sub create_moose_result_class {
             $result->meta->add_attribute( $class->meta->get_attribute($attr)
                   ->attribute_for_class( $schema->attribute_metaclass ) );
         }
-        $result->meta->add_attribute( $id_attribute);
     }
     else {
 
-        foreach my $attr ( $class->meta->get_all_attributes, $id_attribute ) {
+        foreach my $attr ( $class->meta->get_all_attributes ) {
             my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
-                superclasses => [ $schema->attribute_metaclass ],
-                roles   => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
+                superclasses =>
+                  [ $attr->meta->name, $schema->attribute_metaclass ],
+                roles => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
                 cache => 1,
             );
 
@@ -149,9 +135,13 @@ sub create_moose_result_class {
                 bless( $attr, $attribute_metaclass->name ) );
         }
     }
-    
-    for my $superclass ( map { $_->can('name') ? $_->name : $_ } $class->meta->calculate_all_roles
-        , $class->meta->isa('Moose::Meta::Role') ? () : $class->meta->linearized_isa
+
+    for my $superclass (
+        map { $_->can('name') ? $_->name : $_ }
+        $class->meta->calculate_all_roles,
+        $class->meta->isa('Moose::Meta::Role')
+        ? ()
+        : $class->meta->linearized_isa
       )
     {
         $schema->load_classes($superclass)
@@ -179,14 +169,14 @@ sub create_dbic_result_class {
     $result->table($table);
 
     foreach my $attr ( $class->meta->get_attribute_list, 'id' ) {
-        my $attribute = $moose->meta->get_attribute($attr);
-        next unless( $attribute->meta->does_role('MooseX::DBIC::Meta::Role::Attribute::Column') );
-        $result->add_columns(
-            $attribute->name => {
-                is_nullable => !$attribute->is_required,
-                %{ $attribute->column_info || {} }
-            }
-        );
+        my $attribute = $moose->meta->find_attribute_by_name($attr);
+        next
+          unless (
+            $attribute->meta->does_role(
+                'MooseX::DBIC::Meta::Role::Attribute')
+          );
+        $attribute->apply_to_dbic_result_class($result);
+        
     }
     return $result;
 }
