@@ -106,6 +106,7 @@ sub create_moose_result_class {
     for my $superclass ( $class->meta->linearized_isa ) {
         $schema->load_classes($superclass)
           unless ( $schema->is_class_loaded($superclass) );
+        my $rel = $result->meta->relationship_attribute_metaclass->new( $superclass => ( is => 'rw', isa => 'Any', type => 'HasOne') );
     }
 
     return $result;
