@@ -10,7 +10,7 @@ sub _build_column_attribute_metaclass {
     return Moose::Meta::Class->create_anon_class(
         superclasses => ['Moose::Meta::Attribute'],
         roles        => [
-            qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Column)
+            qw(MooseX::DBIC::Meta::Role::Attribute::Column)
         ],
         cache => 1,
     )->name;

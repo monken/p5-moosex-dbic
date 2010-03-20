@@ -89,29 +89,22 @@ sub create_moose_result_class {
     my $result = join( '::', $schema, $class );
     Moose::Meta::Class->create(
         $result,
-        superclasses => [
-            'MooseX::DBIC::Result', $class
-        ],
-        cache => 1,
+        superclasses => [ 'MooseX::DBIC::Result', $class ],
+        cache        => 1,
     );
-
-    my @attributes;
 
     foreach my $attr ( $class->meta->get_all_attributes ) {
         my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
-            superclasses =>
-              [ $attr->meta->name, $result->meta->column_attribute_metaclass ],
-            roles => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
-            cache => 1,
+            superclasses => [ $attr->meta->name ],
+            roles        => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
+            cache        => 1,
         );
 
         $result->meta->add_attribute(
             bless( $attr, $attribute_metaclass->name ) );
     }
 
-    for my $superclass ( map { $_->can('name') ? $_->name : $_ }
-        $class->meta->linearized_isa )
-    {
+    for my $superclass ( $class->meta->linearized_isa ) {
         $schema->load_classes($superclass)
           unless ( $schema->is_class_loaded($superclass) );
     }
