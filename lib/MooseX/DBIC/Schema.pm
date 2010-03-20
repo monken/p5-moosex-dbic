@@ -92,21 +92,34 @@ sub create_moose_result_class {
         cache        => 1,
     );
 
-    foreach my $attr ( $class->meta->get_all_attributes ) {
+    foreach my $attr ( $class->meta->get_attribute_list ) {
+        my $attribute = $class->meta->get_attribute($attr);
         my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
-            superclasses => [ $attr->meta->name ],
+            superclasses => [ $attribute->meta->name ],
             roles        => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
             cache        => 1,
         );
 
         $result->meta->add_attribute(
-            bless( $attr, $attribute_metaclass->name ) );
+            bless( $attribute, $attribute_metaclass->name ) );
     }
 
-    for my $superclass ( $class->meta->linearized_isa ) {
+    my ( undef, $superclass ) = $class->meta->linearized_isa;
+
+    if ($superclass) {
         $schema->load_classes($superclass)
           unless ( $schema->is_class_loaded($superclass) );
-        my $rel = $result->meta->relationship_attribute_metaclass->new( $superclass => ( is => 'rw', isa => 'Any', type => 'HasOne') );
+        my $related_source = join( '::', $schema, 'DBIC', $superclass );
+        ( my $table = lc($superclass) ) =~ s/::/_/g;
+        my $rel = $result->meta->relationship_attribute_metaclass->new(
+            $table => (
+                is             => 'rw',
+                isa            => 'Any',
+                type           => 'HasOne',
+                related_source => $related_source
+            )
+        );
+        $result->meta->add_attribute($rel);
     }
 
     return $result;
@@ -129,7 +142,8 @@ sub create_dbic_result_class {
     );
     $result->table($table);
 
-    foreach my $attr ( $class->meta->get_attribute_list, 'id' ) {
+    foreach my $attr ( $moose->meta->get_attribute_list ) {
+        warn $attr;
         my $attribute = $moose->meta->find_attribute_by_name($attr);
         next
           unless (
