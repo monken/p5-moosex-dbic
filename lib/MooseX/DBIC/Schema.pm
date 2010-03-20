@@ -44,41 +44,37 @@ sub load_namespaces {
 }
 
 sub load_classes {
-    my ( $schema, @load ) = @_;
+    my ( $schema, $class, @defer ) = @_;
     $schema = ref $schema if ( ref $schema );
 
-    my @register_classes = ();
+    $schema->add_loaded_class($class);
 
-    foreach my $class (@load) {
+    my $result_moose = $schema->create_moose_result_class($class);
 
-        $schema->add_loaded_class($class);
+    my $result_dbic =
+      $schema->create_dbic_result_class( $class, $result_moose );
 
-        my $result_moose = $schema->create_moose_result_class($class);
+    $result_moose->meta->add_method( dbic_result_class => sub { $result_dbic },
+    );
 
-        my $result_dbic =
-          $schema->create_dbic_result_class( $class, $result_moose );
+    $result_moose->meta->add_attribute(
+        dbic_result => ( is => 'ro', isa => $result_dbic ) );
 
-        $result_moose->meta->add_method(
-            dbic_result_class => sub { $result_dbic }, );
-
-        $result_moose->meta->add_attribute(
-            dbic_result => ( is => 'ro', isa => $result_dbic ) );
-
-        $result_dbic->meta->add_method(
-            inflate_result => sub {
-                my $self = shift->next::method(@_);
-                my $moose = $result_moose->new( dbic_result => $self );
-                while ( my ( $k, $v ) = each %{ $self->{_column_data} } ) {
-                    $moose->$k($v) if ( defined $v );
-                }
-                $moose->id;    # lazy build
-                return $moose;
+    $result_dbic->meta->add_method(
+        inflate_result => sub {
+            my $self = shift->next::method(@_);
+            my $moose = $result_moose->new( dbic_result => $self );
+            while ( my ( $k, $v ) = each %{ $self->{_column_data} } ) {
+                $moose->$k($v) if ( defined $v );
             }
-        );
+            $moose->id;    # lazy build
+            return $moose;
+        }
+    );
+    $schema->register_class( $class => $result_dbic );
 
-        push( @register_classes, $class => $result_dbic );
-    }
-    $schema->register_class(@register_classes);
+    $schema->load_classes(@defer) if (@defer);
+
 }
 
 sub create_moose_result_class {
@@ -94,26 +90,29 @@ sub create_moose_result_class {
     Moose::Meta::Class->create(
         $result,
         superclasses => [
-            'MooseX::DBIC::Result', $class->meta->isa('Moose::Meta::Role') ? () : $class
+            'MooseX::DBIC::Result',
+            $class->meta->isa('Moose::Meta::Role') ? () : $class
         ],
         cache => 1,
     );
 
-
-
     my @attributes;
     if ( $class->meta->isa('Moose::Meta::Role') ) {
         foreach my $attr ( $class->meta->get_attribute_list ) {
-            $result->meta->add_attribute( $class->meta->get_attribute($attr)
-                  ->attribute_for_class( $result->meta->column_attribute_metaclass ) );
+            $result->meta->add_attribute(
+                $class->meta->get_attribute($attr)->attribute_for_class(
+                    $result->meta->column_attribute_metaclass
+                )
+            );
         }
     }
     else {
 
         foreach my $attr ( $class->meta->get_all_attributes ) {
             my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
-                superclasses =>
-                  [ $attr->meta->name, $result->meta->column_attribute_metaclass ],
+                superclasses => [
+                    $attr->meta->name, $result->meta->column_attribute_metaclass
+                ],
                 roles => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
                 cache => 1,
             );
@@ -159,11 +158,10 @@ sub create_dbic_result_class {
         my $attribute = $moose->meta->find_attribute_by_name($attr);
         next
           unless (
-            $attribute->meta->does_role(
-                'MooseX::DBIC::Meta::Role::Attribute')
+            $attribute->meta->does_role('MooseX::DBIC::Meta::Role::Attribute')
           );
         $attribute->apply_to_dbic_result_class($result);
-        
+
     }
     return $result;
 }

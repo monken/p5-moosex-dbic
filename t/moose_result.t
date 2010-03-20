@@ -37,6 +37,10 @@ $user->delete;
 
 $user->insert;
 
-#warn $user->meta->find_attribute_by_name("first")->set_value;
+ok($user = $schema->resultset('MyApp::User::Admin')->create({}),
+    'create a new user'
+);
+
+ok($user->meta->does_role('MyApp::Role::Hair'), 'Moose Result class does role');
 
 done_testing;

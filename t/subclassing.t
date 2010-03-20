@@ -6,7 +6,6 @@ use SQL::Translator;
 use MySchema;
 
 
-MySchema->load_classes('MyApp::User::Admin');
 my $schema = MySchema->connect( 'dbi:SQLite::memory:' );
 
 $schema->deploy;
