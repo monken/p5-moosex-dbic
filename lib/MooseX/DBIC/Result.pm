@@ -7,7 +7,7 @@ has_column id => (
     isa         => 'Str',
     required    => 1,
     is          => 'rw',
-    lazy_build  => 1,
+    builder  => '_build_id',
     column_info => { data_type => 'character', size => 10 }
 );
 

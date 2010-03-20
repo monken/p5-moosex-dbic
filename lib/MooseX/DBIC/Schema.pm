@@ -67,7 +67,6 @@ sub load_classes {
             while ( my ( $k, $v ) = each %{ $self->{_column_data} } ) {
                 $moose->$k($v) if ( defined $v );
             }
-            $moose->id;    # lazy build
             return $moose;
         }
     );
