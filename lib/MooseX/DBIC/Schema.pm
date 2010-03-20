@@ -90,45 +90,27 @@ sub create_moose_result_class {
     Moose::Meta::Class->create(
         $result,
         superclasses => [
-            'MooseX::DBIC::Result',
-            $class->meta->isa('Moose::Meta::Role') ? () : $class
+            'MooseX::DBIC::Result', $class
         ],
         cache => 1,
     );
 
     my @attributes;
-    if ( $class->meta->isa('Moose::Meta::Role') ) {
-        foreach my $attr ( $class->meta->get_attribute_list ) {
-            $result->meta->add_attribute(
-                $class->meta->get_attribute($attr)->attribute_for_class(
-                    $result->meta->column_attribute_metaclass
-                )
-            );
-        }
-    }
-    else {
 
-        foreach my $attr ( $class->meta->get_all_attributes ) {
-            my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
-                superclasses => [
-                    $attr->meta->name, $result->meta->column_attribute_metaclass
-                ],
-                roles => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
-                cache => 1,
-            );
+    foreach my $attr ( $class->meta->get_all_attributes ) {
+        my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
+            superclasses =>
+              [ $attr->meta->name, $result->meta->column_attribute_metaclass ],
+            roles => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
+            cache => 1,
+        );
 
-            $result->meta->add_attribute(
-                bless( $attr, $attribute_metaclass->name ) );
-        }
+        $result->meta->add_attribute(
+            bless( $attr, $attribute_metaclass->name ) );
     }
 
-    for my $superclass (
-        map { $_->can('name') ? $_->name : $_ }
-        $class->meta->calculate_all_roles,
-        $class->meta->isa('Moose::Meta::Role')
-        ? ()
-        : $class->meta->linearized_isa
-      )
+    for my $superclass ( map { $_->can('name') ? $_->name : $_ }
+        $class->meta->linearized_isa )
     {
         $schema->load_classes($superclass)
           unless ( $schema->is_class_loaded($superclass) );
