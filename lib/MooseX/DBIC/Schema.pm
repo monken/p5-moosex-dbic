@@ -20,6 +20,7 @@ class_has loaded_classes => (
     }
 );
 
+
 sub is_class_loaded {
     my $schema = shift;
     my $class  = shift;
@@ -57,24 +58,16 @@ sub load_classes {
     $result_moose->meta->add_method( dbic_result_class => sub { $result_dbic },
     );
 
-    $result_moose->meta->add_attribute(
-        dbic_result => ( is => 'ro', isa => $result_dbic ) );
+    $schema->register_class( $class => $result_dbic );
 
-    $result_dbic->meta->add_method(
-        inflate_result => sub {
-            my $self = shift->next::method(@_);
-            my $moose = $result_moose->new( dbic_result => $self );
-            while ( my ( $k, $v ) = each %{ $self->{_column_data} } ) {
-                $moose->$k($v) if ( defined $v );
-            }
-            return $moose;
-        }
-    );
+    $result_dbic->result_class($result_moose);
+
     $schema->register_class( $class => $result_dbic );
 
     $schema->load_classes(@defer) if (@defer);
 
 }
+
 
 sub create_moose_result_class {
     my ( $schema, $class ) = @_;
@@ -86,14 +79,22 @@ sub create_moose_result_class {
 
     ( my $table = lc($class) ) =~ s/::/_/g;
     my $result = join( '::', $schema, $class );
-    Moose::Meta::Class->create(
+    
+    my $result_metaclass = $class->meta->create_anon_class(
+        superclasses => [ $class->meta->meta->name ],
+        roles => ['MooseX::DBIC::Meta::Role::Class'],
+        cache        => 1,
+    )->name;
+    
+    $result_metaclass->create(
         $result,
-        superclasses => [ 'MooseX::DBIC::Result', $class ],
+        superclasses => [ $class ],
+        roles => ['MooseX::DBIC::Result'],
         cache        => 1,
     );
 
     foreach my $attr ( $class->meta->get_attribute_list ) {
-        my $attribute = $class->meta->get_attribute($attr);
+        my $attribute           = $class->meta->get_attribute($attr);
         my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
             superclasses => [ $attribute->meta->name ],
             roles        => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
@@ -111,12 +112,16 @@ sub create_moose_result_class {
           unless ( $schema->is_class_loaded($superclass) );
         my $related_source = join( '::', $schema, 'DBIC', $superclass );
         ( my $table = lc($superclass) ) =~ s/::/_/g;
+        warn $table;
         my $rel = $result->meta->relationship_attribute_metaclass->new(
             $table => (
                 is             => 'rw',
                 isa            => 'Any',
                 type           => 'HasOne',
-                related_source => $related_source
+                related_source => $related_source,
+                required       => 1,
+                lazy           => 1,
+                builder        => '_build_relationship'
             )
         );
         $result->meta->add_attribute($rel);
@@ -143,11 +148,12 @@ sub create_dbic_result_class {
     $result->table($table);
 
     foreach my $attr ( $moose->meta->get_attribute_list ) {
-        warn $attr;
+        #warn $attr;
         my $attribute = $moose->meta->find_attribute_by_name($attr);
+        #warn $attribute;
         next
           unless (
-            $attribute->meta->does_role('MooseX::DBIC::Meta::Role::Attribute')
+            $attribute->does('MooseX::DBIC::Meta::Role::Attribute')
           );
         $attribute->apply_to_dbic_result_class($result);
 
@@ -155,4 +161,4 @@ sub create_dbic_result_class {
     return $result;
 }
 
-__PACKAGE__->meta->make_immutable;
+1;

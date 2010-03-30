@@ -12,8 +12,8 @@ sub init_meta {
     my %p = @_;
     return Moose::Util::MetaRole::apply_metaclass_roles(
         for             => $p{for_class},
-        class_metaroles => {
-            class => ['MooseX::DBIC::Meta::Role::Class'],
+        role_metaroles => {
+            role => ['MooseX::DBIC::Meta::Role::Class'],
         },
     );
 }
@@ -22,12 +22,13 @@ sub has_column {
     my $meta    = shift;
     my $name    = shift;
     my %options = @_;
-
+    $options{traits} ||= [];
+    push(@{$options{traits}}, 'MooseX::DBIC::Meta::Role::Attribute', 'MooseX::DBIC::Meta::Role::Attribute::Column');
+    
     my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
-
+    
     foreach my $attr ( @{$attrs} ) {
-        my $attr = $meta->column_attribute_metaclass->new( $attr, %options );
-        $meta->add_attribute( $attr );
+        $meta->add_attribute( $attr => %options );
     }
 }
 
