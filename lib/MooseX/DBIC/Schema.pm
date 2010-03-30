@@ -2,8 +2,8 @@ package MooseX::DBIC::Schema;
 use Carp;
 use Moose;
 use MooseX::ClassAttribute;
-use MooseX::NonMoose;
 use Moose::Util::MetaRole;
+use MooseX::DBIC::Types q(:all);
 
 extends 'DBIx::Class::Schema';
 
@@ -50,7 +50,8 @@ sub load_classes {
 
     $schema->add_loaded_class($class);
 
-    my $result_moose = $schema->create_moose_result_class($class);
+    Class::MOP::load_class($class);
+    my $result_moose = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_moose_result_class($class);
 
     my $result_dbic =
       $schema->create_dbic_result_class( $class, $result_moose );
@@ -75,8 +76,6 @@ sub create_moose_result_class {
     carp 'The name of the class cannot start with DBIC::'
       if ( $class =~ /^DBIC::/ );
 
-    Class::MOP::load_class($class);
-
     ( my $table = lc($class) ) =~ s/::/_/g;
     my $result = join( '::', $schema, $class );
     
@@ -97,7 +96,7 @@ sub create_moose_result_class {
         my $attribute           = $class->meta->get_attribute($attr);
         my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
             superclasses => [ $attribute->meta->name ],
-            roles        => ['MooseX::DBIC::Meta::Role::Attribute::Column'],
+            roles        => ['MooseX::DBIC::Meta::Role::Attribute::Column','MooseX::Attribute::Deflator::Meta::Role::Attribute'],
             cache        => 1,
         );
 
@@ -111,17 +110,21 @@ sub create_moose_result_class {
         $schema->load_classes($superclass)
           unless ( $schema->is_class_loaded($superclass) );
         my $related_source = join( '::', $schema, 'DBIC', $superclass );
+        my $related_result = join( '::', $schema, $superclass );
         ( my $table = lc($superclass) ) =~ s/::/_/g;
-        warn $table;
+        my @handles = map { $result->meta->remove_attribute($_->name); $_->name } 
+                      grep { !$result->meta->has_attribute($_->name) } 
+                        $related_result->meta->get_all_columns;
         my $rel = $result->meta->relationship_attribute_metaclass->new(
             $table => (
                 is             => 'rw',
-                isa            => 'Any',
-                type           => 'HasOne',
+                isa            => Result,
+                type           => 'BelongsTo',
                 related_source => $related_source,
                 required       => 1,
                 lazy           => 1,
-                builder        => '_build_relationship'
+                handles => \@handles,
+                default        => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($table)); }
             )
         );
         $result->meta->add_attribute($rel);
