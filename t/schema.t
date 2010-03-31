@@ -1,5 +1,5 @@
 
-use lib qw(t/lib);
+use lib qw(t/lib ../p5-moosex-attribute-deflator/lib);
 
 use Test::More;
 use SQL::Translator;
@@ -21,6 +21,5 @@ ok($user->update);
 
 ok($user->id, 'id is set');
 
-is($user->first, $user->dbic_result->first );
 
 done_testing;

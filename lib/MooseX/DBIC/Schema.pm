@@ -78,7 +78,7 @@ sub load_classes {
     
     Class::MOP::load_class($class);
         
-    unless($class->can('meta')) {
+    unless($class->can('meta')) { # FIXME: test for role
         $schema->next::method($moniker);
         return $schema->load_classes(@defer);
     }
@@ -99,9 +99,6 @@ sub load_classes {
     my $result_dbic =
       $schema->create_dbic_result_class( $class, $result_moose );
 
-    #$schema->register_class( $moniker => $result_dbic );
-    #$schema->register_source( $moniker => $result_dbic->result_source_instance );
-
     $result_dbic->result_class($result_moose);
     my $map = $schema->class_mappings;
     $map->{$result_dbic} = $moniker;
@@ -117,7 +114,7 @@ sub create_moose_result_class {
       if ( $class =~ /^DBIC::/ );
 
     ( my $table = lc($class) ) =~ s/::/_/g;
-    my $result =  $class ;
+    my $result =  $schema . '::' . $class ;
     
     my $result_metaclass = $class->meta->create_anon_class(
         superclasses => [ $class->meta->meta->name ],
@@ -152,6 +149,7 @@ sub create_moose_result_class {
         $schema->load_classes($superclass)
           unless ( $schema->is_class_loaded($superclass) );
           my $related = join( '::', $schema, $superclass);
+          ( my $table = lc($superclass) ) =~ s/::/_/g;
         $result->meta->add_relationship($table => ( type => 'BelongsTo', isa => $related));
     }
 

@@ -12,6 +12,8 @@ foreach my $source (map { $schema->source($_) } $schema->sources) {
     $ddl->{$source->source_name} = { map { $_ => $source->column_info($_) } $source->columns };
 }
 
+use Data::Dumper; warn Dumper $ddl;
+
 is_deeply($ddl, {
            "Moose::Object"      => { id => {
                                      data_type   => 'character',
