@@ -50,6 +50,20 @@ sub load_classes {
     my ( $schema, $class, @defer ) = @_;
     $schema = ref $schema if ( ref $schema );
 
+    return unless($class);
+    
+    if(ref $class eq "ARRAY") {
+        unshift(@defer, @$class);
+        $class = shift(@defer);
+    } elsif(ref $class eq "HASH") {
+        while(my($k,$v) = each %$class) {
+            load_classes($k, $v);
+        }
+        return $schema->load_classes(@defer);
+    }
+    
+    return $schema->load_classes(@defer) if ($class =~ /^#/);
+    
     my $moniker = $class;
     
     eval {
@@ -65,6 +79,11 @@ sub load_classes {
     
     Class::MOP::load_class($class);
         
+    unless($class->can('meta')) {
+        $schema->next::method($moniker);
+        return $schema->load_classes(@defer);
+    }
+        
     my $result_moose = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_moose_result_class($class);
 
     if($class->does('MooseX::DBIC::Result')) {
@@ -75,7 +94,7 @@ sub load_classes {
     $class->meta->add_method( moniker => sub {$moniker} );
     
 
-    $schema->load_classes(@defer) if (@defer);
+    $schema->load_classes(@defer);
     
     
     my $result_dbic =

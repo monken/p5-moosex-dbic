@@ -1,7 +1,8 @@
 package # hide from PAUSE
     DBICTest::Schema;
 
-use base qw/DBIx::Class::Schema/;
+use Moose;
+extends 'MooseX::DBIC::Schema';
 
 no warnings qw/qw/;
 
