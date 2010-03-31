@@ -50,16 +50,29 @@ sub load_classes {
     my ( $schema, $class, @defer ) = @_;
     $schema = ref $schema if ( ref $schema );
 
+    my $moniker = $class;
+    
+    eval {
+        Class::MOP::load_class(join('::', $schema, $class));
+        $moniker = $class;
+        $class = join('::', $schema, $class);
+        
+    } or do {
+        Class::MOP::load_class($class);
+    };
+    
     $schema->add_loaded_class($class);
-
+    
     Class::MOP::load_class($class);
+        
     my $result_moose = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_moose_result_class($class);
 
     if($class->does('MooseX::DBIC::Result')) {
         $class->meta->add_method( schema_class => sub { $schema } );
         
     }
-    $class->meta->add_method( dbic_result_class => sub { join( '::', $schema, 'DBIC', $class ); }, );
+    $class->meta->add_method( dbic_result_class => sub { join( '::', $schema, 'DBIC', $class ); } );
+    $class->meta->add_method( moniker => sub {$moniker} );
     
 
     $schema->load_classes(@defer) if (@defer);
@@ -68,11 +81,11 @@ sub load_classes {
     my $result_dbic =
       $schema->create_dbic_result_class( $class, $result_moose );
 
-    $schema->register_class( $class => $result_dbic );
+    $schema->register_class( $moniker => $result_dbic );
 
     $result_dbic->result_class($result_moose);
 
-    $schema->register_class( $class => $result_dbic );
+    $schema->register_class( $moniker => $result_dbic );
 
 }
 
@@ -133,7 +146,7 @@ sub create_dbic_result_class {
 
     Class::MOP::load_class($class);
 
-    ( my $table = lc($class) ) =~ s/::/_/g;
+    ( my $table = lc($class->moniker) ) =~ s/::/_/g;
     my $result = join( '::', $schema, 'DBIC', $class );
     Moose::Meta::Class->create(
         $result,

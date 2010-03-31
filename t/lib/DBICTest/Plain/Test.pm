@@ -1,18 +1,11 @@
 package # hide from PAUSE 
     DBICTest::Plain::Test;
 
-use base 'DBIx::Class::Core';
+use Moose;
+use MooseX::DBIC;
+with 'MooseX::DBIC::Result';
 
-__PACKAGE__->table('test');
-__PACKAGE__->add_columns(
-  'id' => {
-    data_type => 'integer',
-    is_auto_increment => 1
-  },
-  'name' => {
-    data_type => 'varchar',
-  },
-);
-__PACKAGE__->set_primary_key('id');
+has_column id => ( is => 'rw', isa => 'Num', column_info => { data_type => 'integer', is_auto_increment => 1 } );
+has_column name => ( is => 'rw', isa => 'Str' );
 
 1;

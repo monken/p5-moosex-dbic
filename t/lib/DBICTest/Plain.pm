@@ -1,9 +1,8 @@
 package # hide from PAUSE 
     DBICTest::Plain;
 
-use strict;
-use warnings;
-use base qw/DBIx::Class::Schema/;
+use Moose;
+extends 'MooseX::DBIC::Schema';
 use DBI;
 
 my $db_file = "t/var/Plain.db";
