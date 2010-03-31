@@ -7,7 +7,7 @@ use Moose;
 use MooseX::DBIC;
 with 'MooseX::DBIC::Result';
 has_column title => ( is => 'rw', isa => 'Str' );
-has_column artist => ( is => 'rw', isa => 'Str' );
+belongs_to artist => ( is => 'rw', isa => 'Artist' );
 
 package Artist;
 use Moose;
@@ -33,14 +33,29 @@ $schema->deploy;
 
  {
     ok(my $artist = $schema->resultset('Artist')->create({ name => 'Mo'}));
+    ok($artist->in_storage, 'Artist is in storage');
     ok(my $cds = $artist->cds);
     isa_ok($cds, 'DBIx::Class::ResultSet');
+    ok(my $cd = $artist->create_related('cds' => { title => 'CD1' } ));
+    is($cd->artist->id, $artist->id);
+}
+
+{
+    ok(my $artist = $schema->resultset('CD')->create({ title => 'Mo'}));
 }
 
 {
     ok(my $artist = $schema->resultset('Artist')->search(undef, {prefetch => 'cds'})->first);
     ok(my $cds = $artist->cds);
-    $cds->all;
+    is($cds->all, 1);
+}
+
+
+{
+    ok(my $artist = $schema->resultset('Artist')->first, 'Look up artist');
+    ok($artist->in_storage, 'Artist is in storage');
+    is($artist->search_related('cds')->all, 1, 'Get cds via search_related');
+    is($artist->cds->all, 1, 'Get cds via accessor');
 }
 
 done_testing;

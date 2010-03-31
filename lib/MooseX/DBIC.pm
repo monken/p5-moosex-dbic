@@ -1,11 +1,10 @@
 package MooseX::DBIC;
 
 use Moose;
-use MooseX::ClassAttribute;
 use MooseX::DBIC::Meta::Role::Class;
 use Moose::Exporter;
 
-Moose::Exporter->setup_import_methods( with_meta => [qw(has_column has_many)] );
+Moose::Exporter->setup_import_methods( with_meta => [qw(has_column has_many belongs_to )] );
 
 
 sub init_meta {
@@ -14,10 +13,11 @@ sub init_meta {
     return Moose::Util::MetaRole::apply_metaclass_roles(
         for             => $p{for_class},
         role_metaroles => {
-            role => ['MooseX::DBIC::Meta::Role::Class'],
+            role => [qw(MooseX::DBIC::Meta::Role::Class)],
+
         },
         class_metaroles => {
-            class => ['MooseX::DBIC::Meta::Role::Class'],
+            class => [qw(MooseX::DBIC::Meta::Role::Class)],
         },
     );
 }
@@ -53,6 +53,10 @@ sub has_many {
     foreach my $attr ( @{$attrs} ) {
         $meta->add_attribute( $attr => %options );
     }
+}
+
+sub belongs_to {
+    shift->add_relationship(@_, type => 'BelongsTo');    
 }
 
 

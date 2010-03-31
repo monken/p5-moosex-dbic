@@ -4,6 +4,8 @@ use Moose;
 use MooseX::ClassAttribute;
 use Moose::Util::MetaRole;
 use MooseX::DBIC::Types q(:all);
+use MooseX::Attribute::Deflator::Moose;
+use MooseX::Attribute::Deflator::Structured;
 
 extends 'DBIx::Class::Schema';
 
@@ -53,19 +55,24 @@ sub load_classes {
     Class::MOP::load_class($class);
     my $result_moose = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_moose_result_class($class);
 
+    if($class->does('MooseX::DBIC::Result')) {
+        $class->meta->add_method( schema_class => sub { $schema } );
+        
+    }
+    $class->meta->add_method( dbic_result_class => sub { join( '::', $schema, 'DBIC', $class ); }, );
+    
+
+    $schema->load_classes(@defer) if (@defer);
+    
+    
     my $result_dbic =
       $schema->create_dbic_result_class( $class, $result_moose );
-
-    $result_moose->meta->add_method( dbic_result_class => sub { $result_dbic },
-    );
 
     $schema->register_class( $class => $result_dbic );
 
     $result_dbic->result_class($result_moose);
 
     $schema->register_class( $class => $result_dbic );
-
-    $schema->load_classes(@defer) if (@defer);
 
 }
 
@@ -91,6 +98,8 @@ sub create_moose_result_class {
         roles => ['MooseX::DBIC::Result'],
         cache        => 1,
     );
+    
+    $result->meta->add_method( schema_class => sub { $schema } );
 
     foreach my $attr ( $class->meta->get_attribute_list ) {
         my $attribute           = $class->meta->get_attribute($attr);
@@ -109,25 +118,8 @@ sub create_moose_result_class {
     if ($superclass) {
         $schema->load_classes($superclass)
           unless ( $schema->is_class_loaded($superclass) );
-        my $related_source = join( '::', $schema, 'DBIC', $superclass );
-        my $related_result = join( '::', $schema, $superclass );
-        ( my $table = lc($superclass) ) =~ s/::/_/g;
-        my @handles = map { $result->meta->remove_attribute($_->name); $_->name } 
-                      grep { !$result->meta->has_attribute($_->name) } 
-                        $related_result->meta->get_all_columns;
-        my $rel = $result->meta->relationship_attribute_metaclass->new(
-            $table => (
-                is             => 'rw',
-                isa            => Result,
-                type           => 'BelongsTo',
-                related_source => $related_source,
-                required       => 1,
-                lazy           => 1,
-                handles => \@handles,
-                default        => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($table)); }
-            )
-        );
-        $result->meta->add_attribute($rel);
+          my $related = join( '::', $schema, $superclass);
+        $result->meta->add_relationship($table => ( type => 'BelongsTo', isa => $related));
     }
 
     return $result;
@@ -148,6 +140,7 @@ sub create_dbic_result_class {
         superclasses => [ $schema->result_base_class ],
         cache        => 1,
     );
+    
     $result->table($table);
 
     foreach my $attr ( $moose->meta->get_attribute_list ) {

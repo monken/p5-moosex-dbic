@@ -16,7 +16,7 @@ subtype Result,
 deflate Result, via { $_->insert_or_update; $_->id };
 inflate Result, via { 
     my ($result, $constraint, $inflate, $rs, $attr) = @_; 
-    $rs->schema->resultset($attr->related_source)->find($_);
+    $rs->schema->resultset($attr->related_class->dbic_result_class)->find($_);
 };
 
 $REGISTRY->add_type_constraint(
