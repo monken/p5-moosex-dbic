@@ -70,7 +70,6 @@ sub load_classes {
         Class::MOP::load_class(join('::', $schema, $class));
         $moniker = $class;
         $class = join('::', $schema, $class);
-        
     } or do {
         Class::MOP::load_class($class);
     };
@@ -84,13 +83,13 @@ sub load_classes {
         return $schema->load_classes(@defer);
     }
         
-    my $result_moose = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_moose_result_class($class);
+    my $result_moose = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_moose_result_class($moniker);
 
     if($class->does('MooseX::DBIC::Result')) {
         $class->meta->add_method( schema_class => sub { $schema } );
         
     }
-    $class->meta->add_method( dbic_result_class => sub { join( '::', $schema, 'DBIC', $class ); } );
+    $class->meta->add_method( dbic_result_class => sub { join( '::', $schema, 'DBIC', $moniker ); } );
     $class->meta->add_method( moniker => sub {$moniker} );
     
 
@@ -100,11 +99,13 @@ sub load_classes {
     my $result_dbic =
       $schema->create_dbic_result_class( $class, $result_moose );
 
-    $schema->register_class( $moniker => $result_dbic );
+    #$schema->register_class( $moniker => $result_dbic );
+    #$schema->register_source( $moniker => $result_dbic->result_source_instance );
 
     $result_dbic->result_class($result_moose);
-
-    $schema->register_class( $moniker => $result_dbic );
+    my $map = $schema->class_mappings;
+    $map->{$result_dbic} = $moniker;
+    $schema->register_source( $moniker => $result_dbic->result_source_instance );
 
 }
 
@@ -116,7 +117,7 @@ sub create_moose_result_class {
       if ( $class =~ /^DBIC::/ );
 
     ( my $table = lc($class) ) =~ s/::/_/g;
-    my $result = join( '::', $schema, $class );
+    my $result =  $class ;
     
     my $result_metaclass = $class->meta->create_anon_class(
         superclasses => [ $class->meta->meta->name ],
@@ -166,7 +167,7 @@ sub create_dbic_result_class {
     Class::MOP::load_class($class);
 
     ( my $table = lc($class->moniker) ) =~ s/::/_/g;
-    my $result = join( '::', $schema, 'DBIC', $class );
+    my $result = join( '::', $schema, 'DBIC', $class->moniker );
     Moose::Meta::Class->create(
         $result,
         superclasses => [ $schema->result_base_class ],

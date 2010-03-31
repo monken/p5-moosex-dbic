@@ -30,7 +30,6 @@ my $schema = MySchema->connect( 'dbi:SQLite::memory:' );
 
 $schema->deploy;
 
-
  {
     ok(my $artist = $schema->resultset('Artist')->create({ name => 'Mo'}));
     ok($artist->in_storage, 'Artist is in storage');

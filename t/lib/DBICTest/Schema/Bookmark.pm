@@ -1,6 +1,20 @@
 package # hide from PAUSE
     DBICTest::Schema::Bookmark;
 
+use Moose;
+use MooseX::DBIC;
+with 'MooseX::DBIC::Result';
+
+has_column id => ( is => 'rw', isa => 'Num', column_info => {
+        data_type => 'integer',
+        is_auto_increment => 1} );
+
+belongs_to link => ( isa => 'DBICTest::Schema::Link', is => 'rw' );
+
+__END__
+package # hide from PAUSE
+    DBICTest::Schema::Bookmark;
+
     use base qw/DBICTest::BaseResult/;
 
 

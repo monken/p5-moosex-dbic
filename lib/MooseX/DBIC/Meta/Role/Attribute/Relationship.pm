@@ -9,8 +9,7 @@ has type => ( is => 'rw', isa => Relationship, required => 1 ); # merging hashre
 
 has related_class => ( is => 'rw', isa => 'Str', required => 1, lazy => 1, default => sub {
     my $self = shift;
-    warn $self->type;
-    if($self->type eq 'HasMany') { warn $self->type_constraint->type_parameter ; return $self->type_constraint->type_parameter->class }
+    if($self->type eq 'HasMany') { return $self->type_constraint->type_parameter->class }
 } );
 
 after apply_to_dbic_result_class => sub {
