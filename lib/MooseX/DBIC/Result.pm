@@ -147,8 +147,7 @@ sub inflate_result {
     $me = {%$me, %$more} if($more);
     my %new = ('-result_source' => $rs, in_storage => 1);
     while(my($k,$v) = each %$me) {
-        my $attr = $class->meta->get_attribute($k);
-        warn $class, $k;
+        my $attr = $class->meta->find_attribute_by_name($k);
         $new{$k} = $attr->inflate($class, $v, undef, $rs, $attr) if(defined $v);
     }
     return $class->new(%new);

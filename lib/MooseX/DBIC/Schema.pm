@@ -6,6 +6,12 @@ use Moose::Util::MetaRole;
 use MooseX::DBIC::Types q(:all);
 use MooseX::Attribute::Deflator::Moose;
 use MooseX::Attribute::Deflator::Structured;
+use Data::Dumper;
+
+$Data::Dumper::Maxdepth = 1;
+$Data::Dumper::Indent = 1;
+$Carp::Verbose = 1;
+
 
 extends 'DBIx::Class::Schema';
 
@@ -48,7 +54,7 @@ sub load_namespaces {
 
 sub load_classes {
     my ( $schema, $class, @defer ) = @_;
-    $schema = ref $schema if ( ref $schema );
+	$schema = ref $schema if ( ref $schema );
 
     return unless($class);
     
@@ -76,8 +82,6 @@ sub load_classes {
     
     $schema->add_loaded_class($class);
     
-    Class::MOP::load_class($class);
-        
     unless($class->can('meta')) { # FIXME: test for role
         $schema->next::method($moniker);
         return $schema->load_classes(@defer);
@@ -103,7 +107,8 @@ sub load_classes {
     my $map = $schema->class_mappings;
     $map->{$result_dbic} = $moniker;
     $schema->register_source( $moniker => $result_dbic->result_source_instance );
-
+	
+	
 }
 
 

@@ -25,7 +25,7 @@ sub init_meta {
 sub has_column {
     my $meta    = shift;
     my $name    = shift;
-    my %options = @_;
+    my %options = (is => 'rw', isa => 'Str', @_);
     $options{traits} ||= [];
     push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Column MooseX::Attribute::Deflator::Meta::Role::Attribute));
     
@@ -37,26 +37,11 @@ sub has_column {
 }
 
 sub has_many {
-    my $meta    = shift;
-    my $name    = shift;
-    my %options = (
-        traits => [], 
-        @_, 
-        type => 'HasMany', 
-        lazy => 1, 
-        default => sub { my $self = shift; return $self->_build_related_resultset($self->meta->get_attribute($name)); } 
-    );
-    push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Relationship MooseX::Attribute::Deflator::Meta::Role::Attribute));
-    
-    my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
-    
-    foreach my $attr ( @{$attrs} ) {
-        $meta->add_attribute( $attr => %options );
-    }
+    shift->add_relationship(@_, type => 'HasMany');
 }
 
 sub belongs_to {
-    shift->add_relationship(@_, type => 'BelongsTo');    
+    shift->add_relationship(@_, type => 'BelongsTo');
 }
 
 

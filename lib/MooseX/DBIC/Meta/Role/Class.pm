@@ -75,6 +75,23 @@ sub add_relationship {
             )
         );
         $self->add_attribute($rel);
+    } elsif($options{type} eq 'HasMany') {
+        %options = ( 
+            traits => [],
+            is => 'rw',
+            %options,            
+            type => 'HasMany', 
+            lazy => 1,
+            default => sub { my $self = shift; return $self->_build_related_resultset($self->meta->get_attribute($name)); } 
+        );
+        push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Relationship MooseX::Attribute::Deflator::Meta::Role::Attribute));
+        
+        my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
+        
+        foreach my $attr ( @{$attrs} ) {
+            $self->add_attribute( $attr => %options );
+        }
+
     }
 }
 
