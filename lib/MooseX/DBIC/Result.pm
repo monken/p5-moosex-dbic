@@ -2,6 +2,8 @@ package MooseX::DBIC::Result;
 
 use Moose::Role;
 use MooseX::DBIC;
+use Carp;
+use DBIx::Class::ResultClass::HashRefInflator;
 #use MooseX::ClassAttribute;
 
 #class_has schema_class => ( is => 'rw', isa => 'Str' );
@@ -18,6 +20,8 @@ has_column id => (
 has result_source => ( is => 'rw', init_arg => '-result_source', required => 1, handles => [qw(primary_columns relationship_info)] );
 
 has in_storage => ( is => 'rw', isa => 'Bool' );
+
+has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_relationship', default => sub {[]} );
 
 sub resultset { return shift->result_source->schema->resultset(@_) }
 
@@ -44,8 +48,10 @@ sub BUILDARGS {
     my ($class, @rest) = @_;
     my @rels = map { $class->meta->get_attribute($_) } $class->meta->get_relationship_list;
     my $handles = {};
+    
     my $args = @rest > 1 ? {@rest} : shift @rest;
     my $rs = $args->{'-result_source'};
+    $args->{_fix_reverse_relationship} = [];
     foreach my $rel(@rels) {
         map { $handles->{$_} = $rel->name } @{$rel->handles || []};
     }
@@ -57,19 +63,54 @@ sub BUILDARGS {
     foreach my $rel(@rels) {
         my $name = $rel->name;
         next unless(exists $args->{$name});
-        if(ref $args->{$name} eq "HASH") {
-            $args->{$name} = $rs->schema->resultset($rel->related_class->dbic_result_class)->new_result($args->{$name});
-        } elsif(ref $args->{$name} eq "ARRAY") {
+        my $value = $args->{$name};
+        if($rel->type eq 'HasMany') {
+            $value = [ $value ] unless( ref $value eq 'ARRAY' );
+            my @rows = map { ref $_ eq "ARRAY" ? $_->[0] : $_ } @$value;
             my $resultset = $rs->schema->resultset($rel->related_class);
-            my @rows = [ map { $resultset->new_result($_) } grep { defined $_->{id} } @{$args->{$name}} ];
+            @rows =  map { $resultset->new_result($_) } grep { defined $_->{id} } @rows;
             $resultset->set_cache(\@rows);
             $args->{$name} = $resultset;
-        } elsif(!ref $args->{$name}) {
-            my $attr = $class->meta->get_attribute($name);
-            $args->{$name} = $attr->inflate($class, $args->{$name}, undef, $rs, $attr) if(defined $args->{$name});
+            push(@{$args->{_fix_reverse_relationship}}, @rows);
+        } else {
+            $value = $value->[0] if(ref $value eq 'ARRAY' );
+            if(!defined $value) {
+                delete $args->{$name};
+                next;
+            } elsif(ref $value eq "HASH") {
+                $args->{$name} = $rs->schema->resultset($rel->related_class->dbic_result_class)->new_result($value);
+            }  elsif(!ref $value) {
+                my $attr = $class->meta->get_attribute($name);
+                $args->{$name} = $attr->inflate($class, $value, undef, $rs, $attr) if(defined $value);
+            
+            }
+            push(@{$args->{_fix_reverse_relationship}}, $args->{$name});
         }
     }
+    
+    while(my($k,$v) = each %$args) {
+        my $attr = $class->meta->find_attribute_by_name($k);
+        next unless($attr && $attr->does('MooseX::Attribute::Deflator::Meta::Role::Attribute'));
+        warn $attr->name;
+        $args->{$k} = $attr->inflate($class, $v, undef, $rs, $attr) if(!ref $v);
+    }
     return $args;
+}
+
+sub BUILD {
+    my $self = shift;
+    return if($self->does('MooseX::DBIC::Meta::Role::ResultProxy'));
+    foreach my $fix(@{ $self->_fix_reverse_relationship }) {
+        next if($fix->does('MooseX::DBIC::Meta::Role::ResultProxy'));
+        my @rels = grep { $_->related_class eq $self->meta->name } $fix->meta->get_all_relationships;
+        foreach my $rel (@rels) {
+            next if($rel->type eq 'HasMany');
+            my $name = $rel->name;
+            $fix->$name($self) if($fix->$name->id eq $self->id);
+            
+        }
+    }
+    $self->_clear_fix_reverse_relationship;
 }
 
 sub get_column{
@@ -77,13 +118,13 @@ sub get_column{
     return $self->$column;
 }
 
-sub get_dirty_columns {()}
+sub get_dirty_columns {shift->get_columns }
 
 sub search_related {
   return shift->related_resultset(shift)->search(@_);
 }
 
-# implement in this class, move stuff to meta class
+# implement in this class, move stuff to meta clas
 my %import = (
     'DBIx::Class::Relationship::Base' => [qw(related_resultset)],
     'DBIx::Class::PK' => [qw(ident_condition _ident_values)],
@@ -144,13 +185,8 @@ sub update_or_insert {
 
 sub inflate_result {
     my ($class, $rs, $me, $more, @more) = @_;
-    $me = {%$me, %$more} if($more);
-    my %new = ('-result_source' => $rs, in_storage => 1);
-    while(my($k,$v) = each %$me) {
-        my $attr = $class->meta->find_attribute_by_name($k);
-        $new{$k} = $attr->inflate($class, $v, undef, $rs, $attr) if(defined $v);
-    }
-    return $class->new(%new);
+    my $hash = DBIx::Class::ResultClass::HashRefInflator::inflate_result(@_);
+    return $class->new(%$hash, '-result_source' => $rs, in_storage => 1);
 }
 
 sub update {

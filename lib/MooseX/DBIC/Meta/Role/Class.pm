@@ -54,44 +54,66 @@ sub get_all_relationships {
     return grep { $_->does('MooseX::DBIC::Meta::Role::Attribute::Relationship') } $self->get_all_attributes;
 }
 
+sub get_relationship {
+    my ($self, $rel) = @_;
+    return map { $self->get_attribute($_) } first { $_ eq $rel } $self->get_relationship_list;
+}
+
+
+sub find_relationship_by_name {
+    my ($self, $rel) = @_;
+    return first { $_->name eq $rel } $self->get_all_relationships;
+}
+
 sub add_relationship {
     my ($self, $name, %options) = @_;
-    if($options{type} eq 'BelongsTo') {
+    $options{traits} ||= [];
+    push(@{$options{traits}}, 
+        qw(MooseX::DBIC::Meta::Role::Attribute 
+           MooseX::DBIC::Meta::Role::Attribute::Relationship
+           MooseX::Attribute::Deflator::Meta::Role::Attribute));
+
+    if($options{type} eq 'HasSuperclass') {
         my $related_result = $options{isa};
         my @handles = map { $self->remove_attribute($_->name); $_->name } 
                       grep { !$self->has_attribute($_->name) } 
                         $related_result->meta->get_all_columns;
-        
-        my $rel = $self->relationship_attribute_metaclass->new(
-            $name => (
-                is             => 'rw',
+        %options = 
+              ( is             => 'rw',
+                %options,
                 isa            => Result,
-                type           => 'BelongsTo',
                 related_class  => $related_result,
                 required       => 1,
                 lazy           => 1,
                 handles => \@handles,
                 default        => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); }
-            )
         );
-        $self->add_attribute($rel);
+        push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute::Column));
+    } elsif($options{type} eq 'BelongsTo') {
+    
+        my $related_result = $options{isa};
+        %options = 
+              ( is             => 'rw',
+                %options,
+                isa            => Result,
+                related_class  => $related_result,
+                lazy           => 1,
+                default        => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); }
+        );
+        push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute::Column));
     } elsif($options{type} eq 'HasMany') {
         %options = ( 
-            traits => [],
             is => 'rw',
             %options,            
             type => 'HasMany', 
             lazy => 1,
             default => sub { my $self = shift; return $self->_build_related_resultset($self->meta->get_attribute($name)); } 
         );
-        push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Relationship MooseX::Attribute::Deflator::Meta::Role::Attribute));
-        
-        my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
-        
-        foreach my $attr ( @{$attrs} ) {
-            $self->add_attribute( $attr => %options );
-        }
-
+    } else { die }
+    
+    my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
+    foreach my $attr ( @{$attrs} ) {
+        $self->add_attribute( $attr => %options );
     }
 }
 

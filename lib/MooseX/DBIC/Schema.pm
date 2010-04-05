@@ -8,10 +8,11 @@ use MooseX::Attribute::Deflator::Moose;
 use MooseX::Attribute::Deflator::Structured;
 use Data::Dumper;
 
-$Data::Dumper::Maxdepth = 1;
+$Data::Dumper::Maxdepth = 2;
 $Data::Dumper::Indent = 1;
 $Carp::Verbose = 1;
 
+BEGIN {$ENV{DBIC_TRACE}=1}
 
 extends 'DBIx::Class::Schema';
 
@@ -155,7 +156,7 @@ sub create_moose_result_class {
           unless ( $schema->is_class_loaded($superclass) );
           my $related = join( '::', $schema, $superclass);
           ( my $table = lc($superclass) ) =~ s/::/_/g;
-        $result->meta->add_relationship($table => ( type => 'BelongsTo', isa => $related));
+        $result->meta->add_relationship($table => ( type => 'HasSuperclass', isa => $related));
     }
 
     return $result;

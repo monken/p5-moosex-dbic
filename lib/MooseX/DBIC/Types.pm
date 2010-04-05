@@ -4,11 +4,12 @@ use MooseX::Types -declare => [qw(Relationship Result ResultSet)];
 use MooseX::Types::Moose qw(HashRef Object);
 use MooseX::Attribute::Deflator;
 use Moose::Util::TypeConstraints;
+use MooseX::DBIC::ResultProxy;
 
 my $REGISTRY = Moose::Util::TypeConstraints->get_type_constraint_registry;
 
 enum Relationship,
-    qw(HasOne HasMany BelongsTo ManyToMany);
+    qw(HasOne HasMany BelongsTo ManyToMany HasSuperclass);
 
 subtype Result,
     as Object;
@@ -16,7 +17,14 @@ subtype Result,
 deflate Result, via { $_->insert_or_update; $_->id };
 inflate Result, via { 
     my ($result, $constraint, $inflate, $rs, $attr) = @_; 
-    $rs->schema->resultset($attr->related_class->dbic_result_class)->find($_);
+    my $id = $_;
+    my $class = MooseX::DBIC::ResultProxy->build_proxy( 
+        $attr->related_class =>
+            ( copy => ['id'], builder => sub {
+                $rs->schema->resultset($attr->related_class->dbic_result_class)->find($id);
+            } )
+    );
+    return $class->new( id => $id );
 };
 
 $REGISTRY->add_type_constraint(

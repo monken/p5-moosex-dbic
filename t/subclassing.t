@@ -10,8 +10,6 @@ my $schema = MySchema->connect( 'dbi:SQLite::memory:' );
 
 $schema->deploy;
 
-use Data::Dumper; $Data::Dumper::Indent = 1; $Data::Dumper::Maxdepth = 3; warn Dumper $schema;
-
 ok(my $admin = $schema->resultset('MyApp::User::Admin')->create({ first => 'Moritz', last => 'Onken', level => 99 }));
 is($admin->first, 'Moritz');
 ok($admin =  $schema->resultset('MyApp::User::Admin')->first);
