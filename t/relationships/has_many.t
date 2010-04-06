@@ -47,6 +47,13 @@ my $artist;
     is($cd->artist->id, $artist->id);
 }
 
+ {
+    ok(my $artist2 = $schema->resultset('Artist')->create({ name => 'Nock', cds => [{title=> 'Foo'},{},{}]}), 'Multi create Artist with 3 CDs');
+    isa_ok($artist2, 'Artist');
+    is($artist2->cds, 3,'Artist has 3 CDs');
+    is($schema->resultset('Artist')->search({name => 'Nock'})->first->cds, 3,'Artist has 3 CDs even from storage');
+}
+
 {
     ok(my $cd = $schema->resultset('CD')->create({ title => 'CD3'}));
     ok(!$cd->has_artist, 'CD3 has no artist');

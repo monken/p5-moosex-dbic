@@ -14,6 +14,9 @@ enum Relationship,
 subtype Result,
     as Object;
 
+deflate ResultSet.'[]', via { foreach my $row(@{$_->get_cache}) { $row->insert_or_update } };
+
+    
 deflate Result, via { $_->insert_or_update; $_->id };
 inflate Result, via { 
     my ($result, $constraint, $inflate, $rs, $attr) = @_; 

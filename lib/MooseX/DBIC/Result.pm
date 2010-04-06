@@ -69,10 +69,10 @@ sub BUILDARGS {
             $value = [ $value ] unless( ref $value eq 'ARRAY' );
             my @rows = map { ref $_ eq "ARRAY" ? $_->[0] : $_ } @$value;
             my $resultset = $rs->schema->resultset($rel->related_class);
-            @rows =  map { $resultset->new_result($_) } grep { defined $_->{id} } @rows;
+            @rows =  map { $resultset->new_result($_) } @rows;
             $resultset->set_cache(\@rows);
             $args->{$name} = $resultset;
-            push(@{$args->{_fix_reverse_relationship}}, @rows);
+            push(@{$args->{_fix_reverse_relationship}}, map { $rel, $_ } @rows);
         } else {
             $value = $value->[0] if(ref $value eq 'ARRAY' );
             if(!defined $value) {
@@ -85,7 +85,7 @@ sub BUILDARGS {
                 $args->{$name} = $attr->inflate($class, $value, undef, $rs, $attr) if(defined $value);
             
             }
-            push(@{$args->{_fix_reverse_relationship}}, $args->{$name});
+            push(@{$args->{_fix_reverse_relationship}}, $rel, $args->{$name});
         }
     }
     
@@ -101,15 +101,13 @@ sub BUILDARGS {
 sub BUILD {
     my $self = shift;
     return if($self->does('MooseX::DBIC::Meta::Role::ResultProxy'));
-    foreach my $fix(@{ $self->_fix_reverse_relationship }) {
+    my @fix = @{ $self->_fix_reverse_relationship };
+    for(my $i = 0; $i < @fix; $i+=2) {
+        my ($relationship, $fix) = ($fix[$i], $fix[$i+1]);
         next if($fix->does('MooseX::DBIC::Meta::Role::ResultProxy'));
-        my @rels = grep { $_->related_class eq $self->meta->name } $fix->meta->get_all_relationships;
-        foreach my $rel (@rels) {
-            next if($rel->type eq 'HasMany');
-            my $name = $rel->name;
-            $fix->$name($self) if($fix->$name->id eq $self->id);
-            
-        }
+        next if($relationship->associated_class == $relationship->foreign_key->associated_class);
+        my $name = $relationship->foreign_key->name;
+        $fix->$name($self);
     }
     $self->_clear_fix_reverse_relationship;
     return $self;
@@ -175,6 +173,7 @@ sub insert {
       unless $source;
     my $updated_cols = $source->storage->insert($source, { $self->get_columns });
     $self->in_storage(1);
+    map { $_->deflate($self) } grep { $_->type eq 'HasMany' } $self->meta->get_all_relationships;
     return $self;
 }
 
@@ -198,7 +197,6 @@ sub update {
   $self->throw_exception("Cannot safely update a row in a PK-less table")
     if ! keys %$ident_cond;
 
-  $self->set_inflated_columns($upd) if $upd;
   my %to_update = $self->get_dirty_columns;
   return $self unless keys %to_update;
   my $rows = $self->result_source->storage->update(
