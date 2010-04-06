@@ -52,23 +52,32 @@ my $artist;
     ok(!$cd->has_artist, 'CD3 has no artist');
     ok($cd = $schema->resultset('CD')->find($cd->id), 'fetch from storage');
     ok(!$cd->has_artist, 'CD3 has still no artist');
+    ok($cd->artist($artist), 'Set artist on CD3');
+    ok($cd->update, 'update CD3');
+    is($schema->resultset('CD')->find($cd->id)->artist->id, $artist->id, 'Artist ID set in storage');
+}
+
+{
+    ok(my $cd = $schema->resultset('CD')->create({ title => 'CD4', artist => { name => 'Rieche' } }), 'Create CD4 with new artist');
+    is($schema->resultset('CD')->find($cd->id)->title, 'CD4', 'CD4 in storage');
+    is($schema->resultset('CD')->find($cd->id)->artist->name, 'Rieche', 'Artist in storage');
 }
 
 {
     ok($artist = $schema->resultset('Artist')->search({ 'me.id' => $artist->id}, {prefetch => 'cds'})->first);
     ok($artist->in_storage, 'Artist is in storage');
     ok(my $cds = $artist->cds);
-    is($cds->all, 2, 'Got 2 CDs');
-    #ok($cds->first->in_storage, 'CD is in storage');
+    is($cds->all, 3, 'Got 3 CDs');
+    TODO: { local $TODO = 'bubble in_storage'; ok($cds->first->in_storage, 'CD is in storage'); }
     is(refaddr $cds->first->artist, refaddr $artist, 'CD\'s artist is the same as $artist');
     
 }
 
 {
-    ok(my $artist = $schema->resultset('Artist')->first, 'Look up artist');
+    ok(my $artist = $schema->resultset('Artist')->find($artist->id), 'Look up artist');
     ok($artist->in_storage, 'Artist is in storage');
-    is($artist->search_related('cds')->all, 2, 'Get cds via search_related');
-    is($artist->cds->all, 2, 'Got 2 CDs via accessor');
+    is($artist->search_related('cds')->all, 3, 'Get cds via search_related');
+    is($artist->cds->all, 3, 'Got 3 CDs via accessor');
 }
 
 {

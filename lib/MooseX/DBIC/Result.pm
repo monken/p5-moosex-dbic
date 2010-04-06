@@ -60,6 +60,7 @@ sub BUILDARGS {
             $args->{$handles->{$k}}->{$k} = delete $args->{$k};
         }
     }
+    
     foreach my $rel(@rels) {
         my $name = $rel->name;
         next unless(exists $args->{$name});
@@ -91,8 +92,8 @@ sub BUILDARGS {
     while(my($k,$v) = each %$args) {
         my $attr = $class->meta->find_attribute_by_name($k);
         next unless($attr && $attr->does('MooseX::Attribute::Deflator::Meta::Role::Attribute'));
-        warn $attr->name;
         $args->{$k} = $attr->inflate($class, $v, undef, $rs, $attr) if(!ref $v);
+        delete $args->{$k} if(!defined $args->{$k});
     }
     return $args;
 }
@@ -111,6 +112,7 @@ sub BUILD {
         }
     }
     $self->_clear_fix_reverse_relationship;
+    return $self;
 }
 
 sub get_column{
@@ -140,9 +142,9 @@ sub has_column_loaded {
 }
 
 while(my($k,$v) = each %import) {
-foreach my $method (@$v) {
-    __PACKAGE__->meta->add_method( $method => \&{$k.'::'.$method} );
-}
+    foreach my $method (@$v) {
+        __PACKAGE__->meta->add_method( $method => \&{$k.'::'.$method} );
+    }
 }
 
 sub new_related {

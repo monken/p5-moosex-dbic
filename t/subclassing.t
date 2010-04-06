@@ -22,9 +22,7 @@ ok(my $user = $schema->resultset('MyApp::User')->create({ first => 'Moritz', las
 
 ok($user =  $schema->resultset('MyApp::User')->first);
 
-TODO: {
-  local $TODO = "fake ISA";
-  ok($admin->isa(ref $user), 'admin isa user');
-}
+ok($admin->isa(ref $user), 'admin isa user');
+
 
 done_testing;

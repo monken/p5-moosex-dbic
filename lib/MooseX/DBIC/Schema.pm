@@ -128,9 +128,14 @@ sub create_moose_result_class {
         cache        => 1,
     )->name;
     
+    my @superclasses = map {
+        $schema->load_classes($_)
+          unless ( $schema->is_class_loaded($_) );
+        join( '::', $schema, $_);
+    } $class->meta->superclasses;
     $result_metaclass->create(
         $result,
-        superclasses => [ $class ],
+        superclasses => [ $class, @superclasses,  ],
         roles => ['MooseX::DBIC::Result'],
         cache        => 1,
     );
@@ -149,13 +154,11 @@ sub create_moose_result_class {
             bless( $attribute, $attribute_metaclass->name ) );
     }
 
-    my ( undef, $superclass ) = $class->meta->linearized_isa;
-
-    if ($superclass) {
+    foreach my $superclass ($class->meta->superclasses) {
         $schema->load_classes($superclass)
           unless ( $schema->is_class_loaded($superclass) );
-          my $related = join( '::', $schema, $superclass);
-          ( my $table = lc($superclass) ) =~ s/::/_/g;
+        my $related = join( '::', $schema, $superclass);
+        ( my $table = lc($superclass) ) =~ s/::/_/g;
         $result->meta->add_relationship($table => ( type => 'HasSuperclass', isa => $related));
     }
 

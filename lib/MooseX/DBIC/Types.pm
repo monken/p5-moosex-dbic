@@ -20,11 +20,12 @@ inflate Result, via {
     my $id = $_;
     my $class = MooseX::DBIC::ResultProxy->build_proxy( 
         $attr->related_class =>
-            ( copy => ['id'], builder => sub {
-                $rs->schema->resultset($attr->related_class->dbic_result_class)->find($id);
+            ( copy => [qw(id result_source)], builder => sub {
+                my $self = shift;
+                $self->result_source->schema->resultset($attr->related_class->dbic_result_class)->find($self->id);
             } )
     );
-    return $class->new( id => $id );
+    return $class->new( id => $id, '-result_source' => $rs );
 };
 
 $REGISTRY->add_type_constraint(
