@@ -6,7 +6,7 @@ package MooseX::DBIC::ResultProxy;
 use Moose;
 use MooseX::ClassAttribute;
 use List::Util qw(first);
-use Carp;
+use Carp; use Data::Dumper;
 
 sub BUILD {
     croak "ResultProxy needs to be subclassed" unless(shift->meta->superclasses > 1);
@@ -20,19 +20,20 @@ sub build_proxy {
         roles => [qw(MooseX::DBIC::Meta::Role::ResultProxy)],
         cache => 1,
         methods => { _build_class => sub {
-            my ($self, $attr) = @_;
+            my ($self, $method) = @_;
+            warn $method;
             my $new = $builder->($self, $superclass);
             bless $self, $superclass;
             %$self = %$new;
-            return $new->$attr;
+            return $new->$method;
         } } )->name;
     Class::MOP->load_class($proxy_class);
-    foreach my $attr ($superclass->meta->get_all_attributes) {
-        next if(first { $attr->name eq $_ } @$copy);
-        $proxy_class->meta->add_attribute( 
-          $attr->clone_and_inherit_options(
-          required => 1, lazy => 1, default => sub { shift->_build_class($attr->name) } 
-        ));
+    map { $proxy_class->meta->add_attribute($_->clone_and_inherit_options(required => 0)) } $superclass->meta->get_all_attributes;
+    my @methods = map { $_->name } map { @{$_->associated_methods} } $proxy_class->meta->get_all_attributes;
+    use Data::Dumper; warn Dumper \@methods;
+    foreach my $method (@methods) {
+        next if(first { $method eq $_ } @$copy);
+        $proxy_class->meta->add_method(  $method => sub { shift->_build_class($method, @_) }   );
     }
     return $proxy_class;
 }

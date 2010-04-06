@@ -23,6 +23,10 @@ has in_storage => ( is => 'rw', isa => 'Bool' );
 
 has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_relationship', default => sub {[]} );
 
+has _raw_data => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => '_build_raw_data' );
+
+sub _build_raw_data { return { shift->get_columns } } 
+
 sub resultset { return shift->result_source->schema->resultset(@_) }
 
 sub _build_id {
@@ -105,11 +109,14 @@ sub BUILD {
     for(my $i = 0; $i < @fix; $i+=2) {
         my ($relationship, $fix) = ($fix[$i], $fix[$i+1]);
         next if($fix->does('MooseX::DBIC::Meta::Role::ResultProxy'));
-        next if($relationship->associated_class == $relationship->foreign_key->associated_class);
+        next if($relationship->associated_class && # FIXME: How can associated_class be undef?
+                $relationship->associated_class == $relationship->foreign_key->associated_class);
         my $name = $relationship->foreign_key->name;
         $fix->$name($self);
+        $fix->in_storage(1) if($self->in_storage);
     }
     $self->_clear_fix_reverse_relationship;
+    $self->_raw_data;
     return $self;
 }
 
@@ -118,7 +125,16 @@ sub get_column{
     return $self->$column;
 }
 
-sub get_dirty_columns {shift->get_columns }
+sub get_dirty_columns {
+    my $self = shift;
+    my $raw = $self->_raw_data;
+    my %dirty = $self->get_columns;
+    while(my ($k,$v) = each %dirty) {
+        delete $dirty{$k} if($v."" eq $raw->{$k}."");
+    }
+    return %dirty;
+    
+}
 
 sub search_related {
   return shift->related_resultset(shift)->search(@_);
@@ -187,7 +203,7 @@ sub update_or_insert {
 sub inflate_result {
     my ($class, $rs, $me, $more, @more) = @_;
     my $hash = DBIx::Class::ResultClass::HashRefInflator::inflate_result(@_);
-    return $class->new(%$hash, '-result_source' => $rs, in_storage => 1);
+    return $class->new(%$hash, '-result_source' => $rs, in_storage => 1, _raw_data => $me);
 }
 
 sub update {

@@ -75,7 +75,7 @@ my $artist;
     ok($artist->in_storage, 'Artist is in storage');
     ok(my $cds = $artist->cds);
     is($cds->all, 3, 'Got 3 CDs');
-    TODO: { local $TODO = 'bubble in_storage'; ok($cds->first->in_storage, 'CD is in storage'); }
+    ok($cds->first->in_storage, 'CD is in storage');
     is(refaddr $cds->first->artist, refaddr $artist, 'CD\'s artist is the same as $artist');
     
 }
