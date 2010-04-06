@@ -3,6 +3,7 @@ package MooseX::DBIC::Meta::Role::Class;
 use Moose::Role;
 use MooseX::ClassAttribute;
 use MooseX::DBIC::Types q(:all);
+use List::Util qw(first);
 
 class_has column_attribute_metaclass =>
   ( is => 'rw', isa => 'Str', lazy_build => 1 );
@@ -56,7 +57,7 @@ sub get_all_relationships {
 
 sub get_relationship {
     my ($self, $rel) = @_;
-    return map { $self->get_attribute($_) } first { $_ eq $rel } $self->get_relationship_list;
+    return $self->get_attribute($rel) if(first { $_ eq $rel } $self->get_relationship_list);
 }
 
 

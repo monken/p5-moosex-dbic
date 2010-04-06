@@ -19,6 +19,7 @@ has foreign_key => (
     isa => 'Moose::Meta::Attribute', 
     required => 1, 
     lazy => 1,
+    weak_ref => 1,
     default => sub {
         my $self = shift;
         if($self->type eq 'HasMany') {
@@ -45,12 +46,25 @@ has join_condition => (
     } 
 );
 
+has proxy_class => ( is => 'rw', isa => 'Moose::Meta::Class', lazy => 1, builder => '_build_proxy_class' );
+
+sub _build_proxy_class {
+    my $attr = shift;
+    MooseX::DBIC::ResultProxy->build_proxy( 
+        $attr->related_class =>
+            ( copy => [qw(id result_source in_storage)], builder => sub {
+                my $self = shift;
+                $self->result_source->schema->resultset($attr->related_class->dbic_result_class)->find($self->id);
+            } )
+    );
+}
+
 after apply_to_dbic_result_class => sub {
     my ($self, $result) = @_;
     
     if($self->type eq 'BelongsTo' || $self->type eq 'HasSuperclass') {
         $result->add_relationship(
-            $self->name, $self->related_class->dbic_result_class, $self->join_condition);
+            $self->name, $self->related_class->dbic_result_class, $self->join_condition, $self->is_required ? {} : {join_type => 'LEFT'});
     } elsif($self->type eq 'HasMany') {
         $result->add_relationship(
             $self->name, $self->related_class->dbic_result_class, $self->join_condition, {

@@ -14,21 +14,15 @@ enum Relationship,
 subtype Result,
     as Object;
 
-deflate ResultSet.'[]', via { foreach my $row(@{$_->get_cache}) { $row->insert_or_update } };
+deflate ResultSet.'[]', via { foreach my $row(@{$_->get_cache}) { $row->update_or_insert } };
 
     
-deflate Result, via { $_->insert_or_update; $_->id };
+deflate Result, via { $_->update_or_insert; $_->id };
 inflate Result, via { 
     my ($result, $constraint, $inflate, $rs, $attr) = @_; 
     my $id = $_;
-    my $class = MooseX::DBIC::ResultProxy->build_proxy( 
-        $attr->related_class =>
-            ( copy => [qw(id result_source)], builder => sub {
-                my $self = shift;
-                $self->result_source->schema->resultset($attr->related_class->dbic_result_class)->find($self->id);
-            } )
-    );
-    return $class->new( id => $id, '-result_source' => $rs );
+    my $class = $attr->proxy_class->name;
+    return $class->new( id => $id, '-result_source' => $rs->schema->source($attr->related_class->dbic_result_class) );
 };
 
 $REGISTRY->add_type_constraint(

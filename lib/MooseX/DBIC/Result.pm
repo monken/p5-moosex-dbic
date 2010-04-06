@@ -4,6 +4,7 @@ use Moose::Role;
 use MooseX::DBIC;
 use Carp;
 use DBIx::Class::ResultClass::HashRefInflator;
+use Scalar::Util qw(weaken);
 #use MooseX::ClassAttribute;
 
 #class_has schema_class => ( is => 'rw', isa => 'Str' );
@@ -21,7 +22,7 @@ has result_source => ( is => 'rw', init_arg => '-result_source', required => 1, 
 
 has in_storage => ( is => 'rw', isa => 'Bool' );
 
-has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_relationship', default => sub {[]} );
+has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_relationship', weak_ref => 1, default => sub {[]} );
 
 has _raw_data => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => '_build_raw_data' );
 
@@ -54,6 +55,7 @@ sub BUILDARGS {
     my $handles = {};
     
     my $args = @rest > 1 ? {@rest} : shift @rest;
+    #warn Data::Dumper::Dumper $args;
     my $rs = $args->{'-result_source'};
     $args->{_fix_reverse_relationship} = [];
     foreach my $rel(@rels) {
@@ -84,9 +86,10 @@ sub BUILDARGS {
                 next;
             } elsif(ref $value eq "HASH") {
                 $args->{$name} = $rs->schema->resultset($rel->related_class->dbic_result_class)->new_result($value);
-            }  elsif(!ref $value) {
+            }  elsif(!ref $value && defined $value) {
                 my $attr = $class->meta->get_attribute($name);
-                $args->{$name} = $attr->inflate($class, $value, undef, $rs, $attr) if(defined $value);
+                $args->{$name} = $attr->inflate($class, $value, undef, $rs, $attr);
+                $args->{$name}->in_storage(1);
             
             }
             push(@{$args->{_fix_reverse_relationship}}, $rel, $args->{$name});
@@ -113,16 +116,23 @@ sub BUILD {
                 $relationship->associated_class == $relationship->foreign_key->associated_class);
         my $name = $relationship->foreign_key->name;
         $fix->$name($self);
+        $relationship->foreign_key->_weaken_value($fix);
         $fix->in_storage(1) if($self->in_storage);
     }
     $self->_clear_fix_reverse_relationship;
-    $self->_raw_data;
+    #$self->_raw_data if($self->in_storage);
     return $self;
 }
 
-sub get_column{
+sub get_column {
     my ($self, $column) = @_;
     return $self->$column;
+}
+
+sub get_columns {
+    my $self = shift;
+    my @columns = $self->meta->get_column_attribute_list;
+    return map { $_ => $self->meta->get_attribute($_)->deflate($self) } @columns;
 }
 
 sub get_dirty_columns {
@@ -130,7 +140,7 @@ sub get_dirty_columns {
     my $raw = $self->_raw_data;
     my %dirty = $self->get_columns;
     while(my ($k,$v) = each %dirty) {
-        delete $dirty{$k} if($v."" eq $raw->{$k}."");
+        delete $dirty{$k} if(defined $v && defined $raw->{$k} && $v."" eq $raw->{$k}."");
     }
     return %dirty;
     
@@ -163,23 +173,16 @@ while(my($k,$v) = each %import) {
 
 sub new_related {
   my ($self, $rel, $values, $attrs) = @_;
-  return $self->search_related($rel)->new($values, $attrs);
+  my $new = $self->search_related($rel)->new_result($values, $attrs);
+  my $fk = $self->meta->get_relationship($rel)->foreign_key;
+  my $name = $fk->name;
+  $new->$name($self) if($fk->type ne 'HasMany');
+  return $new;
+  
 }
 
-sub create_related {
-  my $self = shift;
-  my $rel = shift;
-  my $obj = $self->search_related($rel)->create(@_);
-  # delete $self->{related_resultsets}->{$rel}; FIXME: What is this?
-  return $obj;
-}
+sub create_related { return shift->new_related(@_)->insert; }
 
-
-sub get_columns {
-    my $self = shift;
-    my @columns = $self->meta->get_column_attribute_list;
-    return map { $_ => $self->meta->get_attribute($_)->deflate($self) } @columns;
-}
 
 sub insert {
     my ($self) = @_;
