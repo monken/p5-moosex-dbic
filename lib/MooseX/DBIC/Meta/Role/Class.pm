@@ -80,10 +80,18 @@ sub add_relationship {
     } elsif($options{type} eq 'HasMany') {
         %options = ( 
             is => 'rw',
-            %options,            
-            type => 'HasMany', 
+            %options,
             lazy => 1,
             default => sub { my $self = shift; return $self->_build_related_resultset($self->meta->get_attribute($name)); } 
+        );
+    } elsif($options{type} eq 'MightHave') {
+        %options = ( 
+            is => 'rw',
+            %options,
+            isa => Result,
+            related_class => $options{isa},
+            lazy => 1,
+            default => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); } 
         );
     } else { die }
     push(@{$options{traits}}, 'MooseX::DBIC::Meta::Role::Attribute::Relationship::' . $options{type});

@@ -4,7 +4,7 @@ use Moose;
 use MooseX::DBIC::Meta::Role::Class;
 use Moose::Exporter;
 
-Moose::Exporter->setup_import_methods( with_meta => [qw(has_column has_many belongs_to )] );
+Moose::Exporter->setup_import_methods( with_meta => [qw(has_column has_many belongs_to has_one might_have)] );
 
 
 sub init_meta {
@@ -42,6 +42,14 @@ sub has_many {
 
 sub belongs_to {
     shift->add_relationship(@_, type => 'BelongsTo');
+}
+
+sub might_have {
+    shift->add_relationship(@_, type => 'MightHave');
+}
+
+sub has_one {
+    shift->add_relationship(@_, type => 'HasOne');
 }
 
 

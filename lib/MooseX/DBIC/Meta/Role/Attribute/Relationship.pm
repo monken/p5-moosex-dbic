@@ -40,6 +40,11 @@ has proxy_class => (
     builder => '_build_proxy_class'
 );
 
+has join_type => (
+    is => 'rw',
+    isa => JoinType,
+);
+
 sub _build_proxy_class {
     my $attr = shift;
     MooseX::DBIC::ResultProxy->build_proxy( 

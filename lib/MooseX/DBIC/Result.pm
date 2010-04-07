@@ -40,7 +40,9 @@ sub _build_id {
 sub _build_relationship {
     my ($self, $rel, $args) = @_;
     $args ||= {};
-    return $self->resultset($rel->related_class->dbic_result_class)->new_result($args);
+    my $method = $rel eq $rel->foreign_key ? 'new_related' : 'find_or_new_related';
+    #return $self->resultset($rel->related_class->dbic_result_class)->new_result($args);
+    return $self->$method($rel->name, $args);
 }
 
 sub _build_related_resultset {
@@ -75,7 +77,7 @@ sub BUILDARGS {
             $value = [ $value ] unless( ref $value eq 'ARRAY' );
             my @rows = map { ref $_ eq "ARRAY" ? $_->[0] : $_ } @$value;
             my $resultset = $rs->schema->resultset($rel->related_class);
-            @rows =  map { $resultset->new_result($_) } @rows;
+            @rows =  map { ref $_ eq 'HASH' ? $resultset->new_result($_) : $_ } @rows;
             $resultset->set_cache(\@rows);
             $args->{$name} = $resultset;
             push(@{$args->{_fix_reverse_relationship}}, map { $rel, $_ } @rows);
@@ -150,9 +152,9 @@ sub search_related {
   return shift->related_resultset(shift)->search(@_);
 }
 
-# implement in this class, move stuff to meta clas
+# implement in this class, move stuff to meta class
 my %import = (
-    'DBIx::Class::Relationship::Base' => [qw(related_resultset)],
+    'DBIx::Class::Relationship::Base' => [qw(related_resultset find_or_new_related find_related)],
     'DBIx::Class::PK' => [qw(ident_condition _ident_values)],
     'DBIx::Class::ResultSource' => [qw(_pri_cols _primaries)],
     'Class::Accessor::Grouped' => [qw(get_simple)],
@@ -174,9 +176,12 @@ while(my($k,$v) = each %import) {
 sub new_related {
   my ($self, $rel, $values, $attrs) = @_;
   my $new = $self->search_related($rel)->new_result($values, $attrs);
-  my $fk = $self->meta->get_relationship($rel)->foreign_key;
-  my $name = $fk->name;
-  $new->$name($self) if($fk->type ne 'HasMany');
+  $rel = $self->meta->get_relationship($rel);
+  my $rev = $rel->reverse_relationship;
+  if($rev && $rev->type ne 'HasMany') {
+      my $name = $rev->name;
+      $new->$name($self);
+  }
   return $new;
   
 }
@@ -190,9 +195,11 @@ sub insert {
     my $source = $self->result_source;
     $self->throw_exception("No result_source set on this object; can't insert")
       unless $source;
+    $self->{_update_in_progress} ? return $self : ($self->{_update_in_progress} = 1);
     my $updated_cols = $source->storage->insert($source, { $self->get_columns });
     $self->in_storage(1);
-    map { $_->deflate($self) } grep { $_->type eq 'HasMany' } $self->meta->get_all_relationships;
+    map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
+    undef $self->{_update_in_progress};
     return $self;
 }
 
@@ -215,21 +222,21 @@ sub update {
   my $ident_cond = $self->ident_condition;
   $self->throw_exception("Cannot safely update a row in a PK-less table")
     if ! keys %$ident_cond;
-
+  $self->{_update_in_progress} ? return $self : ($self->{_update_in_progress} = 1);
   my %to_update = $self->get_dirty_columns;
-  return $self unless keys %to_update;
-  my $rows = $self->result_source->storage->update(
-               $self->result_source, \%to_update,
-               $self->{_orig_ident} || $ident_cond
-             );
-  if ($rows == 0) {
-    $self->throw_exception( "Can't update ${self}: row not found" );
-  } elsif ($rows > 1) {
-    $self->throw_exception("Can't update ${self}: updated more than one row");
+  if(keys %to_update) {
+      my $rows = $self->result_source->storage->update(
+                   $self->result_source, \%to_update,
+                   $self->{_orig_ident} || $ident_cond
+                 );
+      if ($rows == 0) {
+        $self->throw_exception( "Can't update ${self}: row not found" );
+      } elsif ($rows > 1) {
+        $self->throw_exception("Can't update ${self}: updated more than one row");
+      }
   }
-  $self->{_dirty_columns} = {};
-  $self->{related_resultsets} = {};
-  undef $self->{_orig_ident};
+  map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
+  undef $self->{_update_in_progress};
   return $self;
 }
 

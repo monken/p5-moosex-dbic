@@ -5,6 +5,7 @@ with 'MooseX::DBIC::Meta::Role::Attribute::Column';
 with 'MooseX::DBIC::Meta::Role::Attribute::Relationship';
 
 use MooseX::DBIC::Types q(:all);
+use List::Util qw(first);
 
 sub _build_foreign_key {
     shift
@@ -26,5 +27,10 @@ after apply_to_dbic_result_class => sub {
 };
 
 sub _build_related_class { die; }
+
+sub reverse_relationship {
+    my $self = shift;
+    return first { $_->foreign_key eq $self } $self->related_class->meta->get_all_relationships;
+}
 
 1;

@@ -1,4 +1,4 @@
-package MooseX::DBIC::Meta::Role::Attribute::Relationship::HasMany;
+package MooseX::DBIC::Meta::Role::Attribute::Relationship::MightHave;
 
 use Moose::Role;
 with 'MooseX::DBIC::Meta::Role::Attribute::Relationship';
@@ -23,8 +23,8 @@ after apply_to_dbic_result_class => sub {
         $self->related_class->dbic_result_class, 
         $self->join_condition, 
         {
-            accessor => 'multi',
-            join_type => 'LEFT',
+            accessor => 'single',
+            join_type => $self->join_type,
             cascade_delete => 1,
             cascade_copy => 1,
         }
@@ -32,7 +32,7 @@ after apply_to_dbic_result_class => sub {
 };
 
 sub _build_related_class {
-    shift->type_constraint->type_parameter->class
+    shift->type_constraint->class
 }
 
 sub reverse_relationship {

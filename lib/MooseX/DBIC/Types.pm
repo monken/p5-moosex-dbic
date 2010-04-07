@@ -1,6 +1,6 @@
 package MooseX::DBIC::Types;
 
-use MooseX::Types -declare => [qw(Relationship Result ResultSet)];
+use MooseX::Types -declare => [qw(Relationship Result ResultSet JoinType)];
 use MooseX::Types::Moose qw(HashRef Object);
 use MooseX::Attribute::Deflator;
 use Moose::Util::TypeConstraints;
@@ -9,15 +9,21 @@ use MooseX::DBIC::ResultProxy;
 my $REGISTRY = Moose::Util::TypeConstraints->get_type_constraint_registry;
 
 enum Relationship,
-    qw(HasOne HasMany BelongsTo ManyToMany HasSuperclass);
+    qw(HasOne HasMany BelongsTo ManyToMany HasSuperclass MightHave);
+
+enum JoinType,
+    qw(LEFT RIGHT INNER);
 
 subtype Result,
     as Object;
 
-deflate ResultSet.'[]', via { foreach my $row(@{$_->get_cache}) { $row->update_or_insert } };
+deflate ResultSet.'[]', via { foreach my $row(@{$_->get_cache || []}) { $row->update_or_insert } };
 
     
-deflate Result, via { $_->update_or_insert; $_->id };
+deflate Result, via { 
+    $_->update_or_insert; 
+    $_->id;
+};
 inflate Result, via { 
     my ($result, $constraint, $inflate, $rs, $attr) = @_; 
     my $id = $_;
