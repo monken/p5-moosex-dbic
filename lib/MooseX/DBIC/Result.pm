@@ -24,9 +24,9 @@ has in_storage => ( is => 'rw', isa => 'Bool' );
 
 has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_relationship', weak_ref => 1, default => sub {[]} );
 
-has _raw_data => ( is => 'rw', isa => 'HashRef', lazy => 1, builder => '_build_raw_data' );
+has _raw_data => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
 
-sub _build_raw_data { return { shift->get_columns } } 
+sub _build__raw_data { return { shift->get_columns } } 
 
 sub resultset { return shift->result_source->schema->resultset(@_) }
 
@@ -143,6 +143,7 @@ sub get_dirty_columns {
     my %dirty = $self->get_columns;
     while(my ($k,$v) = each %dirty) {
         delete $dirty{$k} if(defined $v && defined $raw->{$k} && $v."" eq $raw->{$k}."");
+        delete $dirty{$k} if(!defined $v && !defined $raw->{$k});
     }
     return %dirty;
     
@@ -159,7 +160,6 @@ my %import = (
     'DBIx::Class::ResultSource' => [qw(_pri_cols _primaries)],
     'Class::Accessor::Grouped' => [qw(get_simple)],
     'DBIx::Class::Row' => [qw(throw_exception)],
-    
 );
 
 sub has_column_loaded { 
@@ -196,19 +196,21 @@ sub insert {
     $self->throw_exception("No result_source set on this object; can't insert")
       unless $source;
     $self->{_update_in_progress} ? return $self : ($self->{_update_in_progress} = 1);
-    my $updated_cols = $source->storage->insert($source, { $self->get_columns });
+    my %to_insert = $self->get_columns;
+    my $updated_cols = $source->storage->insert($source, { %to_insert });
     $self->in_storage(1);
     map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
+    $self->_raw_data({%to_insert});
     undef $self->{_update_in_progress};
     return $self;
 }
-
-sub insert_or_update { shift->update_or_insert(@_) }
 
 sub update_or_insert {
     my $self = shift;
     return ( $self->in_storage ? $self->update : $self->insert );
 }
+
+*insert_or_update = \&update_or_insert;
 
 sub inflate_result {
     my ($class, $rs, $me, $more, @more) = @_;
@@ -236,6 +238,7 @@ sub update {
       }
   }
   map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
+  $self->_raw_data({%{$self->_raw_data}, %to_update});
   undef $self->{_update_in_progress};
   return $self;
 }

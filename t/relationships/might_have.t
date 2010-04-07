@@ -45,12 +45,20 @@ $schema->storage->debug(1);
     is(refaddr $cd->cover->cd_cover, refaddr $cd, 'Cover has cd object set');
     ok($cd->cover->image('nice'), 'Set image attribute');
     ok($cd->update, 'Update CD');
+    ok($cd->update, 'Calling update again works');
     ok($cd->cover->in_storage, 'Cover is in storage');
-    ok($cd = $schema->resultset('CD')->first, 'Get CD from storage');
+    is($queries, 5, 'Queries count ok');
+}
+
+
+
+{    
+    $queries = 0;
+    ok(my $cd = $schema->resultset('CD')->first, 'Get CD from storage');
     TODO: { local $TODO = 'Override predicate'; ok($cd->has_cover, 'CD1 has a cover') };
     ok($cd->cover->in_storage, 'Cover is in storage');
     is($cd->cover->image, 'nice', 'Get image attribute from cover');
-    is($queries, 8, 'Queries count ok');
+    is($queries, 2, 'Queries count ok');
 }
 
 {
