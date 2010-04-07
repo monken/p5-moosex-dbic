@@ -131,7 +131,7 @@ sub get_column {
 
 sub get_columns {
     my $self = shift;
-    my @columns = $self->meta->get_column_attribute_list;
+    my @columns = $self->meta->get_column_list;
     return map { $_ => $self->meta->get_attribute($_)->deflate($self) } @columns;
 }
 

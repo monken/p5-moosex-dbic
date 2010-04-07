@@ -76,6 +76,18 @@ my $artist;
 
 {
     $queries = 0;
+    ok(my $cd = $schema->resultset('CD')->create({ title => 'CD6'}));
+    ok($cd = $schema->resultset('CD')->find($cd->id), 'fetch from storage');
+    ok(!$cd->has_artist, 'CD6 has still no artist');
+    ok($cd->artist, 'Create artist on CD6');
+    ok(!$cd->artist->in_storage, 'Artist is not in storage');
+    ok($cd->update, 'update CD6');
+    ok($schema->resultset('CD')->find($cd->id)->artist->id, 'Artist ID set in storage');
+    is($queries, 5, 'Queries Count ok');
+}
+
+{
+    $queries = 0;
     ok(my $cd = $schema->resultset('CD')->create({ title => 'CD4', artist => { name => 'Rieche' } }), 'Create CD4 with new artist');
     is($schema->resultset('CD')->find($cd->id)->title, 'CD4', 'CD4 in storage');
     is($schema->resultset('CD')->find($cd->id)->artist->name, 'Rieche', 'Artist in storage');

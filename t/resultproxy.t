@@ -1,7 +1,13 @@
+use lib qw(../p5-moosex-attribute-deflator/lib);
+use MooseX::Attribute::Deflator::Moose;
+
 package MyClass;
 use Moose;
-has foo => ( is => 'rw' );
-has bar => ( is => 'rw', required => 1 );
+use MooseX::DBIC;
+with 'MooseX::DBIC::Result';
+
+has_column foo => ( is => 'rw' );
+has_column bar => ( is => 'rw', required => 1 );
 
 package main;
 use Test::More;
@@ -17,11 +23,11 @@ ok( my $proxy_class = MooseX::DBIC::ResultProxy->build_proxy(
         ( copy => [ qw(foo) ], 
           builder => sub {
             my ($self, $class) = @_;
-            return $class->new(%$self, bar => 'lazy');
+            return $class->new(%$self, bar => 'lazy', '-result_source' => 'foo');
           } ) )
 );
 
-ok( my $proxy = $proxy_class->new( foo => 'bar' ), 'MyProxy instance' );
+ok( my $proxy = $proxy_class->name->new( foo => 'bar' ), 'MyProxy instance' );
 is( $proxy->foo, 'bar');
 like( ref $proxy, qr/ANON/, 'proxy is an anon class' );
 is( $proxy->bar, 'lazy');

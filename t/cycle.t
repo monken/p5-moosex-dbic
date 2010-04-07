@@ -27,15 +27,15 @@ __PACKAGE__->load_classes(qw(Artist CD));
 
 package main;
 
-my $schema = MySchema->connect( 'dbi:SQLite::memory:' );
-
-$schema->deploy;
-
 use Test::Memory::Cycle;
 
 my $weak;
 
 {
+  my $schema = MySchema->connect( 'dbi:SQLite::memory:' );
+
+  $schema->deploy;
+
   my $s = $weak->{schema} = $schema;
   memory_cycle_ok($s, 'No cycles in schema');
 
@@ -51,10 +51,10 @@ my $weak;
   Scalar::Util::weaken ($_) for values %$weak;
   memory_cycle_ok($weak, 'No cycles in weak object collection');
 }
-TODO: { local $TODO = 'leaks';
+
 for (keys %$weak) {
   ok (! $weak->{$_}, "No $_ leaks");
 }
-};
+
 
 done_testing;

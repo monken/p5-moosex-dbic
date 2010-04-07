@@ -8,11 +8,13 @@ use List::Util qw(first);
 
 has type => ( is => 'rw', isa => Relationship, required => 1 );
 
-has related_class => ( is => 'rw', isa => 'Str', required => 1, lazy => 1, default => sub {
-    my $self = shift;
-    if($self->type eq 'HasMany') { return $self->type_constraint->type_parameter->class }
-    else { die; return undef }
-} );
+has related_class => ( 
+    is => 'rw', 
+    isa => 'Str', 
+    required => 1, 
+    lazy => 1, 
+    builder => '_build_related_class'
+);
 
 has foreign_key => ( 
     is => 'rw', 
@@ -20,14 +22,7 @@ has foreign_key => (
     required => 1, 
     lazy => 1,
     weak_ref => 1,
-    default => sub {
-        my $self = shift;
-        if($self->type eq 'HasMany') {
-            return $self->related_class->meta->get_attribute($self->associated_class->name->dbic_result_class->table);
-        } else {
-            return $self;
-        }
-    }
+    builder => '_build_foreign_key'
 );
 
 has join_condition => ( 
@@ -35,18 +30,15 @@ has join_condition => (
     isa => 'HashRef', 
     required => 1, 
     lazy => 1, 
-    default => sub {
-        my $self = shift;
-        my $fk = $self->foreign_key;
-        if($fk->associated_class->name eq $self->associated_class->name) {
-            return { 'foreign.id' => 'self.' . $fk->name };
-        } else {
-            return { 'foreign.'.$fk->name => 'self.id' };
-        }
-    } 
+    builder => '_build_join_condition'
 );
 
-has proxy_class => ( is => 'rw', isa => 'Moose::Meta::Class', lazy => 1, builder => '_build_proxy_class' );
+has proxy_class => ( 
+    is => 'rw', 
+    isa => 'Moose::Meta::Class', 
+    lazy => 1, 
+    builder => '_build_proxy_class'
+);
 
 sub _build_proxy_class {
     my $attr = shift;
@@ -59,25 +51,5 @@ sub _build_proxy_class {
     );
 }
 
-after apply_to_dbic_result_class => sub {
-    my ($self, $result) = @_;
-    
-    if($self->type eq 'BelongsTo' || $self->type eq 'HasSuperclass') {
-        $result->add_relationship(
-            $self->name, $self->related_class->dbic_result_class, $self->join_condition, $self->is_required ? {} : {join_type => 'LEFT'});
-    } elsif($self->type eq 'HasMany') {
-        $result->add_relationship(
-            $self->name, $self->related_class->dbic_result_class, $self->join_condition, {
-    accessor => 'multi',
-    join_type => 'LEFT',
-    cascade_delete => 1,
-    cascade_copy => 1,});
-    }    
-};
-
-sub get_reverse_relationships {
-    my ($self) = @_;
-    return grep { $_->related_class eq $self->associated_class->name } $self->related_class->meta->get_all_relationships;
-}
 
 1;
