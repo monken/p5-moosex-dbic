@@ -22,15 +22,31 @@ after apply_to_dbic_result_class => sub {
         $self->name, 
         $self->related_class->dbic_result_class, 
         $self->join_condition, 
-        $self->is_required ? {} : {join_type => 'LEFT'}
+        {join_type => $self->join_type}
     );
 };
 
 sub _build_related_class { die; }
 
+sub _build_join_type {
+    shift->is_required ? '' : 'LEFT';
+}
+
 sub reverse_relationship {
     my $self = shift;
     return first { $_->foreign_key eq $self } $self->related_class->meta->get_all_relationships;
+}
+
+sub build_options {
+    my ($class, $for, $name, %options) = @_;
+     return (
+            is => 'rw',
+            %options,
+            isa => Result,
+            related_class => $options{isa},
+            lazy => 1,
+            default => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); } 
+    );
 }
 
 1;

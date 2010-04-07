@@ -43,6 +43,8 @@ has proxy_class => (
 has join_type => (
     is => 'rw',
     isa => JoinType,
+    builder => '_build_join_type',
+    lazy => 1,
 );
 
 sub _build_proxy_class {

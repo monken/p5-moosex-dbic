@@ -39,4 +39,14 @@ sub reverse_relationship {
     shift->foreign_key;
 }
 
+sub build_options {
+    my ($class, $for, $name, %options) = @_;
+    return ( 
+        is => 'rw',
+        %options,
+        lazy => 1,
+        default => sub { my $self = shift; return $self->_build_related_resultset($self->meta->get_attribute($name)); } 
+    );
+}
+
 1;

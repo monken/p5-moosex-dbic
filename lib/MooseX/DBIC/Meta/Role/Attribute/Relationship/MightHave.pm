@@ -39,4 +39,19 @@ sub reverse_relationship {
     shift->foreign_key;
 }
 
+sub _build_join_type { 'LEFT' }
+
+sub build_options {
+    my ($class, $for, $name, %options) = @_;
+    $options{foreign_key} = $options{isa}->meta->get_attribute($options{foreign_key}) if($options{foreign_key});    
+     return (
+            is => 'rw',
+            %options,
+            isa => Result,
+            related_class => $options{isa},
+            lazy => 1,
+            default => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); } 
+    );
+}
+
 1;

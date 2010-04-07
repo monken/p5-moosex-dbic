@@ -12,7 +12,7 @@ enum Relationship,
     qw(HasOne HasMany BelongsTo ManyToMany HasSuperclass MightHave);
 
 enum JoinType,
-    qw(LEFT RIGHT INNER);
+    qw(LEFT RIGHT INNER), '';
 
 subtype Result,
     as Object;
