@@ -167,6 +167,7 @@ sub has_column_loaded {
 }
 
 while(my($k,$v) = each %import) {
+    Class::MOP::load_class($k);
     foreach my $method (@$v) {
         __PACKAGE__->meta->add_method( $method => \&{$k.'::'.$method} );
     }

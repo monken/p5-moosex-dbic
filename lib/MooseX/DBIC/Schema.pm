@@ -16,7 +16,7 @@ BEGIN {$ENV{DBIC_TRACE}=1}
 
 extends 'DBIx::Class::Schema';
 
-class_has result_base_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
+class_has result_source_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
 
 class_has loaded_classes => (
     is      => 'rw',
@@ -36,17 +36,9 @@ sub is_class_loaded {
     return $schema->find_loaded_class( sub { $_ eq $class } );
 }
 
-sub _build_result_base_class {
+sub _build_result_source_class {
     my ($self) = @_;
-    my $result = Moose::Meta::Class->create_anon_class(
-        superclasses => [qw(DBIx::Class::Core)],
-        cache        => 1,
-    )->name;
-    $result->table('foo');
-    $result->add_columns('id');
-
-    $result->set_primary_key(qw(id));
-    return $result;
+    return 'DBIx::Class::ResultSource::Table';
 }
 
 sub load_namespaces {
@@ -94,25 +86,24 @@ sub load_classes {
         $class->meta->add_method( schema_class => sub { $schema } );
         
     }
-    $class->meta->add_method( dbic_result_class => sub { join( '::', $schema, 'DBIC', $moniker ); } );
     $class->meta->add_method( moniker => sub {$moniker} );
     
 
     $schema->load_classes(@defer);
     
-    
-    my $result_dbic =
-      $schema->create_dbic_result_class( $class, $result_moose );
-    my $table = $result_dbic->table;
-    
+    ( my $table = lc($class) ) =~ s/::/_/g;
     $class->meta->add_method( table => sub { $table } );
     
+    my $source =
+      $schema->create_result_source( $class, $result_moose );
     
-    $result_dbic->result_class($result_moose);
+    
+    
+    #$result_dbic->result_class($result_moose);
     my $map = $schema->class_mappings;
-    $map->{$result_dbic} = $moniker;
+    $map->{$source} = $moniker;
     $map->{$result_moose} = $moniker;
-    $schema->register_source( $moniker => $result_dbic->result_source_instance );
+    $schema->register_source( $moniker => $source );
 	
 	
 }
@@ -124,7 +115,6 @@ sub create_moose_result_class {
     carp 'The name of the class cannot start with DBIC::'
       if ( $class =~ /^DBIC::/ );
 
-    ( my $table = lc($class) ) =~ s/::/_/g;
     my $result =  $schema . '::' . $class ;
     
     my $result_metaclass = $class->meta->create_anon_class(
@@ -170,36 +160,29 @@ sub create_moose_result_class {
     return $result;
 }
 
-sub create_dbic_result_class {
+sub create_result_source {
     my ( $schema, $class, $moose ) = @_;
 
     carp 'The name of the class cannot start with DBIC::'
       if ( $class =~ /^DBIC::/ );
 
     Class::MOP::load_class($class);
+    Class::MOP::load_class($schema->result_source_class);
 
     ( my $table = lc($class->moniker) ) =~ s/::/_/g;
-    my $result = join( '::', $schema, 'DBIC', $class->moniker );
-    Moose::Meta::Class->create(
-        $result,
-        superclasses => [ $schema->result_base_class ],
-        cache        => 1,
-    );
+    my $source = $schema->result_source_class->new({name => $table, result_class => $moose});
     
-    $result->table($table);
 
     foreach my $attr ( $moose->meta->get_attribute_list ) {
-        #warn $attr;
         my $attribute = $moose->meta->find_attribute_by_name($attr);
-        #warn $attribute;
         next
           unless (
             $attribute->does('MooseX::DBIC::Meta::Role::Attribute')
           );
-        $attribute->apply_to_dbic_result_class($result);
-
+        $attribute->apply_to_dbic_result_class($source);
     }
-    return $result;
+    $source->set_primary_key('id');
+    return $source;
 }
 
 1;

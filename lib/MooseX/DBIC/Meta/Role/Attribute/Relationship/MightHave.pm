@@ -7,7 +7,7 @@ use MooseX::DBIC::Types q(:all);
 
 sub _build_foreign_key {
     my $self = shift;
-    return $self->related_class->meta->get_attribute($self->associated_class->name->dbic_result_class->table);
+    return $self->related_class->meta->get_attribute($self->associated_class->name->table);
 };
 
 sub _build_join_condition {
@@ -20,7 +20,7 @@ after apply_to_dbic_result_class => sub {
     my ($self, $result) = @_;
     $result->add_relationship(
         $self->name, 
-        $self->related_class->dbic_result_class, 
+        $self->related_class, 
         $self->join_condition, 
         {
             accessor => 'single',
