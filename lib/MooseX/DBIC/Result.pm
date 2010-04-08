@@ -5,9 +5,6 @@ use MooseX::DBIC;
 use Carp;
 use DBIx::Class::ResultClass::HashRefInflator;
 use Scalar::Util qw(weaken);
-#use MooseX::ClassAttribute;
-
-#class_has schema_class => ( is => 'rw', isa => 'Str' );
 
 has_column id => (
     isa         => 'Str',
@@ -152,7 +149,7 @@ sub search_related {
   return shift->related_resultset(shift)->search(@_);
 }
 
-# implement in this class, move stuff to meta class
+# TODO: implement in this class, move stuff to meta class
 my %import = (
     'DBIx::Class::Relationship::Base' => [qw(related_resultset find_or_new_related find_related)],
     'DBIx::Class::PK' => [qw(ident_condition _ident_values)],

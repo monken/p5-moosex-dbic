@@ -75,17 +75,13 @@ sub load_classes {
     
     $schema->add_loaded_class($class);
     
-    unless($class->can('meta')) { # FIXME: test for role
+    unless($class->isa('Moose::Object')) {
         $schema->next::method($moniker);
         return $schema->load_classes(@defer);
     }
         
     my $result = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_result_class($moniker);
 
-    if($class->does('MooseX::DBIC::Result')) {
-        $class->meta->add_method( schema_class => sub { $schema } );
-        
-    }
     $class->meta->add_method( moniker => sub {$moniker} );
     
 
@@ -94,14 +90,11 @@ sub load_classes {
     ( my $table = lc($class) ) =~ s/::/_/g;
     $class->meta->add_method( table => sub { $table } );
     
-    my $source =
-      $schema->create_result_source( $class, $result );
+    my $source = $schema->create_result_source( $class, $result );
     
     
     
-    my $map = $schema->class_mappings;
-    $map->{$source} = $moniker;
-    $map->{$result} = $moniker;
+    $schema->class_mappings->{$result} = $moniker;
     $schema->register_source( $moniker => $source );
 	
 	
@@ -110,9 +103,6 @@ sub load_classes {
 
 sub create_result_class {
     my ( $schema, $class ) = @_;
-
-    carp 'The name of the class cannot start with DBIC::'
-      if ( $class =~ /^DBIC::/ );
 
     my $result =  $schema . '::' . $class ;
     
@@ -133,8 +123,6 @@ sub create_result_class {
         roles => ['MooseX::DBIC::Result'],
         cache        => 1,
     );
-    
-    $result->meta->add_method( schema_class => sub { $schema } );
 
     foreach my $attr ( $class->meta->get_attribute_list ) {
         my $attribute           = $class->meta->get_attribute($attr);
@@ -161,15 +149,10 @@ sub create_result_class {
 
 sub create_result_source {
     my ( $schema, $class, $moose ) = @_;
-
-    carp 'The name of the class cannot start with DBIC::'
-      if ( $class =~ /^DBIC::/ );
-
     Class::MOP::load_class($class);
     Class::MOP::load_class($schema->result_source_class);
 
-    ( my $table = lc($class->moniker) ) =~ s/::/_/g;
-    my $source = $schema->result_source_class->new({name => $table, result_class => $moose});
+    my $source = $schema->result_source_class->new({name => $moose->table, result_class => $moose});
     
 
     foreach my $attr ( $moose->meta->get_attribute_list ) {
