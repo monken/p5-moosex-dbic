@@ -21,5 +21,7 @@ ok($user->update);
 
 ok($user->id, 'id is set');
 
+ok($schema->source('MySchema::MyApp::User'), 'Find source by Moose class');
+
 
 done_testing;

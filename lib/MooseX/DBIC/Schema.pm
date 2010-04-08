@@ -103,10 +103,15 @@ sub load_classes {
     
     my $result_dbic =
       $schema->create_dbic_result_class( $class, $result_moose );
-
+    my $table = $result_dbic->table;
+    
+    $class->meta->add_method( table => sub { $table } );
+    
+    
     $result_dbic->result_class($result_moose);
     my $map = $schema->class_mappings;
     $map->{$result_dbic} = $moniker;
+    $map->{$result_moose} = $moniker;
     $schema->register_source( $moniker => $result_dbic->result_source_instance );
 	
 	

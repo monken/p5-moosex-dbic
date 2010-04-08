@@ -10,6 +10,7 @@ Moose::Exporter->setup_import_methods( with_meta => [qw(has_column has_many belo
 sub init_meta {
     shift;
     my %p = @_;
+    
     return Moose::Util::MetaRole::apply_metaclass_roles(
         for             => $p{for_class},
         role_metaroles => {

@@ -20,7 +20,7 @@ after apply_to_dbic_result_class => sub {
     my ($self, $result) = @_;
     $result->add_relationship(
         $self->name, 
-        $self->related_class->dbic_result_class, 
+        $self->related_class, 
         $self->join_condition, 
         {
             accessor => 'multi',

@@ -19,16 +19,16 @@ subtype Result,
 
 deflate ResultSet.'[]', via { foreach my $row(@{$_->get_cache || []}) { $row->update_or_insert } };
 
-    
-deflate Result, via { 
-    $_->update_or_insert; 
+
+deflate Result, via {
+    $_->update_or_insert;
     $_->id;
 };
-inflate Result, via { 
-    my ($result, $constraint, $inflate, $rs, $attr) = @_; 
+inflate Result, via {
+    my ($result, $constraint, $inflate, $rs, $attr) = @_;
     my $id = $_;
     my $class = $attr->proxy_class->name;
-    return $class->new( id => $id, '-result_source' => $rs->schema->source($attr->related_class->dbic_result_class) );
+    return $class->new( id => $id, '-result_source' => $rs->schema->source($attr->related_class) );
 };
 
 $REGISTRY->add_type_constraint(

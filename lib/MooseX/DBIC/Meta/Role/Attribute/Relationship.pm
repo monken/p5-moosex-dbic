@@ -53,7 +53,7 @@ sub _build_proxy_class {
         $attr->related_class =>
             ( copy => [qw(id result_source in_storage)], builder => sub {
                 my $self = shift;
-                $self->result_source->schema->resultset($attr->related_class->dbic_result_class)->find($self->id);
+                $self->result_source->schema->resultset($attr->related_class)->find($self->id);
             } )
     );
 }

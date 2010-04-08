@@ -41,7 +41,6 @@ sub _build_relationship {
     my ($self, $rel, $args) = @_;
     $args ||= {};
     my $method = $rel eq $rel->foreign_key ? 'new_related' : 'find_or_new_related';
-    #return $self->resultset($rel->related_class->dbic_result_class)->new_result($args);
     return $self->$method($rel->name, $args);
 }
 
@@ -87,7 +86,7 @@ sub BUILDARGS {
                 delete $args->{$name};
                 next;
             } elsif(ref $value eq "HASH") {
-                $args->{$name} = $rs->schema->resultset($rel->related_class->dbic_result_class)->new_result($value);
+                $args->{$name} = $rs->schema->resultset($rel->related_class)->new_result($value);
             }  elsif(!ref $value && defined $value) {
                 my $attr = $class->meta->get_attribute($name);
                 $args->{$name} = $attr->inflate($class, $value, undef, $rs, $attr);
