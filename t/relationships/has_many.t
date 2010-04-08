@@ -4,17 +4,15 @@ use Test::More;
 use SQL::Translator;
 
 package CD;
-use Moose;
 use MooseX::DBIC;
-with 'MooseX::DBIC::Result';
+    
 has_column title => ( is => 'rw', isa => 'Str' );
 belongs_to artist => ( is => 'rw', isa => 'Artist', predicate => 'has_artist' );
 
 package Artist;
-use Moose;
 use MooseX::DBIC;
 use MooseX::DBIC::Types q(:all);
-with 'MooseX::DBIC::Result';
+    
 
 has_column name => ( is => 'rw', isa => 'Str' );
 has_many cds => ( is => 'rw', isa => ResultSet['CD'] );

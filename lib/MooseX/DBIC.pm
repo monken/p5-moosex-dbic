@@ -1,40 +1,27 @@
 package MooseX::DBIC;
-
-use Moose;
+# ABSTRACT: foo
+use Moose ();
 use MooseX::DBIC::Meta::Role::Class;
 use Moose::Exporter;
 
-Moose::Exporter->setup_import_methods( with_meta => [qw(has_column has_many belongs_to has_one might_have)] );
-
+my ( $import, $unimport, $init_meta ) = Moose::Exporter->build_import_methods( 
+  also => 'Moose', 
+  with_meta => [qw(has_column has_many belongs_to has_one might_have)],
+  metaclass_roles => [qw(MooseX::DBIC::Meta::Role::Class)],
+  install => [qw(import unimport init_meta)]
+);
 
 sub init_meta {
-    shift;
-    my %p = @_;
-    
-    return Moose::Util::MetaRole::apply_metaclass_roles(
-        for             => $p{for_class},
-        role_metaroles => {
-            role => [qw(MooseX::DBIC::Meta::Role::Class)],
-
-        },
-        class_metaroles => {
-            class => [qw(MooseX::DBIC::Meta::Role::Class)],
-        },
-    );
+    my $package = shift;
+    my %options = @_;
+    Moose->init_meta(%options);
+    my $meta = $package->$init_meta(%options);
+    Moose::Util::ensure_all_roles($meta, qw(MooseX::DBIC::Role::Result));
+    return $meta;
 }
 
 sub has_column {
-    my $meta    = shift;
-    my $name    = shift;
-    my %options = (is => 'rw', isa => 'Str', @_);
-    $options{traits} ||= [];
-    push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Column MooseX::Attribute::Deflator::Meta::Role::Attribute));
-    
-    my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
-    
-    foreach my $attr ( @{$attrs} ) {
-        $meta->add_attribute( $attr => %options );
-    }
+    shift->add_column(@_);
 }
 
 sub has_many {

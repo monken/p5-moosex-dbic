@@ -31,12 +31,12 @@ local $SIG{__WARN__} = sub { $warn = shift };
 {
   $schema->register_extra_source( 'artist->extra' => $new_source );
 
-  my $source = $schema->source('DBICTest::Artist');
+  my $source = $schema->source('DBICTest::Schema::Artist');
   is($source->source_name, 'Artist', 'original source still primary source');
 }
 
 {
-  my $source = $schema->source('DBICTest::Artist');
+  my $source = $schema->source('DBICTest::Schema::Artist');
   $schema->register_source($source->source_name, $source);
   is($warn, '', "re-registering an existing source under the same name causes no errors");
 }
@@ -45,9 +45,9 @@ local $SIG{__WARN__} = sub { $warn = shift };
   my $new_source_name = 'Artist->preview(artist_preview)';
   $schema->register_source( $new_source_name => $new_source );
 
-  ok(($warn =~ /DBICTest::Artist already has a source, use register_extra_source for additional sources/), 'registering extra source causes errors');
+  ok(($warn =~ /DBICTest::Schema::Artist already has a source, use register_extra_source for additional sources/), 'registering extra source causes errors');
   
-  my $source = $schema->source('DBICTest::Artist');
+  my $source = $schema->source('DBICTest::Schema::Artist');
   is($source->source_name, $new_source_name, 'original source still primary source');
 }
 

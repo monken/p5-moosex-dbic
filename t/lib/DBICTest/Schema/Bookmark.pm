@@ -3,7 +3,7 @@ package # hide from PAUSE
 
 use Moose;
 use MooseX::DBIC;
-with 'MooseX::DBIC::Result';
+    
 
 has_column id => ( is => 'rw', isa => 'Num', column_info => {
         data_type => 'integer',
@@ -11,6 +11,7 @@ has_column id => ( is => 'rw', isa => 'Num', column_info => {
 
 belongs_to link => ( isa => 'DBICTest::Schema::Link', is => 'rw' );
 
+1;
 __END__
 package # hide from PAUSE
     DBICTest::Schema::Bookmark;

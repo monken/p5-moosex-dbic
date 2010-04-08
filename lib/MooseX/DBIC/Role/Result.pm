@@ -1,18 +1,17 @@
-package MooseX::DBIC::Result;
+package MooseX::DBIC::Role::Result;
 
-use Moose::Role;
-use MooseX::DBIC;
+use Moose::Role -traits => ['MooseX::DBIC::Meta::Role::Class'];
 use Carp;
 use DBIx::Class::ResultClass::HashRefInflator;
 use Scalar::Util qw(weaken);
 
-has_column id => (
+__PACKAGE__->meta->add_column( id => (
     isa         => 'Str',
     required    => 1,
     is          => 'rw',
     builder     => '_build_id',
     column_info => { data_type => 'character', size => 10 },
-);
+) );
 
 
 has result_source => ( is => 'rw', init_arg => '-result_source', required => 1, handles => [qw(primary_columns relationship_info)] );

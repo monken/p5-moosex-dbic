@@ -84,15 +84,8 @@ sub init_schema {
     my $self = shift;
     my %args = @_;
 
-    my $schema;
+    my $schema = 'DBICTest::Schema';
 
-    if ($args{compose_connection}) {
-      $schema = DBICTest::Schema->compose_connection(
-                  'DBICTest', $self->_database(%args)
-                );
-    } else {
-      $schema = DBICTest::Schema->compose_namespace('DBICTest');
-    }
     if( $args{storage_type}) {
       $schema->storage_type($args{storage_type});
     }

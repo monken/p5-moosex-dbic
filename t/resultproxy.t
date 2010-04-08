@@ -2,9 +2,8 @@ use lib qw(../p5-moosex-attribute-deflator/lib);
 use MooseX::Attribute::Deflator::Moose;
 
 package MyClass;
-use Moose;
 use MooseX::DBIC;
-with 'MooseX::DBIC::Result';
+
 
 has_column foo => ( is => 'rw' );
 has_column bar => ( is => 'rw', required => 1 );

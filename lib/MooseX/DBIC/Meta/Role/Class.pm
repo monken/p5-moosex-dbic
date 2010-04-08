@@ -5,7 +5,24 @@ use MooseX::ClassAttribute;
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
 
+sub get_all_columns {
+    my $self = shift;
+    return grep { $_->does('MooseX::DBIC::Meta::Role::Attribute::Column') } $self->get_all_attributes;
+}
 
+sub add_column {
+  my $meta    = shift;
+  my $name    = shift;
+  my %options = (is => 'rw', isa => 'Str', @_);
+  $options{traits} ||= [];
+  push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Column MooseX::Attribute::Deflator::Meta::Role::Attribute));
+  
+  my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
+  
+  foreach my $attr ( @{$attrs} ) {
+      $meta->add_attribute( $attr => %options );
+  }
+}
 
 sub get_column_list {
     my $self = shift;
@@ -21,11 +38,6 @@ sub get_relationship_list {
         $self->get_attribute($_)
           ->does('MooseX::DBIC::Meta::Role::Attribute::Relationship')
     } $self->get_attribute_list;
-}
-
-sub get_all_columns {
-    my $self = shift;
-    return grep { $_->does('MooseX::DBIC::Meta::Role::Attribute::Column') } $self->get_all_attributes;
 }
 
 sub get_all_relationships {

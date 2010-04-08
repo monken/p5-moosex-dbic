@@ -3,7 +3,7 @@ package # hide from PAUSE
 
 use Moose;
 use MooseX::DBIC;
-with 'MooseX::DBIC::Result';
+    
 
 has_column id => ( is => 'rw', isa => 'Num', column_info => { data_type => 'integer', is_auto_increment => 1 } );
 has_column name => ( is => 'rw', isa => 'Str' );

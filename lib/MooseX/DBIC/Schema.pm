@@ -70,6 +70,7 @@ sub load_classes {
         $moniker = $class;
         $class = join('::', $schema, $class);
     } or do {
+        warn $@;
         Class::MOP::load_class($class);
     };
     
@@ -79,25 +80,20 @@ sub load_classes {
         $schema->next::method($moniker);
         return $schema->load_classes(@defer);
     }
-        
-    my $result = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_result_class($moniker);
+    
+    my $result = $class->does('MooseX::DBIC::Role::Result') ? $class : $schema->create_result_class($moniker);
 
     $class->meta->add_method( moniker => sub {$moniker} );
     
-
     $schema->load_classes(@defer);
     
-    ( my $table = lc($class) ) =~ s/::/_/g;
+    ( my $table = lc($moniker) ) =~ s/::/_/g;
     $class->meta->add_method( table => sub { $table } );
     
     my $source = $schema->create_result_source( $class, $result );
     
-    
-    
     $schema->class_mappings->{$result} = $moniker;
     $schema->register_source( $moniker => $source );
-	
-	
 }
 
 
@@ -120,7 +116,7 @@ sub create_result_class {
     $result_metaclass->create(
         $result,
         superclasses => [ $class, @superclasses,  ],
-        roles => ['MooseX::DBIC::Result'],
+        roles => ['MooseX::DBIC::Role::Result'],
         cache        => 1,
     );
 
