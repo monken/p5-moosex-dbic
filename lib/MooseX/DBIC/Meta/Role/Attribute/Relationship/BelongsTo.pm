@@ -16,7 +16,7 @@ sub _build_join_condition {
     return { 'foreign.id' => 'self.' . $fk->name };
 } 
 
-after apply_to_dbic_result_class => sub {
+after apply_to_result_source => sub {
     my ($self, $result) = @_;
     $result->add_relationship(
         $self->name, 

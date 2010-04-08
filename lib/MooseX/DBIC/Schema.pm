@@ -80,7 +80,7 @@ sub load_classes {
         return $schema->load_classes(@defer);
     }
         
-    my $result_moose = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_moose_result_class($moniker);
+    my $result = $class->does('MooseX::DBIC::Result') ? $class : $schema->create_result_class($moniker);
 
     if($class->does('MooseX::DBIC::Result')) {
         $class->meta->add_method( schema_class => sub { $schema } );
@@ -95,21 +95,20 @@ sub load_classes {
     $class->meta->add_method( table => sub { $table } );
     
     my $source =
-      $schema->create_result_source( $class, $result_moose );
+      $schema->create_result_source( $class, $result );
     
     
     
-    #$result_dbic->result_class($result_moose);
     my $map = $schema->class_mappings;
     $map->{$source} = $moniker;
-    $map->{$result_moose} = $moniker;
+    $map->{$result} = $moniker;
     $schema->register_source( $moniker => $source );
 	
 	
 }
 
 
-sub create_moose_result_class {
+sub create_result_class {
     my ( $schema, $class ) = @_;
 
     carp 'The name of the class cannot start with DBIC::'
@@ -179,7 +178,7 @@ sub create_result_source {
           unless (
             $attribute->does('MooseX::DBIC::Meta::Role::Attribute')
           );
-        $attribute->apply_to_dbic_result_class($source);
+        $attribute->apply_to_result_source($source);
     }
     $source->set_primary_key('id');
     return $source;

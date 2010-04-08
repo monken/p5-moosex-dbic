@@ -6,7 +6,7 @@ with 'MooseX::DBIC::Meta::Role::Attribute';
 
 has column_info => ( is => 'rw', isa => 'HashRef' ); # merging hashref?
 
-after apply_to_dbic_result_class => sub {
+after apply_to_result_source => sub {
     my ($self, $result) = @_;
     
     $result->add_columns(
