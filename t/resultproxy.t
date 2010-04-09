@@ -1,4 +1,3 @@
-use lib qw(../p5-moosex-attribute-deflator/lib);
 use MooseX::Attribute::Deflator::Moose;
 
 package MyClass;

@@ -1,19 +1,13 @@
 package # hide from PAUSE
     DBICTest::Schema::Link;
   
-use Moose;
 use MooseX::DBIC;
     
+has_column id => ( isa => 'Num', auto_increment => 1 );
 
-has_column id => ( isa => 'Num', column_info => {
-        data_type => 'integer',
-        is_auto_increment => 1} );
+has_column [qw(url title)] => ( size => 100 );
 
-has_column [qw(url title)] => ( column_info => {
-        data_type => 'varchar',
-        size      => 100,
-        is_nullable => 1,
-});
+use overload '""' => sub { shift->url }, fallback=> 1;
 
 1;
 

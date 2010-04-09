@@ -1,6 +1,6 @@
 package MooseX::DBIC::Schema;
 use Carp;
-use Moose;
+use Moose 1.01;
 use MooseX::ClassAttribute;
 use Moose::Util::MetaRole;
 use MooseX::DBIC::Types q(:all);
@@ -8,7 +8,7 @@ use MooseX::Attribute::Deflator::Moose;
 use MooseX::Attribute::Deflator::Structured;
 use Data::Dumper;
 
-$Data::Dumper::Maxdepth = 2;
+$Data::Dumper::Maxdepth = 99;
 $Data::Dumper::Indent = 1;
 $Carp::Verbose = 1;
 
@@ -70,7 +70,6 @@ sub load_classes {
         $moniker = $class;
         $class = join('::', $schema, $class);
     } or do {
-        warn $@;
         Class::MOP::load_class($class);
     };
     

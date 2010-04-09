@@ -1,5 +1,3 @@
-use lib qw(../p5-moosex-attribute-deflator/lib);
-
 use Test::More;
 use SQL::Translator;
 

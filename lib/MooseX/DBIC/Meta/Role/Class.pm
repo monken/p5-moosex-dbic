@@ -15,7 +15,9 @@ sub add_column {
   my $name    = shift;
   my %options = (is => 'rw', isa => 'Str', @_);
   $options{traits} ||= [];
-  push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Attribute MooseX::DBIC::Meta::Role::Attribute::Column MooseX::Attribute::Deflator::Meta::Role::Attribute));
+  push(@{$options{traits}}, qw(
+    MooseX::DBIC::Meta::Role::Attribute::Column
+    MooseX::Attribute::Deflator::Meta::Role::Attribute));
   
   my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
   

@@ -6,11 +6,9 @@ use DBIx::Class::ResultClass::HashRefInflator;
 use Scalar::Util qw(weaken);
 
 __PACKAGE__->meta->add_column( id => (
-    isa         => 'Str',
     required    => 1,
-    is          => 'rw',
     builder     => '_build_id',
-    column_info => { data_type => 'character', size => 10 },
+    size        => 10,
 ) );
 
 

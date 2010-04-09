@@ -1,6 +1,4 @@
-
-use lib qw(t/lib ../p5-moosex-attribute-deflator/lib);
-
+use lib qw(t/lib);
 use Test::More;
 use MySchema;
 
@@ -12,36 +10,73 @@ foreach my $source (map { $schema->source($_) } $schema->sources) {
     $ddl->{$source->source_name} = { map { $_ => $source->column_info($_) } $source->columns };
 }
 
-#use Data::Dumper; warn Dumper $ddl;
-
 is_deeply($ddl, {
-           "Moose::Object"      => { id => {
-                                     data_type   => 'character',
-                                     is_nullable => '',
-                                     size        => 10
-                                   } },
-           "MyApp::User"        => {
-                                     email  => { is_nullable => 1 },
-                                     first  => { is_nullable => 1 },
-                                     id     => {
-                                                 data_type   => 'character',
-                                                 is_nullable => '',
-                                                 size        => 10
-                                               },
-                                     last   => { is_nullable => 1 },
-                                     moose_object
-                                            => { is_nullable => '' }
-                                   },
-           "MyApp::User::Admin" => {
-                                     hair_color => { is_nullable => 1 },
-                                     id         => {
-                                                     data_type   => 'character',
-                                                     is_nullable => '',
-                                                     size        => 10
-                                                   },
-                                     level      => { is_nullable => 1 },
-                                     myapp_user => { is_nullable => '' }
-                                   }
+  'MyApp::User::Admin' => {
+    'level' => {
+      'is_auto_increment' => undef,
+      'data_type' => 'int',
+      'is_nullable' => 1,
+      'size' => undef
+    },
+    'myapp_user' => {
+      'is_auto_increment' => 0,
+      'data_type' => 'character',
+      'is_nullable' => '',
+      'size' => undef
+    },
+    'id' => {
+      'is_auto_increment' => 0,
+      'data_type' => 'varchar',
+      'is_nullable' => '',
+      'size' => 10
+    },
+    'hair_color' => {
+      'is_auto_increment' => undef,
+      'data_type' => 'varchar',
+      'is_nullable' => 1,
+      'size' => undef
+    }
+  },
+  'MyApp::User' => {
+    'email' => {
+      'is_auto_increment' => undef,
+      'data_type' => 'varchar',
+      'is_nullable' => 1,
+      'size' => undef
+    },
+    'first' => {
+      'is_auto_increment' => undef,
+      'data_type' => 'varchar',
+      'is_nullable' => 1,
+      'size' => undef
+    },
+    'moose_object' => {
+      'is_auto_increment' => 0,
+      'data_type' => 'character',
+      'is_nullable' => '',
+      'size' => undef
+    },
+    'last' => {
+      'is_auto_increment' => undef,
+      'data_type' => 'varchar',
+      'is_nullable' => 1,
+      'size' => undef
+    },
+    'id' => {
+      'is_auto_increment' => 0,
+      'data_type' => 'varchar',
+      'is_nullable' => '',
+      'size' => 10
+    }
+  },
+  'Moose::Object' => {
+    'id' => {
+      'is_auto_increment' => 0,
+      'data_type' => 'varchar',
+      'is_nullable' => '',
+      'size' => 10
+    }
+  }
 });
 
 done_testing;

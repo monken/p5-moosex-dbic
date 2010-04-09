@@ -1,6 +1,4 @@
-
-use lib qw(t/lib ../p5-moosex-attribute-deflator/lib);
-
+use lib qw(t/lib);
 use Test::More;
 use SQL::Translator;
 use MySchema;

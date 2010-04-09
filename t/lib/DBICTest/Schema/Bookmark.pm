@@ -1,15 +1,11 @@
 package # hide from PAUSE
     DBICTest::Schema::Bookmark;
 
-use Moose;
 use MooseX::DBIC;
-    
 
-has_column id => ( is => 'rw', isa => 'Num', column_info => {
-        data_type => 'integer',
-        is_auto_increment => 1} );
+has_column id => ( is => 'rw', isa => 'Num', auto_increment => 1 );
 
-belongs_to link => ( isa => 'DBICTest::Schema::Link', is => 'rw' );
+belongs_to link => ( isa => 'DBICTest::Schema::Link' );
 
 1;
 __END__
