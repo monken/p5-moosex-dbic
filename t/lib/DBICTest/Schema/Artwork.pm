@@ -1,20 +1,11 @@
 package # hide from PAUSE
     DBICTest::Schema::Artwork;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC;
 
-__PACKAGE__->table('cd_artwork');
-__PACKAGE__->add_columns(
-  'cd_id' => {
-    data_type => 'integer',
-    is_nullable => 0,
-  },
-);
-__PACKAGE__->set_primary_key('cd_id');
-__PACKAGE__->belongs_to('cd', 'DBICTest::Schema::CD', 'cd_id');
-__PACKAGE__->has_many('images', 'DBICTest::Schema::Image', 'artwork_id');
-
-__PACKAGE__->has_many('artwork_to_artist', 'DBICTest::Schema::Artwork_to_Artist', 'artwork_cd_id');
-__PACKAGE__->many_to_many('artists', 'artwork_to_artist', 'artist');
+belongs_to cd => ( isa => 'DBICTest::Schema::CD' );
+has_many images => ( isa => ResultSet['DBICTest::Schema::Image'] );
+has_many artwork_to_artist => ( isa => ResultSet['DBICTest::Schema::Artwork_to_Artist'] );
+#many_to_many('artists', 'artwork_to_artist', 'artist');
 
 1;

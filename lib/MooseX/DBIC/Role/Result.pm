@@ -1,6 +1,6 @@
 package MooseX::DBIC::Role::Result;
 
-use Moose::Role -traits => ['MooseX::DBIC::Meta::Role::Class'];
+use Moose::Role -traits => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Role)];
 use Carp;
 use DBIx::Class::ResultClass::HashRefInflator;
 use Scalar::Util qw(weaken);
@@ -11,6 +11,9 @@ __PACKAGE__->meta->add_column( id => (
     size        => 10,
 ) );
 
+__PACKAGE__->meta->add_class_attribute( table_name => (
+    is => 'rw', isa => 'Str', lazy => 1, builder => '_build_table_name'
+) );
 
 has result_source => ( is => 'rw', init_arg => '-result_source', required => 1, handles => [qw(primary_columns relationship_info)] );
 
@@ -23,6 +26,12 @@ has _raw_data => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
 sub _build__raw_data { return { shift->get_columns } } 
 
 sub resultset { return shift->result_source->schema->resultset(@_) }
+
+sub _build_table_name {
+    my $self = shift;
+    ( my $table = lc($self->moniker) ) =~ s/::/_/g;
+    return $table;
+}
 
 sub _build_id {
     my @chars = ( 'A' .. 'N', 'P' .. 'Z', 0 .. 9 );

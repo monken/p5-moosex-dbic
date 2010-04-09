@@ -119,7 +119,7 @@ sub deploy_schema {
     my $schema = shift;
     my $args = shift || {};
 
-    if ($ENV{"DBICTEST_SQLT_DEPLOY"}) { 
+    if ($ENV{"DBICTEST_SQLT_DEPLOY"} or 1 == 1) { 
         $schema->deploy($args);
     } else {
         open IN, "t/lib/sqlite.sql";
@@ -161,7 +161,7 @@ sub populate_schema {
     ]);
 
     $schema->populate('CD', [
-        [ qw/cdid artist title year genreid/ ],
+        [ qw/id artist title year genreid/ ],
         [ 1, 1, "Spoonful of bees", 1999, 1 ],
         [ 2, 1, "Forkful of bees", 2001 ],
         [ 3, 1, "Caterwaulin' Blues", 1997 ],
@@ -177,7 +177,7 @@ sub populate_schema {
     ]);
 
     $schema->populate('Tag', [
-        [ qw/tagid cd tag/ ],
+        [ qw/id cd tag/ ],
         [ 1, 1, "Blue" ],
         [ 2, 2, "Blue" ],
         [ 3, 3, "Blue" ],
@@ -299,12 +299,12 @@ sub populate_schema {
         [ 5, "round", "Head" ],
     ]);
     $schema->populate('CollectionObject', [
-        [ qw/collection object/ ],
-        [ 1, 1 ],
-        [ 1, 2 ],
-        [ 1, 3 ],
-        [ 2, 4 ],
-        [ 2, 5 ],
+        [ qw/id collection object/ ],
+        [ 1, 1, 1 ],
+        [ 2, 1, 2 ],
+        [ 3, 1, 3 ],
+        [ 4, 2, 4 ],
+        [ 5, 2, 5 ],
     ]);
 
     $schema->populate('Owners', [

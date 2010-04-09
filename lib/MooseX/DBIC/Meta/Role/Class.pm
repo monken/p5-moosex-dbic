@@ -1,9 +1,29 @@
 package MooseX::DBIC::Meta::Role::Class;
 
 use Moose::Role;
-use MooseX::ClassAttribute;
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
+
+my $application_to_class_class = Moose::Meta::Class->create_anon_class( 
+    superclasses => ['Moose::Meta::Role::Application::ToClass'], 
+    cache => 1 );
+$application_to_class_class->add_after_method_modifier(apply_attributes => sub {
+    my ($self , $role, $class) = @_;
+    my $attr_metaclass = $class->attribute_metaclass;
+    foreach my $attribute_name ( $role->get_class_attribute_list() ) {
+        next if ( $class->has_class_attribute($attribute_name)
+            && $class->get_class_attribute($attribute_name)
+            != $role->get_class_attribute($attribute_name) );
+
+        $class->add_class_attribute(
+            $role->get_class_attribute($attribute_name)
+                ->attribute_for_class($attr_metaclass) );
+    }
+});
+
+sub application_to_class_class { 
+    return $application_to_class_class->name;
+}
 
 sub get_all_columns {
     my $self = shift;

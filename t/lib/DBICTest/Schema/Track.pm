@@ -1,66 +1,31 @@
 package # hide from PAUSE 
     DBICTest::Schema::Track;
 
-use base qw/DBICTest::BaseResult/;
-__PACKAGE__->load_components(qw/InflateColumn::DateTime Ordered/);
+use MooseX::DBIC;
 
-__PACKAGE__->table('track');
-__PACKAGE__->add_columns(
-  'trackid' => {
-    data_type => 'integer',
-    is_auto_increment => 1,
-  },
-  'cd' => {
-    data_type => 'integer',
-  },
-  'position' => {
-    data_type => 'int',
-    accessor => 'pos',
-  },
-  'title' => {
-    data_type => 'varchar',
-    size      => 100,
-  },
-  last_updated_on => {
-    data_type => 'datetime',
+# load_components(qw/InflateColumn::DateTime Ordered/);
+
+has_column position => ( isa => 'Int', accessor => 'pos' );
+has_column title => ( size => 100 );
+
+has_column [qw(last_updated_at last_updated_on)] => (isa => 'DateTime',
     accessor => 'updated_date',
-    is_nullable => 1
-  },
-  last_updated_at => {
-    data_type => 'datetime',
-    is_nullable => 1
-  },
-  small_dt => { # for mssql and sybase DT tests
-    data_type => 'smalldatetime',
-    is_nullable => 1
-  },
-);
-__PACKAGE__->set_primary_key('trackid');
+  );
 
-__PACKAGE__->add_unique_constraint([ qw/cd position/ ]);
-__PACKAGE__->add_unique_constraint([ qw/cd title/ ]);
+has_column small_dt => ( isa => 'DateTime', # for mssql and sybase DT tests
+    data_type => 'smalldatetime');
 
-__PACKAGE__->position_column ('position');
-__PACKAGE__->grouping_column ('cd');
+#__PACKAGE__->position_column ('position');
+#__PACKAGE__->grouping_column ('cd');
 
 
-__PACKAGE__->belongs_to( cd => 'DBICTest::Schema::CD' );
-__PACKAGE__->belongs_to( disc => 'DBICTest::Schema::CD' => 'cd');
+belongs_to cd => ( isa => 'DBICTest::Schema::CD' );
+# belongs_to( disc => 'DBICTest::Schema::CD', foreign_key => 'cd');
 
-__PACKAGE__->might_have( cd_single => 'DBICTest::Schema::CD', 'single_track' );
-__PACKAGE__->might_have( lyrics => 'DBICTest::Schema::Lyrics', 'track_id' );
+might_have cd_single => ( isa => 'DBICTest::Schema::CD', foreign_key => 'single_track' );
+might_have lyrics => ( isa => 'DBICTest::Schema::Lyrics', foreign_key => 'track' );
 
-__PACKAGE__->belongs_to(
-    "year1999cd",
-    "DBICTest::Schema::Year1999CDs",
-    { "foreign.cdid" => "self.cd" },
-    { join_type => 'left' },  # the relationship is of course optional
-);
-__PACKAGE__->belongs_to(
-    "year2000cd",
-    "DBICTest::Schema::Year2000CDs",
-    { "foreign.cdid" => "self.cd" },
-    { join_type => 'left' },
-);
+#belongs_to year1999cd => ( isa => "DBICTest::Schema::Year1999CDs", join_type => 'left', foreign_key => 'cd' );
+#belongs_to year2000cd => ( isa => "DBICTest::Schema::Year2000CDs", join_type => 'left', foreign_key => 'cd' );
 
 1;

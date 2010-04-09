@@ -10,8 +10,10 @@ package Artist;
 use MooseX::DBIC;
 use MooseX::DBIC::Types q(:all);
 
+table 'artists';
+
 has_column name => ( is => 'rw', isa => 'Str' );
-has_many cds => ( is => 'rw', isa => ResultSet['CD'] );
+has_many cds => ( is => 'rw', isa => ResultSet['CD'], foreign_key => 'artist' );
 
 package MySchema;
 use Moose;

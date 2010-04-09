@@ -1,21 +1,10 @@
 package # hide from PAUSE 
     DBICTest::Schema::LinerNotes;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC;
 
-__PACKAGE__->table('liner_notes');
-__PACKAGE__->add_columns(
-  'liner_id' => {
-    data_type => 'integer',
-  },
-  'notes' => {
-    data_type => 'varchar',
-    size      => 100,
-  },
-);
-__PACKAGE__->set_primary_key('liner_id');
-__PACKAGE__->belongs_to(
-  'cd', 'DBICTest::Schema::CD', 'liner_id'
-);
+has_column notes => ( size => 100 );
+
+belongs_to cd => ( isa => 'DBICTest::Schema::CD' );
 
 1;

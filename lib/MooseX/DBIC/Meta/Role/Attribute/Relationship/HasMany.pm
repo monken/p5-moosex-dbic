@@ -4,10 +4,12 @@ use Moose::Role;
 with 'MooseX::DBIC::Meta::Role::Attribute::Relationship';
 
 use MooseX::DBIC::Types q(:all);
+use Moose::Util::TypeConstraints qw();
 
 sub _build_foreign_key {
     my $self = shift;
-    return $self->related_class->meta->get_attribute($self->associated_class->name->table);
+    Class::MOP::load_class($self->related_class);
+    return $self->related_class->meta->get_attribute($self->associated_class->name->table_name);
 };
 
 sub _build_join_condition {
@@ -41,6 +43,11 @@ sub reverse_relationship {
 
 sub build_options {
     my ($class, $for, $name, %options) = @_;
+    if($options{foreign_key}) {
+        my $isa = Moose::Util::TypeConstraints::find_or_parse_type_constraint($options{isa});
+        Class::MOP::load_class($isa->type_parameter->class);
+        $options{foreign_key} = $isa->type_parameter->class->meta->get_attribute($options{foreign_key}); 
+    }
     return ( 
         is => 'rw',
         %options,

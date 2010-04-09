@@ -43,7 +43,10 @@ sub _build_join_type { 'LEFT' }
 
 sub build_options {
     my ($class, $for, $name, %options) = @_;
-    $options{foreign_key} = $options{isa}->meta->get_attribute($options{foreign_key}) if($options{foreign_key});    
+    if($options{foreign_key}) {
+        Class::MOP::load_class($options{isa});
+        $options{foreign_key} = $options{isa}->meta->get_attribute($options{foreign_key});    
+     }
      return (
             is => 'rw',
             %options,

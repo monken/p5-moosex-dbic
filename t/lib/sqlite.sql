@@ -315,15 +315,16 @@ CREATE UNIQUE INDEX cd_artist_title ON cd (artist, title);
 --
 -- Table: collection_object
 --
-CREATE TABLE collection_object (
-  collection integer NOT NULL,
-  object integer NOT NULL,
-  PRIMARY KEY (collection, object)
+CREATE TABLE collectionobject (
+  collection CHAR(10) NOT NULL,
+  object CHAR(10) NOT NULL,
+  id CHAR(10) NOT NULL,
+  PRIMARY KEY (id)
 );
 
-CREATE INDEX collection_object_idx_collection ON collection_object (collection);
+CREATE INDEX collection_object_idx_collection ON collectionobject (collection);
 
-CREATE INDEX collection_object_idx_object ON collection_object (object);
+CREATE INDEX collection_object_idx_object ON collectionobject (object);
 
 --
 -- Table: lyrics
@@ -364,13 +365,13 @@ CREATE INDEX lyric_versions_idx_lyric_id ON lyric_versions (lyric_id);
 --
 -- Table: tags
 --
-CREATE TABLE tags (
-  tagid INTEGER PRIMARY KEY NOT NULL,
-  cd integer NOT NULL,
+CREATE TABLE tag (
+  id CHAR(10) PRIMARY KEY NOT NULL,
+  cd CHAR(10) NOT NULL,
   tag varchar(100) NOT NULL
 );
 
-CREATE INDEX tags_idx_cd ON tags (cd);
+CREATE INDEX tags_idx_cd ON tag (cd);
 
 --
 -- Table: cd_to_producer

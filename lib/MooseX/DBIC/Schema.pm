@@ -70,6 +70,7 @@ sub load_classes {
         $moniker = $class;
         $class = join('::', $schema, $class);
     } or do {
+        warn $@;
         Class::MOP::load_class($class);
     };
     
@@ -86,9 +87,6 @@ sub load_classes {
     
     $schema->load_classes(@defer);
     
-    ( my $table = lc($moniker) ) =~ s/::/_/g;
-    $class->meta->add_method( table => sub { $table } );
-    
     my $source = $schema->create_result_source( $class, $result );
     
     $schema->class_mappings->{$result} = $moniker;
@@ -103,7 +101,7 @@ sub create_result_class {
     
     my $result_metaclass = $class->meta->create_anon_class(
         superclasses => [ $class->meta->meta->name ],
-        roles => ['MooseX::DBIC::Meta::Role::Class'],
+        roles => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)],
         cache        => 1,
     )->name;
     
@@ -147,7 +145,7 @@ sub create_result_source {
     Class::MOP::load_class($class);
     Class::MOP::load_class($schema->result_source_class);
 
-    my $source = $schema->result_source_class->new({name => $moose->table, result_class => $moose});
+    my $source = $schema->result_source_class->new({name => $moose->table_name, result_class => $moose});
     
 
     foreach my $attr ( $moose->meta->get_attribute_list ) {
