@@ -7,7 +7,7 @@ use Moose::Exporter;
 
 my ( $import, $unimport, $init_meta ) = Moose::Exporter->build_import_methods( 
   also => 'Moose', 
-  with_meta => [qw(has_column has_many belongs_to has_one might_have table)],
+  with_meta => [qw(has_column has_many belongs_to has_one might_have table remove)],
   as_is => [qw(ResultSet)],
   metaclass_roles => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)],
   install => [qw(import unimport init_meta)]
@@ -28,6 +28,10 @@ sub table {
 
 sub has_column {
     shift->add_column(@_);
+}
+
+sub remove {
+    shift->remove_attribute(shift);
 }
 
 sub has_many {

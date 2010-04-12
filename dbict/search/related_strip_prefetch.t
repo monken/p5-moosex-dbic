@@ -22,7 +22,7 @@ is_same_sql_bind (
   '(
     SELECT tags.tagid, tags.cd, tags.tag
       FROM (
-        SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+        SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track
           FROM cd me
           JOIN artist artist ON artist.artistid = me.artist
           LEFT JOIN track tracks ON tracks.cd = me.cdid 

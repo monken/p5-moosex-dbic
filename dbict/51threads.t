@@ -1,6 +1,9 @@
 use strict;
 use warnings;
+
 use Test::More;
+use Test::Exception;
+
 use Config;
 
 # README: If you set the env var to a number greater than 10,
@@ -38,13 +41,13 @@ my $schema = DBICTest::Schema->connection($dsn, $user, $pass, { AutoCommit => 1,
 
 my $parent_rs;
 
-eval {
+lives_ok (sub {
     my $dbh = $schema->storage->dbh;
 
     {
         local $SIG{__WARN__} = sub {};
         eval { $dbh->do("DROP TABLE cd") };
-        $dbh->do("CREATE TABLE cd (cdid serial PRIMARY KEY, artist INTEGER NOT NULL UNIQUE, title VARCHAR(100) NOT NULL UNIQUE, year VARCHAR(100) NOT NULL, genreid INTEGER, single_track INTEGER);");
+        $dbh->do("CREATE TABLE cd (cdid serial PRIMARY KEY, artist INTEGER NOT NULL UNIQUE, title VARCHAR(100) NOT NULL UNIQUE, year VARCHAR(100) NOT NULL, genre INTEGER, single_track INTEGER);");
     }
 
     $schema->resultset('CD')->create({ title => 'vacation in antarctica', artist => 123, year => 1901 });
@@ -52,8 +55,7 @@ eval {
 
     $parent_rs = $schema->resultset('CD')->search({ year => 1901 });
     $parent_rs->next;
-};
-ok(!$@) or diag "Creation eval failed: $@";
+}, 'populate successfull');
 
 my @children;
 while(@children < $num_children) {

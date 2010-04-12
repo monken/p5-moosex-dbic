@@ -15,7 +15,7 @@ lives_ok(sub {
   # only the requested me.name column will be fetched.
 
   # reference sql with select => [...]
-  #   SELECT me.name, cds.title, cds.cdid, cds.artist, cds.title, cds.year, cds.genreid, cds.single_track FROM ...
+  #   SELECT me.name, cds.title, cds.cdid, cds.artist, cds.title, cds.year, cds.genre, cds.single_track FROM ...
 
   my $rs = $schema->resultset('Artist')->search(
     { 'cds.title' => { '!=', 'Generic Manufactured Singles' } },

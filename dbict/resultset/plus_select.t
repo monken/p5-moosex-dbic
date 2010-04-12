@@ -8,7 +8,7 @@ use DBICTest;
 
 my $schema = DBICTest->init_schema();
 
-my $cd_rs = $schema->resultset('CD')->search ({genreid => { '!=', undef } }, { order_by => 'cdid' });
+my $cd_rs = $schema->resultset('CD')->search ({genre => { '!=', undef } }, { order_by => 'cdid' });
 my $track_cnt = $cd_rs->search({}, { rows => 1 })->search_related ('tracks')->count;
 
 my %basecols = $cd_rs->first->get_columns;

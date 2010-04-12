@@ -8,11 +8,9 @@ use MooseX::Attribute::Deflator::Moose;
 use MooseX::Attribute::Deflator::Structured;
 use Data::Dumper;
 
-$Data::Dumper::Maxdepth = 99;
+$Data::Dumper::Maxdepth = 3;
 $Data::Dumper::Indent = 1;
 $Carp::Verbose = 1;
-
-BEGIN {$ENV{DBIC_TRACE}=1}
 
 extends 'DBIx::Class::Schema';
 
@@ -159,7 +157,7 @@ sub create_result_source {
           );
         $attribute->apply_to_result_source($source);
     }
-    $source->set_primary_key('id');
+    
     return $source;
 }
 

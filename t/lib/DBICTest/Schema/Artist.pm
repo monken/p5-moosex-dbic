@@ -9,8 +9,11 @@ use MooseX::DBIC; with 'DBICTest::Compat';
 #     "source_info_key_C" => "source_info_value_C",
 # });
 
+remove 'id';
 
-has_column name => ( size => 100 );
+has_column artistid => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
+
+has_column name => ( size => 100, trigger => \&_set_name );
 has_column rank => ( isa => 'Int', default => 13, required => 1 );
 has_column charfield => ( size => 10 );
 # 
@@ -19,7 +22,7 @@ has_column charfield => ( size => 10 );
 #     name        => 'artist name',
 # });
 
-has_many cds => ( isa => ResultSet['DBICTest::Schema::CD'] );
+has_many cds => ( isa => ResultSet['DBICTest::Schema::CD'], cascade_delete => 1 );
 #    { order_by => 'year' },
 
 has_many cds_unordered => ( isa => ResultSet['DBICTest::Schema::CD'] );
@@ -51,5 +54,11 @@ sub store_column {
   $self->next::method($name, $value);
 }
 
+sub _set_name {
+    my ($self, $new, $old) = @_;
+    return unless($new =~ /(X )?store_column test/);
+    $new = 'X '. $new;
+    $self->meta->get_attribute('name')->set_raw_value($self, $new) if($new);
+}
 
 1;

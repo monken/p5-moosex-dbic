@@ -15,7 +15,7 @@ sub _build_foreign_key {
 sub _build_join_condition {
     my $self = shift;
     my $fk = $self->foreign_key;
-    return { 'foreign.'.$fk->name => 'self.id' };
+    return { 'foreign.'.$fk->name => 'self.' . $self->associated_class->get_primary_key->name };
 } 
 
 after apply_to_result_source => sub {
@@ -27,8 +27,8 @@ after apply_to_result_source => sub {
         {
             accessor => 'multi',
             join_type => 'LEFT',
-            cascade_delete => 1,
-            cascade_copy => 1,
+            cascade_delete => $self->cascade_delete,
+            cascade_copy => $self->cascade_update,
         }
     );
 };

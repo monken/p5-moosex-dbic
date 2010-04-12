@@ -3,6 +3,8 @@ package # hide from PAUSE
 
 use MooseX::DBIC;
 
+remove 'id';
+
 belongs_to artist => ( isa => 'DBICTest::Schema::Artist' );
 
 belongs_to cd => ( isa => 'DBICTest::Schema::CD' ); #, undef, { is_deferrable => 0, add_fk_index => 0 } );

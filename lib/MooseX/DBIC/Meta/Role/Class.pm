@@ -63,6 +63,11 @@ sub get_column_list {
     } $self->get_attribute_list;
 }
 
+sub get_primary_key {
+    my $self = shift;
+    return first { $_->primary_key } map { $self->get_attribute($_) } $self->get_column_list;
+}
+
 sub get_relationship_list {
     my $self = shift;
     return grep {

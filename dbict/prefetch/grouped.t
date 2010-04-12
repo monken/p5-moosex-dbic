@@ -85,7 +85,7 @@ for ($cd_rs->all) {
   is_same_sql_bind (
     $track_rs->as_query,
     '(
-      SELECT me.cd, me.track_count, cd.cdid, cd.artist, cd.title, cd.year, cd.genreid, cd.single_track
+      SELECT me.cd, me.track_count, cd.cdid, cd.artist, cd.title, cd.year, cd.genre, cd.single_track
         FROM (
           SELECT me.cd, COUNT (me.trackid) AS track_count
             FROM track me
@@ -214,12 +214,12 @@ for ($cd_rs->all) {
   is_same_sql_bind (
     $rs->as_query,
     '(
-      SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
+      SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track,
              tags.tagid, tags.cd, tags.tag
         FROM (
-          SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+          SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track
             FROM cd me
-          GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track, cdid
+          GROUP BY me.cdid, me.artist, me.title, me.year, me.genre, me.single_track, cdid
           ORDER BY cdid
         ) me
         LEFT JOIN tags tags ON tags.cd = me.cdid
@@ -282,13 +282,13 @@ for ($cd_rs->all) {
     is_same_sql_bind (
       $cd_rs->as_query,
       '(
-        SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
+        SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track,
                artist.artistid, artist.name, artist.rank, artist.charfield
           FROM (
-            SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+            SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track
               FROM cd me
               JOIN artist artist ON artist.artistid = me.artist
-            GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+            GROUP BY me.cdid, me.artist, me.title, me.year, me.genre, me.single_track
           ) me
           JOIN artist artist ON artist.artistid = me.artist
       )',
@@ -307,20 +307,20 @@ for ($cd_rs->all) {
     is_same_sql_bind (
       $cd_rs2->as_query,
       '(
-        SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
+        SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track,
                artist.artistid, artist.name, artist.rank, artist.charfield
           FROM (
-            SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+            SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track
               FROM cd me
               LEFT JOIN track tracks ON tracks.cd = me.cdid
               JOIN artist artist ON artist.artistid = me.artist
             WHERE ( tracks.title != ? )
-            GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+            GROUP BY me.cdid, me.artist, me.title, me.year, me.genre, me.single_track
           ) me
           LEFT JOIN track tracks ON tracks.cd = me.cdid
           JOIN artist artist ON artist.artistid = me.artist
         WHERE ( tracks.title != ? )
-        GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
+        GROUP BY me.cdid, me.artist, me.title, me.year, me.genre, me.single_track,
                  artist.artistid, artist.name, artist.rank, artist.charfield
       )',
       [ map { [ 'tracks.title' => 'ugabuganoexist' ] } (1 .. 2) ],
@@ -339,10 +339,10 @@ for ($cd_rs->all) {
         }
     );
     is_same_sql_bind($rs->as_query, q{
-        (SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track, me.test_count, tags.tagid, tags.cd, tags.tag
-          FROM (SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track, COUNT( tags.tag ) AS test_count
+        (SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track, me.test_count, tags.tagid, tags.cd, tags.tag
+          FROM (SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track, COUNT( tags.tag ) AS test_count
                 FROM cd me LEFT JOIN tags tags ON tags.cd = me.cdid
-            GROUP BY me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track, tags.tag
+            GROUP BY me.cdid, me.artist, me.title, me.year, me.genre, me.single_track, tags.tag
             ORDER BY tags.tag ASC LIMIT 1)
             me
           LEFT JOIN tags tags ON tags.cd = me.cdid

@@ -3,6 +3,8 @@ package # hide from PAUSE
 
 use MooseX::DBIC; with 'DBICTest::Compat';
 
+remove 'id';
+
 has_column [qw(id1 id2)];
 
 belongs_to 'artist' => ( isa => 'DBICTest::Schema::Artist' );

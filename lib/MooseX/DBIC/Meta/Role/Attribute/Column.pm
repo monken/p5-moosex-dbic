@@ -14,6 +14,8 @@ has size => ( is => 'rw', isa => 'Int' );
 
 has auto_increment => ( is => 'rw', isa => 'Bool', default => 0 );
 
+has primary_key => ( is => 'rw', isa => 'Bool', default => 0 );
+
 sub _build_column_info {
     my $self = shift;
     return {
@@ -30,10 +32,15 @@ sub _build_data_type {
 }
 
 after apply_to_result_source => sub {
-    my ($self, $result) = @_;
+    my ($self, $source) = @_;
     
-    $result->add_columns(
+    $source->add_columns(
         $self->name => $self->column_info);
+        
+    if($self->primary_key) {
+        $source->set_primary_key($self->name);
+        $self->associated_class->name->_primaries($self->name);
+    }
 };
 
 1;

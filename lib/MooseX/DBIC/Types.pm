@@ -22,13 +22,14 @@ deflate ResultSet.'[]', via { foreach my $row(@{$_->get_cache || []}) { $row->up
 
 deflate Result, via {
     $_->update_or_insert;
-    $_->id;
+    my $pk = $_->meta->get_primary_key->name;
+    $_->$pk;
 };
 inflate Result, via {
     my ($result, $constraint, $inflate, $rs, $attr) = @_;
     my $id = $_;
     my $class = $attr->proxy_class->name;
-    return $class->new( id => $id, '-result_source' => $rs->schema->source($attr->related_class) );
+    return $class->new( $attr->related_class->meta->get_primary_key->name => $id, '-result_source' => $rs->schema->source($attr->related_class) );
 };
 
 use MooseX::DBIC::TypeMap;

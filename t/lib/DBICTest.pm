@@ -149,19 +149,19 @@ sub populate_schema {
     my $schema = shift;
 
     $schema->populate('Genre', [
-      [qw/id name/],
+      [qw/genreid name/],
       [qw/1       emo  /],
     ]);
 
     $schema->populate('Artist', [
-        [ qw/id name/ ],
+        [ qw/artistid name/ ],
         [ 1, 'Caterwauler McCrae' ],
         [ 2, 'Random Boy Band' ],
         [ 3, 'We Are Goth' ],
     ]);
 
     $schema->populate('CD', [
-        [ qw/id artist title year genre/ ],
+        [ qw/cdid artist title year genre/ ],
         [ 1, 1, "Spoonful of bees", 1999, 1 ],
         [ 2, 1, "Forkful of bees", 2001 ],
         [ 3, 1, "Caterwaulin' Blues", 1997 ],
@@ -170,14 +170,14 @@ sub populate_schema {
     ]);
 
     $schema->populate('LinerNotes', [
-        [ qw/id notes/ ],
+        [ qw/liner_id notes/ ],
         [ 2, "Buy Whiskey!" ],
         [ 4, "Buy Merch!" ],
         [ 5, "Kill Yourself!" ],
     ]);
 
     $schema->populate('Tag', [
-        [ qw/id cd tag/ ],
+        [ qw/tagid cd tag/ ],
         [ 1, 1, "Blue" ],
         [ 2, 2, "Blue" ],
         [ 3, 3, "Blue" ],
@@ -190,10 +190,10 @@ sub populate_schema {
     ]);
 
     $schema->populate('TwoKeys', [
-        [ qw/id artist cd/ ],
-        [ 1, 1, 1 ],
-        [ 2, 1, 2 ],
-        [ 3, 2, 2 ],
+        [ qw/artist cd/ ],
+        [ 1, 1 ],
+        [ 1, 2 ],
+        [ 2, 2 ],
     ]);
 
     $schema->populate('FourKeys', [
@@ -221,8 +221,8 @@ sub populate_schema {
     ]);
 
     $schema->populate('ArtistUndirectedMap', [
-        [ qw/id id1 id2/ ],
-        [ 1, 1, 2 ]
+        [ qw/id1 id2/ ],
+        [ 1, 2 ]
     ]);
 
     $schema->populate('Producer', [
@@ -233,10 +233,10 @@ sub populate_schema {
     ]);
 
     $schema->populate('CD_to_Producer', [
-        [ qw/id cd producer/ ],
-        [ 1, 1, 1 ],
-        [ 2, 1, 2 ],
-        [ 3, 1, 3 ],
+        [ qw/cd producer/ ],
+        [ 1, 1 ],
+        [ 1, 2 ],
+        [ 1, 3 ],
     ]);
     
     $schema->populate('TreeLike', [
@@ -251,7 +251,7 @@ sub populate_schema {
     ]);
 
     $schema->populate('Track', [
-        [ qw/id cd  position title/ ],
+        [ qw/trackid cd  position title/ ],
         [ 4, 2, 1, "Stung with Success"],
         [ 5, 2, 2, "Stripy"],
         [ 6, 2, 3, "Sticky Honey"],
@@ -299,12 +299,12 @@ sub populate_schema {
         [ 5, "round", "Head" ],
     ]);
     $schema->populate('CollectionObject', [
-        [ qw/id collection object/ ],
-        [ 1, 1, 1 ],
-        [ 2, 1, 2 ],
-        [ 3, 1, 3 ],
-        [ 4, 2, 4 ],
-        [ 5, 2, 5 ],
+        [ qw/collection object/ ],
+        [ 1, 1 ],
+        [ 1, 2 ],
+        [ 1, 3 ],
+        [ 2, 4 ],
+        [ 2, 5 ],
     ]);
 
     $schema->populate('Owners', [

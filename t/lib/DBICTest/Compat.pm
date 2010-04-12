@@ -16,11 +16,26 @@ sub discard_changes {}
 
 sub ID {}
 
-sub is_column_changed {}
+sub is_column_changed {
+    my ($self, $column) = @_;
+    return {$self->get_dirty_columns}->{$column};
+}
 
-sub set_columns {}
+sub set_columns {
+    my ($self, $cols) = @_;
+    while(my($k,$v) = each %$cols) {
+        $self->$k($v);
+    }
+}
 
 sub set_column { my ($self, $col, $value) = @_; return $self->$col($value) }
 
 sub get_inflated_columns { my $self = shift; %$self }
+
+sub load_components { die "Can't locate DBIx/Class/DoesNotExist.pm" }
+
+sub field_name_for { return { name => 'artist name' } }
+
+sub has_column_loaded { my $self = shift; return $self->meta->get_attribute(shift)->has_value($self) } 
+
 1;

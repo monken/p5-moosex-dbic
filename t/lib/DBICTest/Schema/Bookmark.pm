@@ -3,7 +3,9 @@ package # hide from PAUSE
 
 use MooseX::DBIC; with 'DBICTest::Compat';
 
-has_column id => ( is => 'rw', isa => 'Num', auto_increment => 1 );
+remove 'id';
+
+has_column id => ( is => 'rw', isa => 'Num', auto_increment => 1, primary_key => 1 );
 
 belongs_to link => ( isa => 'DBICTest::Schema::Link' );
 

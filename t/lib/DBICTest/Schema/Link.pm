@@ -5,15 +5,9 @@ use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
     
 
-has_column id => ( isa => 'Num', column_info => {
-        data_type => 'integer',
-        is_auto_increment => 1} );
+has_column id => ( isa => 'Num', auto_increment => 1, primary_key => 1 );
 
-has_column [qw(url title)] => ( column_info => {
-        data_type => 'varchar',
-        size      => 100,
-        is_nullable => 1,
-});
+has_column [qw(url title)] => ( size      => 100 );
 
 1;
 

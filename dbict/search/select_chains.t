@@ -15,15 +15,15 @@ my @chain = (
   {
     columns     => [ 'cdid' ],
     '+columns'  => [ { title_lc => { lower => 'title' } } ],
-    '+select'   => [ 'genreid' ],
-    '+as'       => [ 'genreid' ],
-  } => 'SELECT me.cdid, LOWER( title ), me.genreid FROM cd me',
+    '+select'   => [ 'genre' ],
+    '+as'       => [ 'genre' ],
+  } => 'SELECT me.cdid, LOWER( title ), me.genre FROM cd me',
 
   {
     '+columns'  => [ { max_year => { max => 'me.year' }}, ],
     '+select'   => [ { count => 'me.cdid' }, ],
     '+as'       => [ 'cnt' ],
-  } => 'SELECT me.cdid, LOWER( title ), MAX( me.year ), me.genreid, COUNT( me.cdid ) FROM cd me',
+  } => 'SELECT me.cdid, LOWER( title ), MAX( me.year ), me.genre, COUNT( me.cdid ) FROM cd me',
 
   {
     select      => [ { min => 'me.cdid' }, ],

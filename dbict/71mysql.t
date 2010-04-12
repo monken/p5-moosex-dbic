@@ -25,7 +25,7 @@ $dbh->do("CREATE TABLE artist (artistid INTEGER NOT NULL AUTO_INCREMENT PRIMARY 
 
 $dbh->do("DROP TABLE IF EXISTS cd;");
 
-$dbh->do("CREATE TABLE cd (cdid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, artist INTEGER, title TEXT, year DATE, genreid INTEGER, single_track INTEGER);");
+$dbh->do("CREATE TABLE cd (cdid INTEGER NOT NULL AUTO_INCREMENT PRIMARY KEY, artist INTEGER, title TEXT, year DATE, genre INTEGER, single_track INTEGER);");
 
 $dbh->do("DROP TABLE IF EXISTS producer;");
 
@@ -184,13 +184,36 @@ lives_ok { $cd->set_producers ([ $producer ]) } 'set_relationship doesnt die';
   is_same_sql_bind (
     $rs->as_query,
     '(
-      SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track,
+      SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track,
              artist.artistid, artist.name, artist.rank, artist.charfield
         FROM cd me
         INNER JOIN artist artist ON artist.artistid = me.artist
     )',
     [],
     'overriden default join type works',
+  );
+}
+
+{
+  # Test support for straight joins
+  my $cdsrc = $schema->source('CD');
+  my $artrel_info = $cdsrc->relationship_info ('artist');
+  $cdsrc->add_relationship(
+    'straight_artist',
+    $artrel_info->{class},
+    $artrel_info->{cond},
+    { %{$artrel_info->{attrs}}, join_type => 'straight' },
+  );
+  is_same_sql_bind (
+    $cdsrc->resultset->search({}, { prefetch => 'straight_artist' })->as_query,
+    '(
+      SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track,
+             straight_artist.artistid, straight_artist.name, straight_artist.rank, straight_artist.charfield
+        FROM cd me
+        STRAIGHT_JOIN artist straight_artist ON straight_artist.artistid = me.artist
+    )',
+    [],
+    'straight joins correctly supported for mysql'
   );
 }
 

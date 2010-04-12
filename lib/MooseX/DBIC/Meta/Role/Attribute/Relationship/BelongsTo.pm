@@ -13,7 +13,13 @@ sub _build_foreign_key {
 sub _build_join_condition {
     my $self = shift;
     my $fk = $self->foreign_key;
-    return { 'foreign.id' => 'self.' . $fk->name };
+    my $pk = $self->related_class->meta->get_primary_key;
+    Moose->throw_error(q(Couldn't find primary key for class ), 
+                       $self->related_class, 
+                       qq(. Please add a join_condition to ),
+                       $self->name, q( in class ), $self->associated_class->name )
+        unless($pk);
+    return { 'foreign.' . $pk->name => 'self.' . $fk->name };
 } 
 
 after apply_to_result_source => sub {
@@ -35,6 +41,10 @@ sub _build_join_type {
 sub reverse_relationship {
     my $self = shift;
     return first { $_->foreign_key eq $self } $self->related_class->meta->get_all_relationships;
+}
+
+sub BUILD {
+    die @_;
 }
 
 sub build_options {

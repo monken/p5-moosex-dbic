@@ -47,13 +47,18 @@ has join_type => (
     lazy => 1,
 );
 
+has [qw(cascade_delete cascade_update)] => ( is => 'rw', isa => 'Bool', default => 0 );
+
 sub _build_proxy_class {
     my $attr = shift;
+    my $pk = $attr->related_class->meta->get_primary_key->name;
     MooseX::DBIC::ResultProxy->build_proxy( 
         $attr->related_class =>
-            ( copy => [qw(id result_source in_storage)], builder => sub {
+            ( copy => [$pk, qw(result_source in_storage)], builder => sub {
                 my $self = shift;
-                $self->result_source->schema->resultset($attr->related_class)->find($self->id);
+                warn "$self $pk";
+                warn Data::Dumper::Dumper $self;
+                $self->result_source->schema->resultset($attr->related_class)->find($self->$pk);
             } )
     );
 }

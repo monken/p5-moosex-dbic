@@ -9,7 +9,7 @@ use DBICTest;
 my $schema = DBICTest->init_schema();
 
 
-my $cd_rs = $schema->resultset('CD')->search ({ genreid => undef }, { columns => [ 'genreid' ]} );
+my $cd_rs = $schema->resultset('CD')->search ({ genre => undef }, { columns => [ 'genre' ]} );
 my $count = $cd_rs->count;
 cmp_ok ( $count, '>', 1, 'several CDs with no genre');
 

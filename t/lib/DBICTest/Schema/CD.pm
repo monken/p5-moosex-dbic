@@ -3,7 +3,10 @@ package # hide from PAUSE
 
 use MooseX::DBIC; with 'DBICTest::Compat';
 
-table 'cd';
+
+remove 'id';
+
+has_column cdid => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
 
 has_column [qw(title year)];
 
@@ -12,10 +15,10 @@ belongs_to artist => ( isa => 'DBICTest::Schema::Artist' );# { is_deferrable => 
 # in case this is a single-cd it promotes a track from another cd
 belongs_to single_track => ( isa => 'DBICTest::Schema::Track', join_type => 'LEFT' );
 
-has_many tracks => ( isa => ResultSet['DBICTest::Schema::Track'] );
+has_many tracks => ( isa => ResultSet['DBICTest::Schema::Track'], cascade_delete => 1 );
 has_many tags => ( isa => ResultSet['DBICTest::Schema::Tag'], #order_by => 'tag' 
 );
-has_many cd_to_producer => ( isa => ResultSet['DBICTest::Schema::CD_to_Producer'] );
+has_many cd_to_producer => ( isa => ResultSet['DBICTest::Schema::CD_to_Producer'], cascade_delete => 1 );
 
 might_have liner_notes => ( isa => 'DBICTest::Schema::LinerNotes', handles => [ qw/notes/ ] );
 

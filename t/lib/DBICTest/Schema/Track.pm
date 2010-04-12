@@ -5,6 +5,10 @@ use MooseX::DBIC; with 'DBICTest::Compat';
 
 # load_components(qw/InflateColumn::DateTime Ordered/);
 
+remove 'id';
+
+has_column trackid => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
+
 has_column position => ( isa => 'Int', accessor => 'pos' );
 has_column title => ( size => 100 );
 

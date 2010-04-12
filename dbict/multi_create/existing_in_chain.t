@@ -36,7 +36,7 @@ TODO: { my $f = __FILE__; local $TODO = "See comment at top of $f for discussion
 
   lives_ok (sub {
     my $existing_nogen_cd = $schema->resultset('CD')->search (
-      { 'genre.genreid' => undef },
+      { 'genre.genre' => undef },
       { join => 'genre' },
     )->first;
 

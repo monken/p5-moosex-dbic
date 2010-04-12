@@ -1,28 +1,18 @@
 package # hide from PAUSE 
     DBICTest::Schema::TypedObject;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
-__PACKAGE__->table('typed_object');
-__PACKAGE__->add_columns(
-  'objectid' => {
-    data_type => 'integer',
-    is_auto_increment => 1,
-  },
-  'type' => {
-    data_type => 'varchar',
-    size      => '100',
-  },
-  'value' => {
-    data_type => 'varchar',
-    size      => 100,
-  },
-);
-__PACKAGE__->set_primary_key('objectid');
+table 'typed_object';
 
-__PACKAGE__->has_many( collection_object => "DBICTest::Schema::CollectionObject",
-                       { "foreign.object" => "self.objectid" }
-                     );
-__PACKAGE__->many_to_many( collections => collection_object => "collection" );
+remove 'id';
+
+has_column objectid => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
+
+has_column [qw(type value)];
+
+has_many collection_object => ( isa => ResultSet["DBICTest::Schema::CollectionObject"], foreign_key => 'object' );
+
+#__PACKAGE__->many_to_many( collections => collection_object => "collection" );
 
 1;

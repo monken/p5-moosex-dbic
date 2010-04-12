@@ -46,7 +46,7 @@ my $bind = [
 is_same_sql_bind (
   $rs->as_query,
   '(
-    SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+    SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track
       FROM cd me
       LEFT JOIN track tracks ON tracks.cd = me.cdid
     WHERE
@@ -65,7 +65,7 @@ $schema->storage->auto_cast (1);
 is_same_sql_bind (
   $rs->as_query,
   '(
-    SELECT me.cdid, me.artist, me.title, me.year, me.genreid, me.single_track
+    SELECT me.cdid, me.artist, me.title, me.year, me.genre, me.single_track
       FROM cd me
       LEFT JOIN track tracks ON tracks.cd = me.cdid
     WHERE

@@ -10,15 +10,20 @@ __PACKAGE__->meta->add_column( id => (
     builder     => '_build_id',
     size        => 10,
     predicate   => 'has_id',
+    primary_key => 1,
 ) );
 
 __PACKAGE__->meta->add_class_attribute( table_name => (
     is => 'rw', isa => 'Str', lazy => 1, builder => '_build_table_name'
 ) );
 
+__PACKAGE__->meta->add_class_attribute( _primaries => (
+    is => 'rw', isa => 'Str', default => 'id'
+) );
+
 has result_source => ( is => 'rw', init_arg => '-result_source', required => 1, handles => [qw(primary_columns relationship_info)] );
 
-has in_storage => ( is => 'rw', isa => 'Bool' );
+has in_storage => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_relationship', weak_ref => 1, default => sub {[]} );
 
@@ -162,7 +167,7 @@ sub search_related {
 my %import = (
     'DBIx::Class::Relationship::Base' => [qw(related_resultset find_or_new_related find_related)],
     'DBIx::Class::PK' => [qw(ident_condition _ident_values)],
-    'DBIx::Class::ResultSource' => [qw(_pri_cols _primaries)],
+    'DBIx::Class::ResultSource' => [qw(_pri_cols )],
     'Class::Accessor::Grouped' => [qw(get_simple)],
     'DBIx::Class::Row' => [qw(throw_exception)],
 );
@@ -203,6 +208,19 @@ sub insert {
       unless $source;
     $self->{_update_in_progress} ? return $self : ($self->{_update_in_progress} = 1);
     my %to_insert = $self->get_columns;
+    
+    my $pk = $self->meta->get_primary_key;
+    if($pk && $self->meta->get_primary_key->auto_increment && !$pk->has_value($self)) {
+        my $storage = $self->result_source->storage;
+        $self->throw_exception( "Missing primary key but Storage doesn't support last_insert_id" )
+          unless $storage->can('last_insert_id');
+        my $id = $storage->last_insert_id($self->result_source, $pk->name);
+        $self->throw_exception( "Can't get last insert id" )
+          unless ($id);
+        $pk->set_value($self, $id + 1);
+        delete $to_insert{$pk->name};
+    }
+    
     my $updated_cols = $source->storage->insert($source, { %to_insert });
     $self->in_storage(1);
     map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
@@ -251,24 +269,22 @@ sub update {
 
 sub delete {
   my $self = shift;
-  if (ref $self) {
     $self->throw_exception( "Not in database" ) unless $self->in_storage;
     my $ident_cond = $self->{_orig_ident} || $self->ident_condition;
     $self->throw_exception("Cannot safely delete a row in a PK-less table")
       if ! keys %$ident_cond;
       $self->throw_exception("Can't delete the object unless it has loaded the primary keys")
-             unless $self->has_id;
+             unless $self->meta->get_primary_key->has_value($self);
 
+    my @cascade = grep { $_->cascade_delete } map { $self->meta->get_relationship($_) } $self->meta->get_relationship_list;
+    foreach my $rel(@cascade) {
+        $self->search_related($rel->name)->delete_all;
+    }
+    
     $self->result_source->storage->delete(
       $self->result_source, $ident_cond);
     $self->in_storage(0);
-  } else {
-    $self->throw_exception("Can't do class delete without a ResultSource instance")
-      unless $self->can('result_source_instance');
-    my $attrs = @_ > 1 && ref $_[$#_] eq 'HASH' ? { %{pop(@_)} } : {};
-    my $query = ref $_[0] eq 'HASH' ? $_[0] : {@_};
-    $self->result_source_instance->resultset->search(@_)->delete;
-  }
+
   return $self;
 }
 
