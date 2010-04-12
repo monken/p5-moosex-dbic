@@ -9,6 +9,7 @@ __PACKAGE__->meta->add_column( id => (
     required    => 1,
     builder     => '_build_id',
     size        => 10,
+    predicate   => 'has_id',
 ) );
 
 __PACKAGE__->meta->add_class_attribute( table_name => (
@@ -130,7 +131,9 @@ sub BUILD {
 
 sub get_column {
     my ($self, $column) = @_;
-    return $self->$column;
+    if(my $attr = $self->meta->get_column($column)) {
+        return $attr->get_value($self);
+    }
 }
 
 sub get_columns {
@@ -243,6 +246,29 @@ sub update {
   map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
   $self->_raw_data({%{$self->_raw_data}, %to_update});
   undef $self->{_update_in_progress};
+  return $self;
+}
+
+sub delete {
+  my $self = shift;
+  if (ref $self) {
+    $self->throw_exception( "Not in database" ) unless $self->in_storage;
+    my $ident_cond = $self->{_orig_ident} || $self->ident_condition;
+    $self->throw_exception("Cannot safely delete a row in a PK-less table")
+      if ! keys %$ident_cond;
+      $self->throw_exception("Can't delete the object unless it has loaded the primary keys")
+             unless $self->has_id;
+
+    $self->result_source->storage->delete(
+      $self->result_source, $ident_cond);
+    $self->in_storage(0);
+  } else {
+    $self->throw_exception("Can't do class delete without a ResultSource instance")
+      unless $self->can('result_source_instance');
+    my $attrs = @_ > 1 && ref $_[$#_] eq 'HASH' ? { %{pop(@_)} } : {};
+    my $query = ref $_[0] eq 'HASH' ? $_[0] : {@_};
+    $self->result_source_instance->resultset->search(@_)->delete;
+  }
   return $self;
 }
 

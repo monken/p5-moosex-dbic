@@ -20,8 +20,8 @@ __PACKAGE__->load_classes(qw/
   Track
   Tag
   #Year2000CDs
-  Year1999CDs
-  CustomSql
+  #Year1999CDs
+  #CustomSql
   Money
   /,
   { 'DBICTest::Schema' => [qw/
@@ -42,11 +42,11 @@ __PACKAGE__->load_classes(qw/
     '#dummy',
     'SelfRef',
     'ArtistUndirectedMap',
-    'ArtistSourceName',
-    'ArtistSubclass',
+    '#ArtistSourceName',
+    '#ArtistSubclass',
     'Producer',
     'CD_to_Producer',
-    'Dummy',    # this is a real result class we remove in the hook below
+    '#Dummy',    # this is a real result class we remove in the hook below
   ),
   qw/SelfRefAlias TreeLike TwoKeyTreeLike Event EventTZ NoPrimaryKey/,
   qw/Collection CollectionObject TypedObject Owners BooksInLibrary/,

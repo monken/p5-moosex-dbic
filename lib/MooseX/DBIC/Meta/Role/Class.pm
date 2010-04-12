@@ -46,6 +46,15 @@ sub add_column {
   }
 }
 
+sub get_column {
+    my $self = shift;
+    my $name = shift;
+    return first {
+        $_->does('MooseX::DBIC::Meta::Role::Attribute::Column') &&
+        $_->name eq $name
+    } map { $self->get_attribute($_) } $self->get_attribute_list;
+}
+
 sub get_column_list {
     my $self = shift;
     return grep {

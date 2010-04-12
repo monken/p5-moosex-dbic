@@ -49,7 +49,7 @@ my $record_jp = $schema->resultset("Artist")->search(undef, { join => 'cds' })->
 
 ok($record_jp, "prefetch on same rel okay");
 
-my $record_fn = $schema->resultset("Artist")->search(undef, { join => 'cds' })->search({'cds.cdid' => '1'}, {join => 'artist_undirected_maps'})->next;
+my $record_fn = $schema->resultset("Artist")->search(undef, { join => 'cds' })->search({'cds.id' => '1'}, {join => 'artist_undirected_maps'})->next;
 
 ok($record_fn, "funny join is okay");
 
@@ -57,7 +57,7 @@ ok($record_fn, "funny join is okay");
 
 is(@art, 1, "Changed artist returned by search");
 
-is($art[0]->artistid, 3,'Correct artist too');
+is($art[0]->id, 3,'Correct artist too');
 
 lives_ok (sub { $art->delete }, 'Cascading delete on Ordered has_many works' );  # real test in ordered.t
 
@@ -79,9 +79,9 @@ ok($art->in_storage, "Re-created");
 
 is(@art, 3, 'And now there are three again');
 
-my $new = $schema->resultset("Artist")->create({ artistid => 4 });
+my $new = $schema->resultset("Artist")->create({ id => 4 });
 
-is($new->artistid, 4, 'Create produced record ok');
+is($new->id, 4, 'Create produced record ok');
 
 @art = $schema->resultset("Artist")->search({ });
 
@@ -123,7 +123,7 @@ is($new_again->ID, 'DBICTest::Artist|artist|artistid=4', 'unique object id gener
   my $warnings = '';
   local $SIG{__WARN__} = sub { $warnings .= $_[0] };
 
-  my $artist_by_hash = $schema->resultset('Artist')->find(artistid => 4);
+  my $artist_by_hash = $schema->resultset('Artist')->find(id => 4);
   is($artist_by_hash->name, 'Man With A Spoon', 'Retrieved correctly');
   is($artist_by_hash->ID, 'DBICTest::Artist|artist|artistid=4', 'unique object id generated correctly');
   like($warnings, qr/deprecated/, 'warned about deprecated find usage');
@@ -134,14 +134,14 @@ is($schema->resultset("Artist")->count, 4, 'count ok');
 # test find_or_new
 {
   my $existing_obj = $schema->resultset('Artist')->find_or_new({
-    artistid => 4,
+    id => 4,
   });
 
   is($existing_obj->name, 'Man With A Spoon', 'find_or_new: found existing artist');
   ok($existing_obj->in_storage, 'existing artist is in storage');
 
   my $new_obj = $schema->resultset('Artist')->find_or_new({
-    artistid => 5,
+    id => 5,
     name     => 'find_or_new',
   });
 
@@ -192,7 +192,7 @@ is($cd->get_column('artist_name'), 'Caterwauler McCrae', 'Additional column retu
 
 # update_or_insert
 $new = $schema->resultset("Track")->new( {
-  trackid => 100,
+  id => 100,
   cd => 1,
   title => 'Insert or Update',
   last_updated_on => '1973-07-19 12:01:02'

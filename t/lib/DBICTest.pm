@@ -149,19 +149,19 @@ sub populate_schema {
     my $schema = shift;
 
     $schema->populate('Genre', [
-      [qw/genreid name/],
+      [qw/id name/],
       [qw/1       emo  /],
     ]);
 
     $schema->populate('Artist', [
-        [ qw/artistid name/ ],
+        [ qw/id name/ ],
         [ 1, 'Caterwauler McCrae' ],
         [ 2, 'Random Boy Band' ],
         [ 3, 'We Are Goth' ],
     ]);
 
     $schema->populate('CD', [
-        [ qw/id artist title year genreid/ ],
+        [ qw/id artist title year genre/ ],
         [ 1, 1, "Spoonful of bees", 1999, 1 ],
         [ 2, 1, "Forkful of bees", 2001 ],
         [ 3, 1, "Caterwaulin' Blues", 1997 ],
@@ -170,7 +170,7 @@ sub populate_schema {
     ]);
 
     $schema->populate('LinerNotes', [
-        [ qw/liner_id notes/ ],
+        [ qw/id notes/ ],
         [ 2, "Buy Whiskey!" ],
         [ 4, "Buy Merch!" ],
         [ 5, "Kill Yourself!" ],
@@ -190,10 +190,10 @@ sub populate_schema {
     ]);
 
     $schema->populate('TwoKeys', [
-        [ qw/artist cd/ ],
-        [ 1, 1 ],
-        [ 1, 2 ],
-        [ 2, 2 ],
+        [ qw/id artist cd/ ],
+        [ 1, 1, 1 ],
+        [ 2, 1, 2 ],
+        [ 3, 2, 2 ],
     ]);
 
     $schema->populate('FourKeys', [
@@ -221,8 +221,8 @@ sub populate_schema {
     ]);
 
     $schema->populate('ArtistUndirectedMap', [
-        [ qw/id1 id2/ ],
-        [ 1, 2 ]
+        [ qw/id id1 id2/ ],
+        [ 1, 1, 2 ]
     ]);
 
     $schema->populate('Producer', [
@@ -233,10 +233,10 @@ sub populate_schema {
     ]);
 
     $schema->populate('CD_to_Producer', [
-        [ qw/cd producer/ ],
-        [ 1, 1 ],
-        [ 1, 2 ],
-        [ 1, 3 ],
+        [ qw/id cd producer/ ],
+        [ 1, 1, 1 ],
+        [ 2, 1, 2 ],
+        [ 3, 1, 3 ],
     ]);
     
     $schema->populate('TreeLike', [
@@ -251,7 +251,7 @@ sub populate_schema {
     ]);
 
     $schema->populate('Track', [
-        [ qw/trackid cd  position title/ ],
+        [ qw/id cd  position title/ ],
         [ 4, 2, 1, "Stung with Success"],
         [ 5, 2, 2, "Stripy"],
         [ 6, 2, 3, "Sticky Honey"],

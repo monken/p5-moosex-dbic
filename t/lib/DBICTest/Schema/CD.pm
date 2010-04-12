@@ -1,7 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::CD;
 
-use MooseX::DBIC;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
 table 'cd';
 
@@ -15,7 +15,7 @@ belongs_to single_track => ( isa => 'DBICTest::Schema::Track', join_type => 'LEF
 has_many tracks => ( isa => ResultSet['DBICTest::Schema::Track'] );
 has_many tags => ( isa => ResultSet['DBICTest::Schema::Tag'], #order_by => 'tag' 
 );
-has_many cd_to_producer => ( isa => 'DBICTest::Schema::CD_to_Producer' );
+has_many cd_to_producer => ( isa => ResultSet['DBICTest::Schema::CD_to_Producer'] );
 
 might_have liner_notes => ( isa => 'DBICTest::Schema::LinerNotes', handles => [ qw/notes/ ] );
 

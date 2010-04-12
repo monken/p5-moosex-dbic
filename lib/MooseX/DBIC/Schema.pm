@@ -65,13 +65,16 @@ sub load_classes {
     
     my $moniker = $class;
     
+    my $warn;
     eval {
         Class::MOP::load_class(join('::', $schema, $class));
         $moniker = $class;
         $class = join('::', $schema, $class);
-    } or do {
-        warn $@;
+    } or do { $warn = $@; } and eval {
+        
         Class::MOP::load_class($class);
+    } or do {
+        die $warn || $@;
     };
     
     $schema->add_loaded_class($class);

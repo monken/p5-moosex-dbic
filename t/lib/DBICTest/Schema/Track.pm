@@ -1,7 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::Track;
 
-use MooseX::DBIC;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
 # load_components(qw/InflateColumn::DateTime Ordered/);
 

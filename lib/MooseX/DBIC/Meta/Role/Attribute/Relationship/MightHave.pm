@@ -7,7 +7,7 @@ use MooseX::DBIC::Types q(:all);
 
 sub _build_foreign_key {
     my $self = shift;
-    return $self->related_class->meta->get_attribute($self->associated_class->name->table);
+    return $self->related_class->meta->get_attribute($self->associated_class->name->table_name);
 };
 
 sub _build_join_condition {

@@ -1,7 +1,7 @@
 package MooseX::DBIC::TypeMap::Registry;
 # ABSTRACT: Registry class for type mapping
 use Moose;
-use Moose::Util::TypeConstraints qw(find_or_parse_type_constraint);
+use Moose::Util::TypeConstraints ();
 
 has map => ( 
 	traits => ['Hash'],
@@ -18,8 +18,10 @@ has map => (
 
 sub find {
     my ($self, $type) = @_;
-    warn $type;
-    return $self->get($type) || $self->find(find_or_parse_type_constraint($type)->parent->name);
+    my $constraint = $self->get($type);
+    return defined $constraint 
+        ? $constraint 
+        : $self->find(Moose::Util::TypeConstraints::find_or_create_isa_type_constraint($type)->parent->name);
 }
 
 1;

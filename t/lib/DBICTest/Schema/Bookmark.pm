@@ -1,7 +1,7 @@
 package # hide from PAUSE
     DBICTest::Schema::Bookmark;
 
-use MooseX::DBIC;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
 has_column id => ( is => 'rw', isa => 'Num', auto_increment => 1 );
 

@@ -2,7 +2,7 @@ package # hide from PAUSE
     DBICTest::Plain::Test;
 
 use Moose;
-use MooseX::DBIC;
+use MooseX::DBIC; with 'DBICTest::Compat';
     
 
 has_column id => ( is => 'rw', isa => 'Num', column_info => { data_type => 'integer', is_auto_increment => 1 } );

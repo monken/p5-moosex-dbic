@@ -21,6 +21,7 @@ sub _build_column_info {
         is_auto_increment => $self->auto_increment,
         is_nullable => !$self->is_required,
         size => $self->size,
+        $self->is_default_a_coderef ? () : ( default_value => $self->default )
     };
 }
 
