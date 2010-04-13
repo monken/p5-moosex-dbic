@@ -210,19 +210,24 @@ sub insert {
     my %to_insert = $self->get_columns;
     
     my $pk = $self->meta->get_primary_key;
-    if($pk && $self->meta->get_primary_key->auto_increment && !$pk->has_value($self)) {
+    my $set_pk = ($pk && $self->meta->get_primary_key->auto_increment && !$pk->has_value($self));
+    
+    delete $to_insert{$pk->name} if($set_pk);
+    
+    my $updated_cols = $source->storage->insert($source, { %to_insert });
+    $self->in_storage(1);
+
+    if($set_pk) {
         my $storage = $self->result_source->storage;
         $self->throw_exception( "Missing primary key but Storage doesn't support last_insert_id" )
           unless $storage->can('last_insert_id');
         my $id = $storage->last_insert_id($self->result_source, $pk->name);
         $self->throw_exception( "Can't get last insert id" )
           unless ($id);
-        $pk->set_value($self, $id + 2);
+        $pk->set_value($self, $id);
         delete $to_insert{$pk->name};
     }
-    
-    my $updated_cols = $source->storage->insert($source, { %to_insert });
-    $self->in_storage(1);
+
     map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
     $self->_raw_data({%to_insert});
     undef $self->{_update_in_progress};

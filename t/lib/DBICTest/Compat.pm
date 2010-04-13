@@ -32,7 +32,7 @@ sub set_column { my ($self, $col, $value) = @_; return $self->$col($value) }
 
 sub get_inflated_columns { my $self = shift; %$self }
 
-sub load_components { die "Can't locate DBIx/Class/DoesNotExist.pm" }
+sub load_components { shift; Class::MOP::load_class('DBIx::Class::' . shift) }
 
 sub field_name_for { return { name => 'artist name' } }
 
