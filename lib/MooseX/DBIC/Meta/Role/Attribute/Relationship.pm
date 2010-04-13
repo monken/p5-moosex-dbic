@@ -56,8 +56,6 @@ sub _build_proxy_class {
         $attr->related_class =>
             ( copy => [$pk, qw(result_source in_storage)], builder => sub {
                 my $self = shift;
-                warn "$self $pk";
-                warn Data::Dumper::Dumper $self;
                 $self->result_source->schema->resultset($attr->related_class)->find($self->$pk);
             } )
     );

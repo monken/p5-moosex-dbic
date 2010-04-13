@@ -1,39 +1,32 @@
-package # hide from PAUSE
-    DBICTest::Schema::Encoded;
+package    # hide from PAUSE
+  DBICTest::Schema::Encoded;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC;
+with 'DBICTest::Compat';
 
-use strict;
-use warnings;
+remove 'id';
 
-__PACKAGE__->table('encoded');
-__PACKAGE__->add_columns(
-    'id' => {
-        data_type => 'integer',
-        is_auto_increment => 1
-    },
-    'encoded' => {
-        data_type => 'varchar',
-        size      => 100,
-        is_nullable => 1,
-    },
+has_column id => (
+    isa            => 'Int',
+    auto_increment => 1,
+    primary_key    => 1
 );
 
-__PACKAGE__->set_primary_key('id');
+has_column encoded => (
+    size    => 100,
+    trigger => \&encode
+);
 
-sub set_column {
-  my ($self, $col, $value) = @_;
-  if( $col eq 'encoded' ){
+has_many keyholders => (
+    isa => ResultSet ['DBICTest::Schema::Employee'],
+    foreign_key => 'secretkey'
+);
+
+sub encode {
+    my ( $self, $value ) = @_;
+    return unless $value;
     $value = reverse split '', $value;
-  }
-  $self->next::method($col, $value);
-}
-
-sub new {
-  my($self, $attr, @rest) = @_;
-  $attr->{encoded} = reverse split '', $attr->{encoded}
-    if defined $attr->{encoded};
-  return $self->next::method($attr, @rest);
+    $self->meta->get_attribute('encoded')->set_raw_value( $self, $value );
 }
 
 1;

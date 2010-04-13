@@ -217,7 +217,7 @@ sub insert {
         my $id = $storage->last_insert_id($self->result_source, $pk->name);
         $self->throw_exception( "Can't get last insert id" )
           unless ($id);
-        $pk->set_value($self, $id + 1);
+        $pk->set_value($self, $id + 2);
         delete $to_insert{$pk->name};
     }
     
