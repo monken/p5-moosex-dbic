@@ -4,35 +4,13 @@ package # hide from PAUSE
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 remove 'id';
-
-has_column id => ( is => 'rw', isa => 'Num', auto_increment => 1, primary_key => 1 );
+has_column id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
 
 belongs_to link => ( isa => 'DBICTest::Schema::Link' );
 
-1;
-__END__
-package # hide from PAUSE
-    DBICTest::Schema::Bookmark;
+sub might_have {
+    warn q("might_have/has_one" must not be on columns with is_nullable set to true) unless($ENV{DBIC_DONT_VALIDATE_RELS});
+}
 
-    use base qw/DBICTest::BaseResult/;
-
-
-use strict;
-use warnings;
-
-__PACKAGE__->table('bookmark');
-__PACKAGE__->add_columns(
-    'id' => {
-        data_type => 'integer',
-        is_auto_increment => 1
-    },
-    'link' => {
-        data_type => 'integer',
-        is_nullable => 1,
-    },
-);
-
-__PACKAGE__->set_primary_key('id');
-__PACKAGE__->belongs_to(link => 'DBICTest::Schema::Link', 'link', { on_delete => 'SET NULL' } );
 
 1;

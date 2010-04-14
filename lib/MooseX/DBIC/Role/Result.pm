@@ -173,8 +173,9 @@ my %import = (
 sub has_column_loaded { 
     my ($self, $column) = @_;
     $column = $self->meta->get_attribute($column);
-    return $column->has_value($self) 
-        || $column->is_required 
+    return $column->has_value($self)
+        || $column->is_required
+        || !$self->in_storage
         || ( $self->in_storage && exists $self->_raw_data->{$column->name} );
 }
 

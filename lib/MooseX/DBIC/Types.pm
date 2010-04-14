@@ -34,12 +34,12 @@ inflate Result, via {
 
 use MooseX::DBIC::TypeMap;
 
-map_type 'Str', 'varchar';
-map_type 'Bool', 'bool';
-map_type 'Int', 'int';
-map_type 'Num', 'real';
+map_type 'Str', 'VARCHAR';
+map_type 'Bool', 'BOOL';
+map_type 'Int', 'INTEGER';
+map_type 'Num', 'REAL';
 map_type 'Any', '';
-map_type Result, 'character';
+map_type Result, 'CHARACTER';
 
 no MooseX::DBIC::TypeMap;
 

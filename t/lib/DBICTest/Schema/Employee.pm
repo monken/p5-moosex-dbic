@@ -8,7 +8,7 @@ package # hide from PAUSE
 remove 'id';
 has_column employee_id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
 
-has_column [qw(position group_id group_id_2 group_id_3)] => ( isa => 'Num' );
+has_column [qw(position group_id group_id_2 group_id_3)] => ( isa => 'Int' );
 
 has_column 'name';
 
