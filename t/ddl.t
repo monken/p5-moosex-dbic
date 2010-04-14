@@ -17,27 +17,27 @@ is_deeply(
         'MyApp::User::Admin' => {
             'level' => {
                 'is_auto_increment' => undef,
-                'data_type'         => 'int',
+                'data_type'         => 'INTEGER',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
                 'size'              => undef
             },
             'myapp_user' => {
                 'is_auto_increment' => 0,
-                'data_type'         => 'character',
+                'data_type'         => 'CHARACTER',
                 'is_nullable'       => '',
                 'size'              => undef
             },
             'id' => {
                 'is_auto_increment' => 0,
-                'data_type'         => 'varchar',
+                'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => '',
                 'size'              => 10
             },
             'hair_color' => {
                 'is_auto_increment' => undef,
-                'data_type'         => 'varchar',
+                'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
                 'size'              => undef
@@ -46,34 +46,34 @@ is_deeply(
         'MyApp::User' => {
             'email' => {
                 'is_auto_increment' => undef,
-                'data_type'         => 'varchar',
+                'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
                 'size'              => undef
             },
             'first' => {
                 'is_auto_increment' => undef,
-                'data_type'         => 'varchar',
+                'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
                 'size'              => undef
             },
             'moose_object' => {
                 'is_auto_increment' => 0,
-                'data_type'         => 'character',
+                'data_type'         => 'CHARACTER',
                 'is_nullable'       => '',
                 'size'              => undef
             },
             'last' => {
                 'is_auto_increment' => undef,
-                'data_type'         => 'varchar',
+                'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
                 'size'              => undef
             },
             'id' => {
                 'is_auto_increment' => 0,
-                'data_type'         => 'varchar',
+                'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => '',
                 'size'              => 10
@@ -82,7 +82,7 @@ is_deeply(
         'Moose::Object' => {
             'id' => {
                 'is_auto_increment' => 0,
-                'data_type'         => 'varchar',
+                'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => '',
                 'size'              => 10
