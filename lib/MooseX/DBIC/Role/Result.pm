@@ -34,7 +34,8 @@ sub _build__raw_data { return { shift->get_columns } }
 
 sub resultset { return shift->result_source->schema->resultset(@_) }
 
-sub _build_table_name { MooseX::DBIC::Util::decamelize(shift->meta->name); }
+sub _build_table_name { 
+    (my $table = MooseX::DBIC::Util::decamelize(shift->moniker)) =~ s/::/_/g; $table }
 
 sub _build_id {
     my @chars = ( 'A' .. 'N', 'P' .. 'Z', 0 .. 9 );
