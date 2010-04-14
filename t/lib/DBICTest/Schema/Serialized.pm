@@ -1,13 +1,11 @@
 package # hide from PAUSE 
     DBICTest::Schema::Serialized;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
-__PACKAGE__->table('serialized');
-__PACKAGE__->add_columns(
-  'id' => { data_type => 'integer', is_auto_increment => 1 },
-  'serialized' => { data_type => 'text' },
-);
-__PACKAGE__->set_primary_key('id');
+table 'books';
+remove 'id';
+has_column id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
+has_column 'serialized';
 
 1;

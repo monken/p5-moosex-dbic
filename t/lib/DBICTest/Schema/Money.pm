@@ -1,21 +1,13 @@
 package # hide from PAUSE 
     DBICTest::Schema::Money;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
-__PACKAGE__->table('money_test');
+table 'money_test';
+remove 'id';
+has_column id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
 
-__PACKAGE__->add_columns(
-  'id' => {
-    data_type => 'integer',
-    is_auto_increment => 1,
-  },
-  'amount' => {
-    data_type => 'money',
-    is_nullable => 1,
-  },
-);
+has_column amount => ( data_type => 'money' );
 
-__PACKAGE__->set_primary_key('id');
 
 1;

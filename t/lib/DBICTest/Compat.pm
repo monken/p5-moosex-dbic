@@ -3,12 +3,29 @@ package DBICTest::Compat;
 use Moose::Role;
 use DateTime;
 use DateTime::Format::SQLite;
+use Test::More ();
 
 use MooseX::Attribute::Deflator;
 
 inflate 'DateTime', via { DateTime::Format::SQLite->parse_datetime( $_ ) };
 
 no MooseX::Attribute::Deflator;
+
+{
+    no warnings q(redefine);
+    # ewww, ugly
+    sub main::isa_ok($$;$) { 
+        my @class = split(/::/, $_[1]);
+        my $class = $class[0] eq 'DBICTest' ? join('::', shift @class, 'Schema', @class) : $_[1];
+        return Test::More::isa_ok $_[0], $class;
+    }
+}
+
+around has_column_loaded => sub {
+    my ($orig, $self, $column) = @_;
+    $column = 'cd' if($column eq 'cd_id');
+    return $self->$orig($column);
+};
 
 sub make_column_dirty {}
 

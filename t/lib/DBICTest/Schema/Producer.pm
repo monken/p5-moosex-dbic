@@ -10,5 +10,9 @@ has_column name => ( size => 100 );
 
 has_many producer_to_cd => ( isa => ResultSet['DBICTest::Schema::CD_to_Producer'] );
 
+sub cds {
+    shift->search_related('producer_to_cd')->search_related('cd');
+}
+
 #__PACKAGE__->many_to_many('cds', 'producer_to_cd', 'cd');
 1;

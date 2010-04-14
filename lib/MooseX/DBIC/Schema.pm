@@ -6,7 +6,9 @@ use Moose::Util::MetaRole;
 use MooseX::DBIC::Types q(:all);
 use MooseX::Attribute::Deflator::Moose;
 use MooseX::Attribute::Deflator::Structured;
+use MooseX::DBIC::Util ();
 use Data::Dumper;
+
 
 $Data::Dumper::Maxdepth = 3;
 $Data::Dumper::Indent = 1;
@@ -78,6 +80,7 @@ sub load_classes {
     $schema->add_loaded_class($class);
     
     unless($class->isa('Moose::Object')) {
+        warn $moniker, ' isa DBIx::Class';
         $schema->next::method($moniker);
         return $schema->load_classes(@defer);
     }
@@ -122,7 +125,7 @@ sub create_result_class {
         my $attribute           = $class->meta->get_attribute($attr);
         my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
             superclasses => [ $attribute->meta->name ],
-            roles        => ['MooseX::DBIC::Meta::Role::Attribute::Column','MooseX::Attribute::Deflator::Meta::Role::Attribute'],
+            roles        => ['MooseX::DBIC::Meta::Role::Column','MooseX::Attribute::Deflator::Meta::Role::Attribute'],
             cache        => 1,
         );
 

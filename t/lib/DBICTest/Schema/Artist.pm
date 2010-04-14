@@ -34,7 +34,7 @@ has_many cds_very_very_very_long_relationship_name => ( isa => ResultSet['DBICTe
 has_many artist_undirected_maps => ( isa => ResultSet['DBICTest::Schema::ArtistUndirectedMap'] );
 #  { cascade_copy => 0 } # this would *so* not make sense
 
-#has_many artwork_to_artist => ( isa => ResultSet['DBICTest::Schema::Artwork_to_Artist'] );
+has_many artwork_to_artist => ( isa => ResultSet['DBICTest::Schema::Artwork_to_Artist'] );
 
 #__PACKAGE__->many_to_many('artworks', 'artwork_to_artist', 'artwork');
 
@@ -46,12 +46,6 @@ sub sqlt_deploy_hook {
     $sqlt_table->add_index( name => 'artist_name_hookidx', fields => ['name'] )
       or die $sqlt_table->error;
   }
-}
-
-sub store_column {
-  my ($self, $name, $value) = @_;
-  $value = 'X '.$value if ($name eq 'name' && $value && $value =~ /(X )?store_column test/);
-  $self->next::method($name, $value);
 }
 
 sub _set_name {

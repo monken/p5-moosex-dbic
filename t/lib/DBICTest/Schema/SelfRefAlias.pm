@@ -1,20 +1,15 @@
 package # hide from PAUSE 
     DBICTest::Schema::SelfRefAlias;
 
-use base qw/DBICTest::BaseResult/;
+    
+use MooseX::DBIC; with 'DBICTest::Compat';
 
-__PACKAGE__->table('self_ref_alias');
-__PACKAGE__->add_columns(
-  'self_ref' => {
-    data_type => 'integer',
-  },
-  'alias' => {
-    data_type => 'integer',
-  },
-);
-__PACKAGE__->set_primary_key(qw/self_ref alias/);
+table 'self_ref_alias';
+remove 'id';
+has_column id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
+has_column [qw(alias self_ref)] => ( isa => 'Int' );
 
-__PACKAGE__->belongs_to( self_ref => 'DBICTest::Schema::SelfRef' );
-__PACKAGE__->belongs_to( alias => 'DBICTest::Schema::SelfRef' );
+belongs_to self_ref => ( isa => 'DBICTest::Schema::SelfRef' );
+belongs_to alias => ( isa => 'DBICTest::Schema::SelfRef' );
 
 1;

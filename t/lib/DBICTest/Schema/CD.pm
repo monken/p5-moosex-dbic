@@ -22,8 +22,8 @@ has_many cd_to_producer => ( isa => ResultSet['DBICTest::Schema::CD_to_Producer'
 
 might_have liner_notes => ( isa => 'DBICTest::Schema::LinerNotes', handles => [ qw/notes/ ] );
 
-might_have artwork => ( isa => 'DBICTest::Schema::Artwork' );
-has_one mandatory_artwork => ( isa => 'DBICTest::Schema::Artwork' );
+might_have artwork => ( isa => 'DBICTest::Schema::Artwork', foreign_key => 'cd' );
+might_have mandatory_artwork => ( isa => 'DBICTest::Schema::Artwork' );
 
 # many_to_many( producers => cd_to_producer => 'producer' );
 # many_to_many(
@@ -46,5 +46,13 @@ belongs_to genre_inefficient => ( isa => 'DBICTest::Schema::Genre',
         #undef_on_null_fk => 0,
     
 );
+
+sub add_to_producers {
+    shift->create_related('cd_to_producer', { producer => shift });
+}
+
+sub producers {
+    shift->search_related('cd_to_producer')->search_related('producer');
+}
 
 1;

@@ -1,21 +1,12 @@
 package # hide from PAUSE 
     DBICTest::Schema::Owners;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
-__PACKAGE__->table('owners');
-__PACKAGE__->add_columns(
-  'id' => {
-    data_type => 'integer',
-    is_auto_increment => 1,
-  },
-  'name' => {
-    data_type => 'varchar',
-    size      => '100',
-  },
-);
-__PACKAGE__->set_primary_key('id');
+remove 'id';
+has_column id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
+has_column 'name';
 
-__PACKAGE__->has_many(books => "DBICTest::Schema::BooksInLibrary", "owner");
+has_many books => ( isa => ResultSet["DBICTest::Schema::BooksInLibrary"], foreign_key => "owner");
 
 1;

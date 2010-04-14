@@ -1,29 +1,15 @@
 package # hide from PAUSE 
     DBICTest::Schema::BindType;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
-__PACKAGE__->table('bindtype_test');
+table 'bindtype_test';
+remove 'id';
+has_column id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
 
-__PACKAGE__->add_columns(
-  'id' => {
-    data_type => 'integer',
-    is_auto_increment => 1,
-  },
-  'bytea' => {
-    data_type => 'bytea',
-    is_nullable => 1,
-  },
-  'blob' => {
-    data_type => 'blob',
-    is_nullable => 1,
-  },
-  'clob' => {
-    data_type => 'clob',
-    is_nullable => 1,
-  },
-);
+has_column bytea => ( data_type => 'bytea' );
+has_column blob => ( data_type => 'blob' );
+has_column clob => ( data_type => 'clob' );
 
-__PACKAGE__->set_primary_key('id');
 
 1;

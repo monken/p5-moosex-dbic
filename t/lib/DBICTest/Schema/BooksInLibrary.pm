@@ -1,34 +1,19 @@
 package # hide from PAUSE 
     DBICTest::Schema::BooksInLibrary;
 
-use base qw/DBICTest::BaseResult/;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
-__PACKAGE__->table('books');
-__PACKAGE__->add_columns(
-  'id' => {
-    data_type => 'integer',
-    is_auto_increment => 1,
-  },
-  'source' => {
-    data_type => 'varchar',
-    size      => '100',
-  },
-  'owner' => {
-    data_type => 'integer',
-  },
-  'title' => {
-    data_type => 'varchar',
-    size      => '100',
-  },
-  'price' => {
-    data_type => 'integer',
-    is_nullable => 1,
-  },
-);
-__PACKAGE__->set_primary_key('id');
+table 'books';
+remove 'id';
+has_column id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
 
-__PACKAGE__->resultset_attributes({where => { source => "Library" } });
 
-__PACKAGE__->belongs_to ( owner => 'DBICTest::Schema::Owners', 'owner' );
+has_column [qw(source title)] => (size => 100 );
+has_column owner => ( isa => 'Int', required => 1 );
+has_column price => ( isa => 'Int' );
+
+#__PACKAGE__->resultset_attributes({where => { source => "Library" } });
+
+belongs_to owner => ( isa => 'DBICTest::Schema::Owners' );
 
 1;

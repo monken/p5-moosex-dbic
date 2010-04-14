@@ -26,7 +26,7 @@ has_column small_dt => ( isa => 'DateTime', # for mssql and sybase DT tests
 belongs_to cd => ( isa => 'DBICTest::Schema::CD' );
 # belongs_to( disc => 'DBICTest::Schema::CD', foreign_key => 'cd');
 
-might_have cd_single => ( isa => 'DBICTest::Schema::CD', foreign_key => 'single_track' );
+might_have cd_single => ( isa => 'DBICTest::Schema::CD', foreign_key => 'single_track', predicate => 'has_cd_single' );
 might_have lyrics => ( isa => 'DBICTest::Schema::Lyrics', foreign_key => 'track' );
 
 #belongs_to year1999cd => ( isa => "DBICTest::Schema::Year1999CDs", join_type => 'left', foreign_key => 'cd' );

@@ -27,7 +27,7 @@ sub application_to_class_class {
 
 sub get_all_columns {
     my $self = shift;
-    return grep { $_->does('MooseX::DBIC::Meta::Role::Attribute::Column') } $self->get_all_attributes;
+    return grep { $_->does('MooseX::DBIC::Meta::Role::Column') } $self->get_all_attributes;
 }
 
 sub add_column {
@@ -36,7 +36,7 @@ sub add_column {
   my %options = (is => 'rw', isa => 'Str', @_);
   $options{traits} ||= [];
   push(@{$options{traits}}, qw(
-    MooseX::DBIC::Meta::Role::Attribute::Column
+    MooseX::DBIC::Meta::Role::Column
     MooseX::Attribute::Deflator::Meta::Role::Attribute));
   
   my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
@@ -50,7 +50,7 @@ sub get_column {
     my $self = shift;
     my $name = shift;
     return first {
-        $_->does('MooseX::DBIC::Meta::Role::Attribute::Column') &&
+        $_->does('MooseX::DBIC::Meta::Role::Column') &&
         $_->name eq $name
     } map { $self->get_attribute($_) } $self->get_attribute_list;
 }
@@ -59,7 +59,7 @@ sub get_column_list {
     my $self = shift;
     return grep {
         $self->get_attribute($_)
-          ->does('MooseX::DBIC::Meta::Role::Attribute::Column')
+          ->does('MooseX::DBIC::Meta::Role::Column')
     } $self->get_attribute_list;
 }
 
@@ -72,13 +72,13 @@ sub get_relationship_list {
     my $self = shift;
     return grep {
         $self->get_attribute($_)
-          ->does('MooseX::DBIC::Meta::Role::Attribute::Relationship')
+          ->does('MooseX::DBIC::Meta::Role::Relationship')
     } $self->get_attribute_list;
 }
 
 sub get_all_relationships {
     my $self = shift;
-    return grep { $_->does('MooseX::DBIC::Meta::Role::Attribute::Relationship') } $self->get_all_attributes;
+    return grep { $_->does('MooseX::DBIC::Meta::Role::Relationship') } $self->get_all_attributes;
 }
 
 sub get_relationship {
@@ -94,7 +94,7 @@ sub find_relationship_by_name {
 
 sub add_relationship {
     my ($self, $name, %options) = @_;
-    my $role = 'MooseX::DBIC::Meta::Role::Attribute::Relationship::' . $options{type};
+    my $role = 'MooseX::DBIC::Meta::Role::Relationship::' . $options{type};
     $options{traits} ||= [];
     push(@{$options{traits}}, 
         qw(MooseX::DBIC::Meta::Role::Attribute

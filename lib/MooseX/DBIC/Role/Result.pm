@@ -4,6 +4,7 @@ use Moose::Role -traits => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttr
 use Carp;
 use DBIx::Class::ResultClass::HashRefInflator;
 use Scalar::Util qw(weaken);
+use MooseX::DBIC::Util ();
 
 __PACKAGE__->meta->add_column( id => (
     required    => 1,
@@ -33,11 +34,7 @@ sub _build__raw_data { return { shift->get_columns } }
 
 sub resultset { return shift->result_source->schema->resultset(@_) }
 
-sub _build_table_name {
-    my $self = shift;
-    ( my $table = lc($self->moniker) ) =~ s/::/_/g;
-    return $table;
-}
+sub _build_table_name { MooseX::DBIC::Util::decamelize(shift->meta->name); }
 
 sub _build_id {
     my @chars = ( 'A' .. 'N', 'P' .. 'Z', 0 .. 9 );
@@ -225,7 +222,7 @@ sub insert {
         $self->throw_exception( "Can't get last insert id" )
           unless ($id);
         $pk->set_value($self, $id);
-        delete $to_insert{$pk->name};
+        $to_insert{$pk->name} = $id;
     }
 
     map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
