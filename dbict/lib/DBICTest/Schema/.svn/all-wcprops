@@ -1,0 +1,317 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/9035/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema
+END
+Track.pm
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/bast/!svn/ver/7909/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Track.pm
+END
+TreeLike.pm
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/TreeLike.pm
+END
+Bookmark.pm
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/bast/!svn/ver/7059/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Bookmark.pm
+END
+TwoKeys.pm
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/bast/!svn/ver/6725/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/TwoKeys.pm
+END
+TwoKeyTreeLike.pm
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/TwoKeyTreeLike.pm
+END
+Tag.pm
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Tag.pm
+END
+TypedObject.pm
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/TypedObject.pm
+END
+BindType.pm
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/BindType.pm
+END
+TimestampPrimaryKey.pm
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/repos/bast/!svn/ver/9035/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/TimestampPrimaryKey.pm
+END
+Event.pm
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/bast/!svn/ver/8952/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Event.pm
+END
+Image.pm
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Image.pm
+END
+CD.pm
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/bast/!svn/ver/7960/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/CD.pm
+END
+SelfRef.pm
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/SelfRef.pm
+END
+EventTZPg.pm
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/repos/bast/!svn/ver/8996/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/EventTZPg.pm
+END
+Money.pm
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/bast/!svn/ver/7097/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Money.pm
+END
+ArtistSourceName.pm
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/ArtistSourceName.pm
+END
+LyricVersion.pm
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/LyricVersion.pm
+END
+NoPrimaryKey.pm
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/NoPrimaryKey.pm
+END
+Artwork.pm
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/bast/!svn/ver/6967/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Artwork.pm
+END
+OneKey.pm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/OneKey.pm
+END
+Serialized.pm
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/bast/!svn/ver/7303/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Serialized.pm
+END
+Dummy.pm
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Dummy.pm
+END
+Year2000CDs.pm
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/repos/bast/!svn/ver/7909/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Year2000CDs.pm
+END
+Link.pm
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/bast/!svn/ver/6541/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Link.pm
+END
+ComputedColumn.pm
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/8515/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/ComputedColumn.pm
+END
+Lyrics.pm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Lyrics.pm
+END
+ArtistSubclass.pm
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/ArtistSubclass.pm
+END
+Artist.pm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/8235/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Artist.pm
+END
+FourKeys.pm
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/FourKeys.pm
+END
+SequenceTest.pm
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/SequenceTest.pm
+END
+ForceForeign.pm
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/bast/!svn/ver/8692/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/ForceForeign.pm
+END
+ArtistUndirectedMap.pm
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/repos/bast/!svn/ver/6789/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/ArtistUndirectedMap.pm
+END
+Owners.pm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/6435/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Owners.pm
+END
+Employee.pm
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/bast/!svn/ver/8928/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Employee.pm
+END
+ArtistGUID.pm
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/bast/!svn/ver/7209/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/ArtistGUID.pm
+END
+EventTZDeprecated.pm
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/repos/bast/!svn/ver/6616/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/EventTZDeprecated.pm
+END
+Artwork_to_Artist.pm
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Artwork_to_Artist.pm
+END
+LinerNotes.pm
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/LinerNotes.pm
+END
+CollectionObject.pm
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/CollectionObject.pm
+END
+Producer.pm
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Producer.pm
+END
+NoSuchClass.pm
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/NoSuchClass.pm
+END
+Year1999CDs.pm
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/repos/bast/!svn/ver/7909/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Year1999CDs.pm
+END
+BooksInLibrary.pm
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/6446/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/BooksInLibrary.pm
+END
+CustomSql.pm
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/repos/bast/!svn/ver/7267/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/CustomSql.pm
+END
+CD_to_Producer.pm
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/CD_to_Producer.pm
+END
+Collection.pm
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Collection.pm
+END
+FileColumn.pm
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/bast/!svn/ver/8907/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/FileColumn.pm
+END
+FourKeys_to_TwoKeys.pm
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/FourKeys_to_TwoKeys.pm
+END
+EventTZ.pm
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/bast/!svn/ver/6616/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/EventTZ.pm
+END
+Genre.pm
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/repos/bast/!svn/ver/6781/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Genre.pm
+END
+SelfRefAlias.pm
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/SelfRefAlias.pm
+END
+Encoded.pm
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/bast/!svn/ver/8928/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema/Encoded.pm
+END

@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/bast/!svn/ver/9058/DBIx-Class/0.08/trunk/t/inflate
+END
+datetime_mysql.t
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/bast/!svn/ver/6616/DBIx-Class/0.08/trunk/t/inflate/datetime_mysql.t
+END
+datetime_oracle.t
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/bast/!svn/ver/7209/DBIx-Class/0.08/trunk/t/inflate/datetime_oracle.t
+END
+datetime_pg.t
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/7126/DBIx-Class/0.08/trunk/t/inflate/datetime_pg.t
+END
+hri.t
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/repos/bast/!svn/ver/8754/DBIx-Class/0.08/trunk/t/inflate/hri.t
+END
+datetime_sybase.t
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/bast/!svn/ver/8515/DBIx-Class/0.08/trunk/t/inflate/datetime_sybase.t
+END
+datetime_firebird.t
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/bast/!svn/ver/9058/DBIx-Class/0.08/trunk/t/inflate/datetime_firebird.t
+END
+datetime_determine_parser.t
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/bast/!svn/ver/7419/DBIx-Class/0.08/trunk/t/inflate/datetime_determine_parser.t
+END
+datetime_sybase_asa.t
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/8649/DBIx-Class/0.08/trunk/t/inflate/datetime_sybase_asa.t
+END
+serialize.t
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/7557/DBIx-Class/0.08/trunk/t/inflate/serialize.t
+END
+datetime_informix.t
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/bast/!svn/ver/9058/DBIx-Class/0.08/trunk/t/inflate/datetime_informix.t
+END
+core.t
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/bast/!svn/ver/8028/DBIx-Class/0.08/trunk/t/inflate/core.t
+END
+datetime_mssql.t
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/bast/!svn/ver/7209/DBIx-Class/0.08/trunk/t/inflate/datetime_mssql.t
+END
+datetime.t
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/bast/!svn/ver/6616/DBIx-Class/0.08/trunk/t/inflate/datetime.t
+END
+file_column.t
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8907/DBIx-Class/0.08/trunk/t/inflate/file_column.t
+END

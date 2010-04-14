@@ -46,9 +46,9 @@ $schema = DBICTest->init_schema();
 
 {
 	my $artist = $schema->resultset('Artist')->create({ artistid => 666, name => 'bad religion' });
-	my $cd = $schema->resultset('CD')->create({ cdid => 187, artist => 1, title => 'how could hell be any worse?', year => 1982, genre => undef });
+	my $cd = $schema->resultset('CD')->create({ cdid => 187, artist => 1, title => 'how could hell be any worse?', year => 1982, genreid => undef });
 
-	ok(!defined($cd->get_column('genre')), 'genre is NULL');  #no accessor was defined for this column
+	ok(!defined($cd->get_column('genreid')), 'genreid is NULL');  #no accessor was defined for this column
 	ok(!defined($cd->genre), 'genre accessor returns undef');
 }
 
@@ -56,7 +56,7 @@ $schema = DBICTest->init_schema();
 
 {
 	my $artist = $schema->resultset('Artist')->create({ artistid => 666, name => 'bad religion' });
-	my $genre = $schema->resultset('Genre')->create({ genre => 88, name => 'disco' });
+	my $genre = $schema->resultset('Genre')->create({ genreid => 88, name => 'disco' });
 	my $cd = $schema->resultset('CD')->create({ cdid => 187, artist => 1, title => 'how could hell be any worse?', year => 1982 });
 
 	dies_ok { $cd->genre } 'genre accessor throws without column';

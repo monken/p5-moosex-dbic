@@ -1,0 +1,113 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib
+END
+Blurb.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/Blurb.pm
+END
+Actor.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/Actor.pm
+END
+MyStarLinkMCPK.pm
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/MyStarLinkMCPK.pm
+END
+Thing.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/testlib/Thing.pm
+END
+OtherThing.pm
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/testlib/OtherThing.pm
+END
+Director.pm
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/Director.pm
+END
+Order.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/Order.pm
+END
+Lazy.pm
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/Lazy.pm
+END
+MyStar.pm
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/MyStar.pm
+END
+MyBase.pm
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/MyBase.pm
+END
+CDBase.pm
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/testlib/CDBase.pm
+END
+Log.pm
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/Log.pm
+END
+ActorAlias.pm
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/ActorAlias.pm
+END
+Film.pm
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/Film.pm
+END
+MyFoo.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/MyFoo.pm
+END
+OtherFilm.pm
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/OtherFilm.pm
+END
+MyStarLink.pm
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/MyStarLink.pm
+END
+MyFilm.pm
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/testlib/MyFilm.pm
+END

@@ -150,7 +150,6 @@ is($schema->resultset("Artist")->count, 4, 'count ok');
 }
 
 my $cd = $schema->resultset("CD")->find(1);
-
 my %cols = $cd->get_columns;
 
 is(keys %cols, 6, 'get_columns number of columns ok');
@@ -169,7 +168,7 @@ $cd->discard_changes;
 # check whether ResultSource->columns returns columns in order originally supplied
 my @cd = $schema->source("CD")->columns;
 
-is_deeply( \@cd, [qw/cdid artist title year genre single_track/], 'column order');
+is_deeply( \@cd, [qw/cdid artist title year genreid single_track/], 'column order');
 
 $cd = $schema->resultset("CD")->search({ title => 'Spoonful of bees' }, { columns => ['title'] })->next;
 is($cd->title, 'Spoonful of bees', 'subset of columns returned correctly');
@@ -214,7 +213,7 @@ SKIP: {
     my %tdata = $new->get_inflated_columns;
     is($tdata{'trackid'}, 100, 'got id');
     isa_ok($tdata{'cd'}, 'DBICTest::CD', 'cd is CD object');
-    is($tdata{'cd'}->cdid, 1, 'cd object is id 1');
+    is($tdata{'cd'}->id, 1, 'cd object is id 1');
     is(
         $tdata{'position'},
         $schema->resultset ('Track')->search ({cd => 1})->count,
@@ -316,7 +315,7 @@ ok($schema->storage(), 'Storage available');
 }
 
 # test source_name
-if(1==0){
+{
   # source_name should be set for normal modules
   is($schema->source('CD')->source_name, 'CD', 'source_name is set to moniker');
 
@@ -370,18 +369,18 @@ lives_ok (sub { my $newlink = $newbook->link}, "stringify to false value doesn't
 {
   is_deeply(
     [$schema->source('CD')->columns],
-    [qw/cdid artist title year genre single_track/],
+    [qw/cdid artist title year genreid single_track/],
     'initial columns',
   );
 
   $schema->source('CD')->remove_columns('coolyear'); #should not delete year
   is_deeply(
     [$schema->source('CD')->columns],
-    [qw/cdid artist title year genre single_track/],
+    [qw/cdid artist title year genreid single_track/],
     'nothing removed when removing a non-existent column',
   );
 
-  $schema->source('CD')->remove_columns('genre', 'year');
+  $schema->source('CD')->remove_columns('genreid', 'year');
   is_deeply(
     [$schema->source('CD')->columns],
     [qw/cdid artist title single_track/],
@@ -390,7 +389,7 @@ lives_ok (sub { my $newlink = $newbook->link}, "stringify to false value doesn't
 
   my $priv_columns = $schema->source('CD')->_columns;
   ok(! exists $priv_columns->{'year'}, 'year purged from _columns');
-  ok(! exists $priv_columns->{'genre'}, 'genre purged from _columns');
+  ok(! exists $priv_columns->{'genreid'}, 'genreid purged from _columns');
 }
 
 # test get_inflated_columns with objects

@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 53
+/repos/bast/!svn/ver/9035/DBIx-Class/0.08/trunk/t/lib
+END
+sqlite.sql
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/bast/!svn/ver/9035/DBIx-Class/0.08/trunk/t/lib/sqlite.sql
+END
+DBICVersion_v1.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8430/DBIx-Class/0.08/trunk/t/lib/DBICVersion_v1.pm
+END
+DBICVersion_v2.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8430/DBIx-Class/0.08/trunk/t/lib/DBICVersion_v2.pm
+END
+DBICVersion_v3.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8430/DBIx-Class/0.08/trunk/t/lib/DBICVersion_v3.pm
+END
+DBICTest.pm
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/bast/!svn/ver/8377/DBIx-Class/0.08/trunk/t/lib/DBICTest.pm
+END

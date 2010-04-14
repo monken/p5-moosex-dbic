@@ -28,7 +28,7 @@ CREATE TABLE cd (
   artist int,
   title varchar(255),
   year varchar(4),
-  genre int,
+  genreid int,
   single_track int
 )
 EOS

@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 57
+/repos/bast/!svn/ver/9143/DBIx-Class/0.08/trunk/t/storage
+END
+disable_sth_caching.t
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/7419/DBIx-Class/0.08/trunk/t/storage/disable_sth_caching.t
+END
+exception.t
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/7585/DBIx-Class/0.08/trunk/t/storage/exception.t
+END
+stats.t
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/bast/!svn/ver/7419/DBIx-Class/0.08/trunk/t/storage/stats.t
+END
+dbh_do.t
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/bast/!svn/ver/7419/DBIx-Class/0.08/trunk/t/storage/dbh_do.t
+END
+on_connect_call.t
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/bast/!svn/ver/7793/DBIx-Class/0.08/trunk/t/storage/on_connect_call.t
+END
+reconnect.t
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/7419/DBIx-Class/0.08/trunk/t/storage/reconnect.t
+END
+dbi_coderef.t
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/7419/DBIx-Class/0.08/trunk/t/storage/dbi_coderef.t
+END
+ping_count.t
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/bast/!svn/ver/7557/DBIx-Class/0.08/trunk/t/storage/ping_count.t
+END
+debug.t
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/bast/!svn/ver/8558/DBIx-Class/0.08/trunk/t/storage/debug.t
+END
+dbi_env.t
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/bast/!svn/ver/9143/DBIx-Class/0.08/trunk/t/storage/dbi_env.t
+END
+on_connect_do.t
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/bast/!svn/ver/7730/DBIx-Class/0.08/trunk/t/storage/on_connect_do.t
+END
+error.t
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/bast/!svn/ver/8762/DBIx-Class/0.08/trunk/t/storage/error.t
+END
+base.t
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/bast/!svn/ver/7436/DBIx-Class/0.08/trunk/t/storage/base.t
+END
+replicated.t
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/bast/!svn/ver/8675/DBIx-Class/0.08/trunk/t/storage/replicated.t
+END

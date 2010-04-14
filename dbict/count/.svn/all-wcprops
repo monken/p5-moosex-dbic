@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 55
+/repos/bast/!svn/ver/8748/DBIx-Class/0.08/trunk/t/count
+END
+prefetch.t
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/bast/!svn/ver/8432/DBIx-Class/0.08/trunk/t/count/prefetch.t
+END
+distinct.t
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/bast/!svn/ver/8746/DBIx-Class/0.08/trunk/t/count/distinct.t
+END
+group_by_func.t
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8748/DBIx-Class/0.08/trunk/t/count/group_by_func.t
+END
+grouped_pager.t
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/7557/DBIx-Class/0.08/trunk/t/count/grouped_pager.t
+END
+in_subquery.t
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/7557/DBIx-Class/0.08/trunk/t/count/in_subquery.t
+END
+search_related.t
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/bast/!svn/ver/7968/DBIx-Class/0.08/trunk/t/count/search_related.t
+END
+joined.t
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/bast/!svn/ver/6939/DBIx-Class/0.08/trunk/t/count/joined.t
+END
+count_rs.t
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/bast/!svn/ver/8432/DBIx-Class/0.08/trunk/t/count/count_rs.t
+END

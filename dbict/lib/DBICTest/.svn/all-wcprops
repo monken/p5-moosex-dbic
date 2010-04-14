@@ -1,0 +1,89 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/repos/bast/!svn/ver/9035/DBIx-Class/0.08/trunk/t/lib/DBICTest
+END
+SyntaxErrorComponent1.pm
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/SyntaxErrorComponent1.pm
+END
+SyntaxErrorComponent2.pm
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/SyntaxErrorComponent2.pm
+END
+ResultSetManager.pm
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/ResultSetManager.pm
+END
+BaseResultSet.pm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/BaseResultSet.pm
+END
+SyntaxErrorComponent3.pm
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/SyntaxErrorComponent3.pm
+END
+OptionalComponent.pm
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/OptionalComponent.pm
+END
+FakeComponent.pm
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/FakeComponent.pm
+END
+BaseResult.pm
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/bast/!svn/ver/8051/DBIx-Class/0.08/trunk/t/lib/DBICTest/BaseResult.pm
+END
+ForeignComponent.pm
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/ForeignComponent.pm
+END
+ErrorComponent.pm
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/ErrorComponent.pm
+END
+Stats.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Stats.pm
+END
+Schema.pm
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/bast/!svn/ver/9035/DBIx-Class/0.08/trunk/t/lib/DBICTest/Schema.pm
+END
+AuthorCheck.pm
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/bast/!svn/ver/8721/DBIx-Class/0.08/trunk/t/lib/DBICTest/AuthorCheck.pm
+END
+Plain.pm
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/lib/DBICTest/Plain.pm
+END

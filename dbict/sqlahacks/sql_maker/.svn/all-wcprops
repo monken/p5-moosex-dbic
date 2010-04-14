@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/8056/DBIx-Class/0.08/trunk/t/sqlahacks/sql_maker
+END
+sql_maker.t
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/repos/bast/!svn/ver/8056/DBIx-Class/0.08/trunk/t/sqlahacks/sql_maker/sql_maker.t
+END
+sql_maker_quote.t
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/repos/bast/!svn/ver/8056/DBIx-Class/0.08/trunk/t/sqlahacks/sql_maker/sql_maker_quote.t
+END

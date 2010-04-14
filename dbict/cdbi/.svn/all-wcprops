@@ -1,0 +1,233 @@
+K 25
+svn:wc:ra_dav:version-url
+V 54
+/repos/bast/!svn/ver/8483/DBIx-Class/0.08/trunk/t/cdbi
+END
+30-pager.t
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/30-pager.t
+END
+set_to_undef.t
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/set_to_undef.t
+END
+26-mutator.t
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/26-mutator.t
+END
+22-deflate_order.t
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/bast/!svn/ver/8483/DBIx-Class/0.08/trunk/t/cdbi/22-deflate_order.t
+END
+early_column_heisenbug.t
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/early_column_heisenbug.t
+END
+98-failure.t
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/98-failure.t
+END
+mk_group_accessors.t
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/mk_group_accessors.t
+END
+22-self_referential.t
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/22-self_referential.t
+END
+14-might_have.t
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/14-might_have.t
+END
+01-columns.t
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/01-columns.t
+END
+19-set_sql.t
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/19-set_sql.t
+END
+16-reserved.t
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/16-reserved.t
+END
+23-cascade.t
+K 25
+svn:wc:ra_dav:version-url
+V 67
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/23-cascade.t
+END
+12-filter.t
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/12-filter.t
+END
+13-constraint.t
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/repos/bast/!svn/ver/7630/DBIx-Class/0.08/trunk/t/cdbi/13-constraint.t
+END
+08-inheritcols.t
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/08-inheritcols.t
+END
+has_many_loads_foreign_class.t
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/has_many_loads_foreign_class.t
+END
+set_vs_DateTime.t
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/set_vs_DateTime.t
+END
+retrieve_from_sql_with_limit.t
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/retrieve_from_sql_with_limit.t
+END
+multi_column_set.t
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/multi_column_set.t
+END
+construct.t
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/construct.t
+END
+24-meta_info.t
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/24-meta_info.t
+END
+09-has_many.t
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/09-has_many.t
+END
+15-accessor.t
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/15-accessor.t
+END
+object_cache.t
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/object_cache.t
+END
+hasa_without_loading.t
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/hasa_without_loading.t
+END
+03-subclassing.t
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/03-subclassing.t
+END
+columns_as_hashes.t
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/columns_as_hashes.t
+END
+06-hasa.t
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/06-hasa.t
+END
+04-lazy.t
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/04-lazy.t
+END
+18-has_a.t
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/18-has_a.t
+END
+columns_dont_override_custom_accessors.t
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/columns_dont_override_custom_accessors.t
+END
+11-triggers.t
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/11-triggers.t
+END
+02-Film.t
+K 25
+svn:wc:ra_dav:version-url
+V 64
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/02-Film.t
+END
+68-inflate_has_a.t
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/68-inflate_has_a.t
+END
+max_min_value_of.t
+K 25
+svn:wc:ra_dav:version-url
+V 73
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/max_min_value_of.t
+END
+21-iterator.t
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/repos/bast/!svn/ver/8407/DBIx-Class/0.08/trunk/t/cdbi/21-iterator.t
+END
+copy.t
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/repos/bast/!svn/ver/6400/DBIx-Class/0.08/trunk/t/cdbi/copy.t
+END
