@@ -135,7 +135,7 @@ sub BUILD {
 sub get_column {
     my ($self, $column) = @_;
     if(my $attr = $self->meta->get_column($column)) {
-        return $attr->get_value($self);
+        return $attr->get_raw_value($self);
     }
 }
 
@@ -172,7 +172,10 @@ my %import = (
 
 sub has_column_loaded { 
     my ($self, $column) = @_;
-    return $self->meta->get_attribute($column)->has_value($self);
+    $column = $self->meta->get_attribute($column);
+    return $column->has_value($self) 
+        || $column->is_required 
+        || ( $self->in_storage && exists $self->_raw_data->{$column->name} );
 }
 
 while(my($k,$v) = each %import) {
