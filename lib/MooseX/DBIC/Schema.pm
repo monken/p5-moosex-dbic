@@ -86,8 +86,9 @@ sub load_classes {
     }
     
     my $result = $class->does('MooseX::DBIC::Role::Result') ? $class : $schema->create_result_class($moniker);
-
+    $class->meta->make_mutable;
     $class->meta->add_method( moniker => sub {$moniker} );
+    $class->meta->make_immutable;
     
     $schema->load_classes(@defer);
     
@@ -140,6 +141,7 @@ sub create_result_class {
         ( my $table = lc($superclass) ) =~ s/::/_/g;
         $result->meta->add_relationship($table => ( type => 'HasSuperclass', isa => $related));
     }
+   
 
     return $result;
 }
@@ -160,6 +162,12 @@ sub create_result_source {
           );
         $attribute->apply_to_result_source($source);
     }
+    
+    eval {
+        my $resultset = $class . '::Set';
+        Class::MOP::load_class($resultset);
+        $source->resultset_class($resultset);
+    } or do { warn $@ };
     
     return $source;
 }

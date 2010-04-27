@@ -2,6 +2,12 @@ package MooseX::DBIC::Util;
 
 # from String::CamelCase
 
+sub camelize {
+	my $s = shift;
+	join('', map{ ucfirst $_ } split(/(?<=[A-Za-z])_(?=[A-Za-z])|\b/, $s));
+}
+
+
 sub decamelize {
 	my $s = shift;
 	$s =~ s{([^a-zA-Z]?)([A-Z]*)([A-Z])([a-z]?)}{

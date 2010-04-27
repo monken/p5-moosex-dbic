@@ -6,6 +6,7 @@ with 'MooseX::DBIC::Meta::Role::Relationship';
 
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
+use MooseX::DBIC::Util ();
 
 sub _build_foreign_key {
     shift
@@ -32,7 +33,22 @@ after apply_to_result_source => sub {
     );
 };
 
-sub _build_related_class { die; }
+sub _build_related_class {
+    my $self = shift;
+    my @parts = split(/::/, $self->associated_class->name);
+    my $camel = MooseX::DBIC::Util::camelize($self->name);
+    my $related_class;
+    while(@parts) {
+        $related_class = join('::', @parts, $camel);
+        eval { 
+            Class::MOP::load_class($related_class);
+            undef @parts;
+        } or do {
+            pop @parts;
+        }
+    }
+    return $related_class;
+}
 
 sub _build_join_type {
     shift->is_required ? '' : 'LEFT';
@@ -43,17 +59,14 @@ sub reverse_relationship {
     return first { $_->foreign_key eq $self } $self->related_class->meta->get_all_relationships;
 }
 
-sub BUILD {
-    die @_;
-}
-
 sub build_options {
     my ($class, $for, $name, %options) = @_;
-     return (
+    $options{related_class} = $options{isa} if( $options{isa} );
+    
+    return (
             is => 'rw',
             %options,
             isa => Result,
-            related_class => $options{isa},
             lazy => 1,
             default => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); } 
     );
