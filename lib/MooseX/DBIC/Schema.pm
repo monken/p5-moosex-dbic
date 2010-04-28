@@ -86,10 +86,12 @@ sub load_classes {
     }
     
     my $result = $class->does('MooseX::DBIC::Role::Result') ? $class : $schema->create_result_class($moniker);
-    $class->meta->make_mutable;
-    $class->meta->add_method( moniker => sub {$moniker} );
-    $class->meta->make_immutable;
     
+    # TODO: use a class attribute for this
+    #unless($class eq 'Moose::Object') {
+        $result->moniker($moniker);
+        #$class->meta->make_immutable($class->meta->immutable_options);
+    #}
     $schema->load_classes(@defer);
     
     my $source = $schema->create_result_source( $class, $result );
@@ -163,11 +165,11 @@ sub create_result_source {
         $attribute->apply_to_result_source($source);
     }
     
+    my $resultset = $class . '::Set';
     eval {
-        my $resultset = $class . '::Set';
         Class::MOP::load_class($resultset);
         $source->resultset_class($resultset);
-    } or do { warn $@ };
+    } or do { warn $@ if($@ !~ /^Can't locate/) };
     
     return $source;
 }

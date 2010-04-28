@@ -18,6 +18,10 @@ __PACKAGE__->meta->add_class_attribute( table_name => (
     is => 'rw', isa => 'Str', lazy => 1, builder => '_build_table_name'
 ) );
 
+__PACKAGE__->meta->add_class_attribute( moniker => (
+    is => 'rw', isa => 'Str'
+) );
+
 __PACKAGE__->meta->add_class_attribute( _primaries => (
     is => 'rw', isa => 'Str', default => 'id'
 ) );
