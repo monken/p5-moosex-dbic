@@ -86,12 +86,7 @@ sub load_classes {
     }
     
     my $result = $class->does('MooseX::DBIC::Role::Result') ? $class : $schema->create_result_class($moniker);
-    
-    # TODO: use a class attribute for this
-    #unless($class eq 'Moose::Object') {
-        $result->moniker($moniker);
-        #$class->meta->make_immutable($class->meta->immutable_options);
-    #}
+    $result->moniker($moniker);
     $schema->load_classes(@defer);
     
     my $source = $schema->create_result_source( $class, $result );
