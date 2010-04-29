@@ -22,6 +22,10 @@ __PACKAGE__->meta->add_class_attribute( moniker => (
     is => 'rw', isa => 'Str'
 ) );
 
+__PACKAGE__->meta->add_class_attribute( _orig => (
+    is => 'rw', isa => 'Str'
+) );
+
 __PACKAGE__->meta->add_class_attribute( _primaries => (
     is => 'rw', isa => 'Str', default => 'id'
 ) );
@@ -67,7 +71,6 @@ sub BUILDARGS {
     my $handles = {};
     
     my $args = @rest > 1 ? {@rest} : shift @rest;
-    #warn Data::Dumper::Dumper $args;
     my $rs = $args->{'-result_source'};
     $args->{_fix_reverse_relationship} = [];
     foreach my $rel(@rels) {
@@ -177,6 +180,7 @@ my %import = (
 sub has_column_loaded { 
     my ($self, $column) = @_;
     $column = $self->meta->get_attribute($column);
+    return unless $column;
     return $column->has_value($self)
         || $column->is_required
         || !$self->in_storage

@@ -111,4 +111,18 @@ sub add_relationship {
     }
 }
 
+override get_attribute => sub {
+    my $self = shift;
+    return super() if($self->isa('Moose::Meta::Role'));
+    return super() if($self->name->_orig eq $self->name);
+    return $self->name->_orig->meta->get_attribute(@_);
+};
+
+override get_attribute_list => sub {
+    my $self = shift;
+    return super() if($self->isa('Moose::Meta::Role'));
+    return super() if($self->name->_orig eq $self->name);
+    return $self->name->_orig->meta->get_attribute_list(@_);
+};
+
 1;

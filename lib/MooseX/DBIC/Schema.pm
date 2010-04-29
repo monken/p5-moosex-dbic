@@ -87,6 +87,7 @@ sub load_classes {
     
     my $result = $class->does('MooseX::DBIC::Role::Result') ? $class : $schema->create_result_class($moniker);
     $result->moniker($moniker);
+    $result->_orig($result);
     $schema->load_classes(@defer);
     
     my $source = $schema->create_result_source( $class, $result );
@@ -164,7 +165,7 @@ sub create_result_source {
     eval {
         Class::MOP::load_class($resultset);
         $source->resultset_class($resultset);
-    } or do { warn $@ if($@ !~ /^Can't locate/) };
+    } or do { die $@ if($@ !~ /^Can't locate/) };
     
     return $source;
 }
