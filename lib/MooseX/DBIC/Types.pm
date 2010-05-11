@@ -21,7 +21,7 @@ deflate ResultSet.'[]', via { foreach my $row(@{$_->get_cache || []}) { $row->up
 
 
 deflate Result, via {
-    $_->update_or_insert;
+    $_->update_or_insert unless($_->does('MooseX::DBIC::Meta::Role::ResultProxy'));
     my $pk = $_->meta->get_primary_key->name;
     $_->$pk;
 };
