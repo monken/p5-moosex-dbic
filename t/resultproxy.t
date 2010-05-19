@@ -14,7 +14,7 @@ use Test::Exception;
 use MooseX::DBIC::ResultProxy;
 
 
-throws_ok {my $proxy  = MooseX::DBIC::ResultProxy->new } qr/subclass/, 'need subclassing';
+throws_ok {my $proxy  = MooseX::DBIC::ResultProxy->new } qr/cannot be instanciated/, 'cannot be instanciated';
 
 ok( my $proxy_class = MooseX::DBIC::ResultProxy->build_proxy( 
     MyClass => 

@@ -54,12 +54,17 @@ sub _build_proxy_class {
     my $pk = $attr->related_class->meta->get_primary_key->name;
     MooseX::DBIC::ResultProxy->build_proxy( 
         $attr->related_class =>
-            ( copy => [$pk, qw(result_source in_storage)], builder => sub {
-                my $self = shift;
-                $self->result_source->schema->resultset($attr->related_class)->find($self->$pk);
-            } )
+            ( 
+                copy => [$pk, qw(result_source in_storage)], 
+                builder => \&_build_proxy_class_builder
+            )
     );
 }
 
+sub _build_proxy_class_builder {
+    my $self = shift;
+    my ($pk) = $self->meta->get_primary_key->name;
+    $self->result_source->resultset->find($self->$pk);
+}
 
 1;

@@ -46,8 +46,6 @@ $schema->storage->debug(1);
     is($queries, 5, 'Queries count ok');
 }
 
-
-
 {    
     $queries = 0;
     ok(my $cd = $schema->resultset('CD')->first, 'Get CD from storage');

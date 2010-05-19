@@ -9,7 +9,7 @@ use List::Util qw(first);
 use Carp; use Data::Dumper;
 
 sub BUILD {
-    croak "ResultProxy needs to be subclassed" unless(shift->meta->superclasses > 1);
+    croak "ResultProxy cannot be instanciated";
 }
 
 my @refs;
@@ -40,3 +40,16 @@ sub build_proxy {
 }
 
 1;
+
+__END__
+
+=head1 SYNOPSIS
+
+  MooseX::DBIC::ResultProxy->build_proxy(
+    'MySchema::User',
+    copy    => [qw(id)],
+    builder => sub {
+        my ($self, $superclass) = @_;
+        return $schema->resultset($superclass)->find($self->id);
+    }
+  );
