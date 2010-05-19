@@ -51,11 +51,11 @@ has [qw(cascade_delete cascade_update)] => ( is => 'rw', isa => 'Bool', default 
 
 sub _build_proxy_class {
     my $attr = shift;
-    my $pk = $attr->related_class->meta->get_primary_key->name;
+    my $pk = $attr->related_class->meta->get_primary_key;
     MooseX::DBIC::ResultProxy->build_proxy( 
         $attr->related_class =>
             ( 
-                copy => [$pk, qw(result_source in_storage)], 
+                copy => [$pk->get_read_method, qw(result_source in_storage)], 
                 builder => \&_build_proxy_class_builder
             )
     );
@@ -63,8 +63,8 @@ sub _build_proxy_class {
 
 sub _build_proxy_class_builder {
     my $self = shift;
-    my ($pk) = $self->meta->get_primary_key->name;
-    $self->result_source->resultset->find($self->$pk);
+    my $pk = $self->meta->get_primary_key;
+    $self->result_source->resultset->find($pk->get_value($self));
 }
 
 1;
