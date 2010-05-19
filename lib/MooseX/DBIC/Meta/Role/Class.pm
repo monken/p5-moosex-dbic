@@ -3,6 +3,7 @@ package MooseX::DBIC::Meta::Role::Class;
 use Moose::Role;
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
+use List::MoreUtils ();
 
 my $application_to_class_class = Moose::Meta::Class->create_anon_class( 
     superclasses => ['Moose::Meta::Role::Application::ToClass'], 
@@ -61,6 +62,18 @@ sub get_column_list {
         $self->get_attribute($_)
           ->does('MooseX::DBIC::Meta::Role::Column')
     } $self->get_attribute_list;
+}
+
+sub get_dirty_column_list {
+    my ($meta, $self) = @_;
+    $self->{_dirty_in_progress} ? return () : ($self->{_dirty_in_progress} = 1);
+    my @cols = grep { !$self->in_storage || $meta->get_attribute($_)->is_dirty($self) } $meta->get_column_list;
+    delete $self->{_dirty_in_progress};
+    return @cols;
+}
+
+sub is_dirty {
+    return shift->get_dirty_column_list(shift);
 }
 
 sub get_primary_key {

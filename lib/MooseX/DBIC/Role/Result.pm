@@ -38,6 +38,8 @@ has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_
 
 has _raw_data => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
 
+has dirty_columns => ( is => 'rw', isa => 'HashRef', clearer => 'clear_dirty_columns' );
+
 sub _build__raw_data { return { shift->get_columns } } 
 
 sub resultset { return shift->result_source->schema->resultset(@_) }
@@ -135,6 +137,7 @@ sub BUILD {
         $fix->in_storage(1) if($self->in_storage);
     }
     $self->_clear_fix_reverse_relationship;
+    $self->clear_dirty_columns;
     #$self->_raw_data if($self->in_storage);
     return $self;
 }
@@ -154,14 +157,7 @@ sub get_columns {
 
 sub get_dirty_columns {
     my $self = shift;
-    my $raw = $self->_raw_data;
-    my %dirty = $self->get_columns;
-    while(my ($k,$v) = each %dirty) {
-        delete $dirty{$k} if(defined $v && defined $raw->{$k} && $v."" eq $raw->{$k}."");
-        delete $dirty{$k} if(!defined $v && !defined $raw->{$k});
-    }
-    return %dirty;
-    
+    map { $_ => $self->meta->get_attribute($_)->deflate($self) } $self->meta->get_dirty_column_list($self);
 }
 
 sub search_related {
@@ -182,7 +178,7 @@ sub has_column_loaded {
     $column = $self->meta->get_attribute($column);
     return unless $column;
     return $column->has_value($self)
-        || $column->is_required
+        || $column->is_required # WRONG, a column can be required but not loaded from storage
         || !$self->in_storage
         || ( $self->in_storage && exists $self->_raw_data->{$column->name} );
 }
@@ -220,7 +216,7 @@ sub insert {
     my %to_insert = $self->get_columns;
     
     my $pk = $self->meta->get_primary_key;
-    my $set_pk = ($pk && $self->meta->get_primary_key->auto_increment && !$pk->has_value($self));
+    my $set_pk = ($pk && $pk->auto_increment && !$pk->has_value($self));
     
     delete $to_insert{$pk->name} if($set_pk);
     
@@ -240,7 +236,8 @@ sub insert {
 
     map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
     $self->_raw_data({%to_insert});
-    undef $self->{_update_in_progress};
+    $self->clear_dirty_columns;
+    delete $self->{_update_in_progress};
     return $self;
 }
 
@@ -278,7 +275,8 @@ sub update {
   }
   map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
   $self->_raw_data({%{$self->_raw_data}, %to_update});
-  undef $self->{_update_in_progress};
+  $self->clear_dirty_columns;
+  delete $self->{_update_in_progress};
   return $self;
 }
 

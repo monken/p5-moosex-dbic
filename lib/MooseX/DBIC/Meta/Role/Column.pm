@@ -16,6 +16,10 @@ has auto_increment => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has primary_key => ( is => 'rw', isa => 'Bool', default => 0 );
 
+sub _build_dirty {
+    return !shift->associated_class->in_storage;
+}
+
 sub _build_column_info {
     my $self = shift;
     return {
@@ -43,4 +47,16 @@ after apply_to_result_source => sub {
     }
 };
 
+sub is_dirty {
+    my ($attr, $self) = @_;
+    return $self->dirty_columns && $self->dirty_columns->{$attr->name};
+}
+
 1;
+
+__END__
+
+=head2 is_dirty
+
+A column is considered dirty when the associated row is not in storage
+or if the column's slot has been set. See L<MooseX::DBIC::Meta::Role::Instance>. 

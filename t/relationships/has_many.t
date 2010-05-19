@@ -65,6 +65,7 @@ my $artist;
     ok($cd = $schema->resultset('CD')->find($cd->id), 'fetch from storage');
     ok(!$cd->has_artist, 'CD3 has still no artist');
     ok($cd->artist($artist), 'Set artist on CD3');
+    is_deeply([$cd->meta->get_dirty_column_list($cd)], ['artist'], 'cd\'s artist column is dirty');
     ok($cd->update, 'update CD3');
     is($schema->resultset('CD')->find($cd->id)->artist->id, $artist->id, 'Artist ID set in storage');
     is($queries, 4, 'Queries Count ok');

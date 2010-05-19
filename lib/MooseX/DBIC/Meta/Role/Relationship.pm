@@ -67,4 +67,12 @@ sub _build_proxy_class_builder {
     $self->result_source->resultset->find($pk->get_value($self));
 }
 
+sub is_dirty {
+    my ($attr, $self) = @_;
+    return 0 unless($attr->has_value($self));
+    my $rel = $attr->get_value($self);
+    return 0 if($rel->does('MooseX::DBIC::Meta::Role::ResultProxy'));
+    return $rel->meta->is_dirty($rel);
+}
+
 1;

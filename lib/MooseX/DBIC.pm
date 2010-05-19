@@ -9,7 +9,10 @@ my ( $import, $unimport, $init_meta ) = Moose::Exporter->build_import_methods(
   also => 'Moose', 
   with_meta => [qw(has_column has_many belongs_to has_one might_have table remove)],
   as_is => [qw(ResultSet)],
-  metaclass_roles => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)],
+  class_metaroles => {
+    class => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)],
+    instance => [qw(MooseX::DBIC::Meta::Role::Instance)],
+  },
   install => [qw(import unimport init_meta)]
 );
 

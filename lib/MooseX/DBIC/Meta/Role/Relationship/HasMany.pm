@@ -5,6 +5,7 @@ with 'MooseX::DBIC::Meta::Role::Relationship';
 
 use MooseX::DBIC::Types q(:all);
 use Moose::Util::TypeConstraints qw();
+use List::Util ();
 
 sub _build_foreign_key {
     my $self = shift;
@@ -54,6 +55,13 @@ sub build_options {
         lazy => 1,
         default => sub { my $self = shift; return $self->_build_related_resultset($self->meta->get_attribute($name)); } 
     );
+}
+
+sub is_dirty {
+    my ($attr, $self) = @_;
+    return 0 unless($attr->has_value($self));
+    my $rows = $attr->get_value($self)->get_cache;
+    List::Util::first { $_ && $_->meta->is_dirty($_) } @$rows;
 }
 
 1;

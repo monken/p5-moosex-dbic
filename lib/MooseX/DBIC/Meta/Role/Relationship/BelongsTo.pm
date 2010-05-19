@@ -1,8 +1,8 @@
 package MooseX::DBIC::Meta::Role::Relationship::BelongsTo;
 
 use Moose::Role;
-with 'MooseX::DBIC::Meta::Role::Column';
-with 'MooseX::DBIC::Meta::Role::Relationship';
+with 'MooseX::DBIC::Meta::Role::Relationship' => { -alias    => { is_dirty => 'relationship_is_dirty' } };
+with 'MooseX::DBIC::Meta::Role::Column' => { -alias    => { is_dirty => 'column_is_dirty' } };
 
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
@@ -70,6 +70,11 @@ sub build_options {
             lazy => 1,
             default => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); } 
     );
+}
+
+sub is_dirty {
+    my ($attr, $self) = @_;
+    return $attr->column_is_dirty($self) || $attr->relationship_is_dirty($self);
 }
 
 1;
