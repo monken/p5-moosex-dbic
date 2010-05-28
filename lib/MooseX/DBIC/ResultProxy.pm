@@ -12,12 +12,10 @@ sub BUILD {
     croak "ResultProxy cannot be instanciated";
 }
 
-my @refs;
-
 sub build_proxy {
     my ($class, $superclass, %args) = @_;
     my ($copy, $builder) = ($args{copy}, $args{builder});
-    my $proxy_class = Moose::Meta::Class->create_anon_class(
+    my $proxy_class = $superclass->meta->create_anon_class(
         superclasses => [$superclass],
         roles => [qw(MooseX::DBIC::Meta::Role::ResultProxy)],
         methods => { _build_class => sub {
@@ -35,7 +33,6 @@ sub build_proxy {
         $proxy_class->add_method(  $method => sub { shift->_build_class($method, @_) }   );
     }
     $proxy_class->make_immutable;
-    push(@refs, $proxy_class);
     return $proxy_class;
 }
 
