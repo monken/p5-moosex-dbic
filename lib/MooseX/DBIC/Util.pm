@@ -20,5 +20,18 @@ sub decamelize {
 	$s;
 }
 
+sub find_result_class {
+    my $class = shift;
+    if(!ref $class) {
+    } elsif($class->isa('Moose::Meta::TypeConstraint::Parameterized')) {
+        $class = find_result_class($class->type_parameter);
+    } elsif($class->isa('Moose::Meta::TypeConstraint::Class')) {
+        $class = $class->class;
+    }
+    Class::MOP::load_class($class);
+    return $class if($class->isa('Moose::Object') && $class->does('MooseX::DBIC::Role::Result'));
+    
+}
+
 
 1;

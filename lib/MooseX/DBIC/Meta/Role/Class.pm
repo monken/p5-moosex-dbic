@@ -119,8 +119,8 @@ sub add_relationship {
     
     my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
     foreach my $attr ( @{$attrs} ) {
-        my %copy = $metaclass->build_options($self, $attr, %options);
-        $self->add_attribute( $metaclass->new( $attr => %copy ) );
+        #my %copy = $metaclass->build_options($self, $attr, %options);
+        $self->add_attribute( $metaclass->new( $attr => %options, associated_class => $self->name ) );
     }
 }
 

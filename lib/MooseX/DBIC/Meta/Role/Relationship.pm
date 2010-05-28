@@ -25,6 +25,11 @@ has foreign_key => (
     builder => '_build_foreign_key'
 );
 
+has _foreign_key => ( 
+    is => 'rw', 
+    isa => 'Str',
+);
+
 has join_condition => ( 
     is => 'rw', 
     isa => 'HashRef', 
@@ -48,6 +53,49 @@ has join_type => (
 );
 
 has [qw(cascade_delete cascade_update)] => ( is => 'rw', isa => 'Bool', default => 0 );
+
+around _process_options => sub {
+    my ($orig, $self, $name, $options) = @_;
+    $options->{isa} ||= $self->_build_related_class($name, $options->{associated_class});
+        
+    %$options = ( 
+        is => 'rw',
+        lazy => 1,
+        default =>  $self->_build_builder($name),
+        %$options
+    );
+    $self->$orig($name, $options);
+    if($options->{type_constraint}
+        && (my $class = MooseX::DBIC::Util::find_result_class($options->{type_constraint}))) {
+            $options->{related_class} = $class;
+    }
+};
+
+sub _build_builder {
+    my ($s, $name) = @_;
+    return sub {
+        my $self = shift;
+        $self->_build_relationship($self->meta->get_attribute($name));
+    }
+}
+
+sub _build_related_class {
+    my $self = shift;
+    my ($name, $associated_class) = ref $self ? ($self->name, $self->associated_class->name) : @_;
+    my $camel = MooseX::DBIC::Util::camelize($name);
+    my @parts = split(/::/, $associated_class);
+    my ($related_class, $done);
+    while(@parts || !$done) {
+        $done = $#parts;
+        $related_class = join('::', @parts, $camel);
+        eval { 
+            Class::MOP::load_class($related_class);
+            undef @parts;
+        };
+        pop @parts || last;
+    }
+    return $related_class;
+}
 
 sub _build_proxy_class {
     my $attr = shift;

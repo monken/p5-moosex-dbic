@@ -5,9 +5,13 @@ with 'MooseX::DBIC::Meta::Role::Relationship';
 
 use MooseX::DBIC::Types q(:all);
 
+has dbic_accessor => ( is => 'ro', default => 'single' );
+
 sub _build_foreign_key {
     my $self = shift;
-    return $self->related_class->meta->get_attribute($self->associated_class->name->table_name);
+    return $self->related_class->meta->get_attribute($self->{_foreign_key} || $self->associated_class->name->table_name) ||
+    Moose->throw_error('Foreign key for relationship ', $self->name, ' could not be found. ',
+        'Please specify explicitly in class ', $self->associated_class, '.');
 };
 
 sub _build_join_condition {
@@ -23,7 +27,7 @@ after apply_to_result_source => sub {
         $self->related_class, 
         $self->join_condition, 
         {
-            accessor => 'single',
+            accessor => $self->dbic_accessor,
             join_type => $self->join_type,
             cascade_delete => 1,
             cascade_copy => 1,
@@ -31,30 +35,20 @@ after apply_to_result_source => sub {
     );
 };
 
-sub _build_related_class {
-    shift->type_constraint->class
-}
-
 sub reverse_relationship {
     shift->foreign_key;
 }
 
 sub _build_join_type { 'LEFT' }
 
-sub build_options {
-    my ($class, $for, $name, %options) = @_;
-    if($options{foreign_key}) {
-        Class::MOP::load_class($options{isa});
-        $options{foreign_key} = $options{isa}->meta->get_attribute($options{foreign_key});    
-     }
-     return (
-            is => 'rw',
-            %options,
-            isa => Result,
-            related_class => $options{isa},
-            lazy => 1,
-            default => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); } 
-    );
-}
+around _process_options => sub {
+    my ($orig, $self, $name, $options) = @_;
+    $self->$orig($name, $options);
+    if(!ref $options->{foreign_key} && $options->{foreign_key}) {
+        $options->{_foreign_key} = delete $options->{foreign_key};    
+    }
+    $options->{type_constraint} = Result[$options->{type_constraint}]
+        unless($options->{type_constraint}->parent eq Result);
+};
 
 1;

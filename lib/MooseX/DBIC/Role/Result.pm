@@ -19,7 +19,7 @@ __PACKAGE__->meta->add_class_attribute( table_name => (
 ) );
 
 __PACKAGE__->meta->add_class_attribute( moniker => (
-    is => 'rw', isa => 'Str'
+    is => 'rw', isa => 'Str', default => sub { shift->name }
 ) );
 
 __PACKAGE__->meta->add_class_attribute( _orig => (

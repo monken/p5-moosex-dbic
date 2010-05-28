@@ -33,23 +33,6 @@ after apply_to_result_source => sub {
     );
 };
 
-sub _build_related_class {
-    my $self = shift;
-    my @parts = split(/::/, $self->associated_class->name);
-    my $camel = MooseX::DBIC::Util::camelize($self->name);
-    my $related_class;
-    while(@parts) {
-        $related_class = join('::', @parts, $camel);
-        eval { 
-            Class::MOP::load_class($related_class);
-            undef @parts;
-        } or do {
-            pop @parts;
-        }
-    }
-    return $related_class;
-}
-
 sub _build_join_type {
     shift->is_required ? '' : 'LEFT';
 }
@@ -59,22 +42,16 @@ sub reverse_relationship {
     return first { $_->foreign_key eq $self } $self->related_class->meta->get_all_relationships;
 }
 
-sub build_options {
-    my ($class, $for, $name, %options) = @_;
-    $options{related_class} = $options{isa} if( $options{isa} );
-    
-    return (
-            is => 'rw',
-            %options,
-            isa => Result,
-            lazy => 1,
-            default => sub { my $self = shift; return $self->_build_relationship($self->meta->get_attribute($name)); } 
-    );
-}
-
 sub is_dirty {
     my ($attr, $self) = @_;
     return $attr->column_is_dirty($self) || $attr->relationship_is_dirty($self);
 }
+
+around _process_options => sub {
+    my ($orig, $self, $name, $options) = @_;
+    $self->$orig($name, $options);
+    $options->{type_constraint} = Result[$options->{type_constraint}]
+        unless($options->{type_constraint}->parent eq Result);
+};
 
 1;
