@@ -75,7 +75,7 @@ sub _build_builder {
     my ($s, $name) = @_;
     return sub {
         my $self = shift;
-        $self->_build_relationship($self->meta->get_attribute($name));
+        $self->_build_relationship($self->meta->get_relationship($name));
     }
 }
 

@@ -26,9 +26,18 @@ sub application_to_class_class {
     return $application_to_class_class->name;
 }
 
+has orig_class => ( is => 'ro', lazy => 1, builder => 'get_orig_class' );
+has column_list => ( is => 'rw', default => sub {['id']} ); # TODO: Role applicator
+has relationship_list => ( is => 'rw', default => sub {[]} );
+
+sub get_orig_class {
+    my $class = first { grep { $_->name eq 'MooseX::DBIC::Role::Result' } @{$_->meta->roles} } shift->class_precedence_list;
+    return $class->meta;
+}
+
 sub get_all_columns {
     my $self = shift;
-    return grep { $_->does('MooseX::DBIC::Meta::Role::Column') } $self->get_all_attributes;
+    return grep { $_->does('MooseX::DBIC::Meta::Role::Column') } $self->orig_class->get_all_attributes;
 }
 
 sub add_column {
@@ -44,30 +53,31 @@ sub add_column {
   
   foreach my $attr ( @{$attrs} ) {
       $meta->add_attribute( $attr => %options );
+      $meta->column_list([@{$meta->column_list}, $attr]);
   }
 }
 
+sub remove_column {
+    my ($self, $column) = @_;
+    $self->column_list([grep { $_ ne $column } @{$self->column_list}]);
+    $self->remove_attribute($column);
+}
+
 sub get_column {
-    my $self = shift;
-    my $name = shift;
-    return first {
-        $_->does('MooseX::DBIC::Meta::Role::Column') &&
-        $_->name eq $name
-    } map { $self->get_attribute($_) } $self->get_attribute_list;
+    my ($self, $name) = @_;
+    return $self->find_attribute_by_name( 
+        first { $_ eq $name } $self->get_column_list
+    );
 }
 
 sub get_column_list {
-    my $self = shift;
-    return grep {
-        $self->get_attribute($_)
-          ->does('MooseX::DBIC::Meta::Role::Column')
-    } $self->get_attribute_list;
+    return @{shift->orig_class->column_list};
 }
 
 sub get_dirty_column_list {
     my ($meta, $self) = @_;
     $self->{_dirty_in_progress} ? return () : ($self->{_dirty_in_progress} = 1);
-    my @cols = grep { !$self->in_storage || $meta->get_attribute($_)->is_dirty($self) } $meta->get_column_list;
+    my @cols = grep { !$self->in_storage || $meta->get_column($_)->is_dirty($self) } $meta->get_column_list;
     delete $self->{_dirty_in_progress};
     return @cols;
 }
@@ -78,15 +88,11 @@ sub is_dirty {
 
 sub get_primary_key {
     my $self = shift;
-    return first { $_->primary_key } map { $self->get_attribute($_) } $self->get_column_list;
+    return first { $_->primary_key } map { $self->get_column($_) } $self->get_column_list;
 }
 
 sub get_relationship_list {
-    my $self = shift;
-    return grep {
-        $self->get_attribute($_)
-          ->does('MooseX::DBIC::Meta::Role::Relationship')
-    } $self->get_attribute_list;
+    return @{shift->orig_class->relationship_list};
 }
 
 sub get_all_relationships {
@@ -96,7 +102,7 @@ sub get_all_relationships {
 
 sub get_relationship {
     my ($self, $rel) = @_;
-    return $self->get_attribute($rel) if(first { $_ eq $rel } $self->get_relationship_list);
+    return $self->orig_class->get_attribute($rel) if(first { $_ eq $rel } $self->get_relationship_list);
 }
 
 
@@ -120,7 +126,11 @@ sub add_relationship {
     my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
     foreach my $attr ( @{$attrs} ) {
         #my %copy = $metaclass->build_options($self, $attr, %options);
-        $self->add_attribute( $metaclass->new( $attr => %options, associated_class => $self->name ) );
+        $self->relationship_list([@{$self->relationship_list}, $attr]);
+        my $rel = $self->add_attribute( $metaclass->new( $attr => %options, associated_class => $self->name ) );
+        $self->column_list([@{$self->column_list}, $attr])
+            if($rel->does('MooseX::DBIC::Meta::Role::Column'));
+        
     }
 }
 

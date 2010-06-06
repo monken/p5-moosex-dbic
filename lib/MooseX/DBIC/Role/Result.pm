@@ -69,7 +69,7 @@ sub _build_related_resultset {
 
 sub BUILDARGS { 
     my ($class, @rest) = @_;
-    my @rels = map { $class->meta->get_attribute($_) } $class->meta->get_relationship_list;
+    my @rels = map { $class->meta->get_relationship($_) } $class->meta->get_relationship_list;
     my $handles = {};
     
     my $args = @rest > 1 ? {@rest} : shift @rest;
@@ -104,7 +104,7 @@ sub BUILDARGS {
             } elsif(ref $value eq "HASH") {
                 $args->{$name} = $rs->schema->resultset($rel->related_class)->new_result($value);
             }  elsif(!ref $value && defined $value) {
-                my $attr = $class->meta->get_attribute($name);
+                my $attr = $class->meta->get_column($name) || $class->meta->get_relationship($name);
                 $args->{$name} = $attr->inflate($class, $value, undef, $rs, $attr);
                 $args->{$name}->in_storage(1);
             
@@ -131,8 +131,8 @@ sub BUILD {
         next if($fix->does('MooseX::DBIC::Meta::Role::ResultProxy'));
         next if($relationship->associated_class && # FIXME: How can associated_class be undef?
                 $relationship->associated_class == $relationship->foreign_key->associated_class);
-        my $name = $relationship->foreign_key->name;
-        $fix->$name($self);
+        my $name = $relationship->foreign_key->set_raw_value($fix, $self);
+        #$fix->$name($self);
         $relationship->foreign_key->_weaken_value($fix);
         $fix->in_storage(1) if($self->in_storage);
     }
@@ -152,12 +152,12 @@ sub get_column {
 sub get_columns {
     my $self = shift;
     my @columns = $self->meta->get_column_list;
-    return map { $_ => $self->meta->get_attribute($_)->deflate($self) } @columns;
+    return map { $_ => $self->meta->get_column($_)->deflate($self) } @columns;
 }
 
 sub get_dirty_columns {
     my $self = shift;
-    map { $_ => $self->meta->get_attribute($_)->deflate($self) } $self->meta->get_dirty_column_list($self);
+    map { $_ => $self->meta->get_column($_)->deflate($self) } $self->meta->get_dirty_column_list($self);
 }
 
 sub search_related {
@@ -175,7 +175,7 @@ my %import = (
 
 sub has_column_loaded { 
     my ($self, $column) = @_;
-    $column = $self->meta->get_attribute($column);
+    $column = $self->meta->get_column($column);
     return unless $column;
     return $column->has_value($self)
         || $column->is_required # WRONG, a column can be required but not loaded from storage
@@ -257,6 +257,7 @@ sub inflate_result {
 sub update {
   my ($self, $upd) = @_;
   $self->throw_exception( "Not in database" ) unless $self->in_storage;
+  return $self if($self->does('MooseX::DBIC::Meta::Role::ResultProxy'));
   my $ident_cond = $self->ident_condition;
   $self->throw_exception("Cannot safely update a row in a PK-less table")
     if ! keys %$ident_cond;

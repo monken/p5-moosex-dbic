@@ -8,7 +8,7 @@ no warnings qw/qw/;
 
 __PACKAGE__->load_classes(qw/
   Artist
-  SequenceTest
+  #SequenceTest
   BindType
   Employee
   CD
@@ -31,14 +31,14 @@ __PACKAGE__->load_classes(qw/
     Image
     Lyrics
     LyricVersion
-    OneKey
+    #OneKey
     #dummy
     TwoKeys
     Serialized
   /]},
   (
-    'FourKeys',
-    'FourKeys_to_TwoKeys',
+    '#FourKeys',
+    '#FourKeys_to_TwoKeys',
     '#dummy',
     'SelfRef',
     'ArtistUndirectedMap',
@@ -48,9 +48,9 @@ __PACKAGE__->load_classes(qw/
     'CD_to_Producer',
     '#Dummy',    # this is a real result class we remove in the hook below
   ),
-  qw/SelfRefAlias TreeLike TwoKeyTreeLike Event EventTZ NoPrimaryKey/,
+  qw/SelfRefAlias #TreeLike #TwoKeyTreeLike Event #EventTZ #NoPrimaryKey/,
   qw/Collection CollectionObject TypedObject Owners BooksInLibrary/,
-  qw/ForceForeign Encoded/,
+  qw/#ForceForeign Encoded/,
 );
 
 sub sqlt_deploy_hook {

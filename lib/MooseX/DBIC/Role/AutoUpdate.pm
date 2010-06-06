@@ -4,7 +4,7 @@ use Moose::Role;
 
 sub DEMOLISH {
     my $self = shift;
-    $self->update if($self->in_storage);
+    $self->update if($self->in_storage && !$self->does('MooseX::DBIC::Meta::Role::ResultProxy'));
 }
 
 1;

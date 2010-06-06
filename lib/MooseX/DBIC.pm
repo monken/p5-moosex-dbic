@@ -44,7 +44,7 @@ sub has_column {
 }
 
 sub remove {
-    shift->remove_attribute(shift);
+    shift->remove_column(shift);
 }
 
 sub has_many {

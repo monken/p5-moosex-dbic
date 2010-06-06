@@ -60,6 +60,14 @@ my %dirty = ( in_storage => 1, _raw_data => 1 );
     lives_ok { map { $_->create_related('tracks', { title => 'foo' }) } $genre->cds->all }; 
 }
 
+{
+    my $genre = $schema->resultset('Genre')->search(undef, { prefetch => 'model_cd' })->first;
+    my $rel = $genre->model_cd->meta->get_relationship('genre');
+    ok(!$rel->is_column_dirty($genre->model_cd), 'Column is not dirty');
+    ok(!$rel->is_relationship_dirty($genre->model_cd), 'Relationship is not dirty');
+    
+}
+
 
 
 done_testing;

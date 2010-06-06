@@ -1,8 +1,8 @@
 package MooseX::DBIC::Meta::Role::Relationship::BelongsTo;
 
 use Moose::Role;
-with 'MooseX::DBIC::Meta::Role::Relationship' => { -alias    => { is_dirty => 'relationship_is_dirty' } };
-with 'MooseX::DBIC::Meta::Role::Column' => { -alias    => { is_dirty => 'column_is_dirty' } };
+with 'MooseX::DBIC::Meta::Role::Relationship' => { -alias    => { is_dirty => 'is_relationship_dirty' } };
+with 'MooseX::DBIC::Meta::Role::Column' => { -alias    => { is_dirty => 'is_column_dirty' } };
 
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
@@ -44,7 +44,7 @@ sub reverse_relationship {
 
 sub is_dirty {
     my ($attr, $self) = @_;
-    return $attr->column_is_dirty($self) || $attr->relationship_is_dirty($self);
+    return $attr->is_column_dirty($self) || $attr->is_relationship_dirty($self);
 }
 
 around _process_options => sub {

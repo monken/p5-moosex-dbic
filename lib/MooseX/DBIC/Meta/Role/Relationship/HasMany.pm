@@ -20,7 +20,7 @@ sub _build_builder {
     my ($s, $name) = @_;
     return sub {
         my $self = shift;
-        $self->_build_related_resultset($self->meta->get_attribute($name));
+        $self->_build_related_resultset($self->meta->get_relationship($name));
     }
 }
 

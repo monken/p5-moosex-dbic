@@ -11,12 +11,14 @@ foreach my $source ( map { $schema->source($_) } $schema->sources ) {
       { map { $_ => $source->column_info($_) } $source->columns };
 }
 
+#warn Data::Dumper::Dumper $ddl;
+
 is_deeply(
     $ddl,
     {
         'MyApp::User::Admin' => {
             'level' => {
-                'is_auto_increment' => undef,
+                'is_auto_increment' => 0,
                 'data_type'         => 'INTEGER',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
@@ -36,7 +38,7 @@ is_deeply(
                 'size'              => 10
             },
             'hair_color' => {
-                'is_auto_increment' => undef,
+                'is_auto_increment' => 0,
                 'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
@@ -45,14 +47,14 @@ is_deeply(
         },
         'MyApp::User' => {
             'email' => {
-                'is_auto_increment' => undef,
+                'is_auto_increment' => 0,
                 'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
                 'size'              => undef
             },
             'first' => {
-                'is_auto_increment' => undef,
+                'is_auto_increment' => 0,
                 'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => 1,
@@ -65,7 +67,7 @@ is_deeply(
                 'size'              => undef
             },
             'last' => {
-                'is_auto_increment' => undef,
+                'is_auto_increment' => 0,
                 'data_type'         => 'VARCHAR',
                 'default_value'     => undef,
                 'is_nullable'       => 1,

@@ -27,6 +27,7 @@ use MooseX::DBIC;
 has_column 'name';
 belongs_to 'cd' => ( isa => 'CD' );
 belongs_to 'cd2' => ( isa => 'CD' );
+has_one 'cd3' => ( isa => 'CD', foreign_key => 'cover' );
 
 
 package main;
@@ -53,6 +54,13 @@ package main;
     ok(my $rel = CD->meta->get_relationship('cover2'), 'get might_have relationship cover2');
     is($rel->related_class, 'CD::Cover', 'related class is CD::Cover');
     is($rel->foreign_key, CD::Cover->meta->get_relationship('cd2'), 'foreign key is cd2 in CD::Cover');
+}
+
+{
+    ok(my $rel = CD::Cover->meta->get_relationship('cd3'), 'get has_one relationship cd3');
+    is($rel->related_class, 'CD', 'related class is CD');
+    is($rel->foreign_key, CD->meta->get_relationship('cover'), 'foreign key is cover in CD');
+    ok($rel->is_required, 'has_one rels are required');
 }
 
 done_testing;

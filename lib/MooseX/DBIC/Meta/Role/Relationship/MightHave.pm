@@ -9,9 +9,9 @@ has dbic_accessor => ( is => 'ro', default => 'single' );
 
 sub _build_foreign_key {
     my $self = shift;
-    return $self->related_class->meta->get_attribute($self->{_foreign_key} || $self->associated_class->name->table_name) ||
-    Moose->throw_error('Foreign key for relationship ', $self->name, ' could not be found. ',
-        'Please specify explicitly in class ', $self->associated_class, '.');
+    return $self->related_class->meta->get_relationship($self->_foreign_key || $self->associated_class->name->table_name)
+        || Moose->throw_error('Foreign key for relationship ', $self->name, ' could not be found. ',
+           'Please specify explicitly in class ', $self->associated_class->name, '.');
 };
 
 sub _build_join_condition {

@@ -9,11 +9,11 @@ use MooseX::Attribute::Deflator::Structured;
 use MooseX::DBIC::Util ();
 use Data::Dumper;
 
-
+BEGIN{
 $Data::Dumper::Maxdepth = 3;
 $Data::Dumper::Indent = 1;
 $Carp::Verbose = 1;
-
+}
 extends 'DBIx::Class::Schema';
 
 class_has result_source_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
@@ -63,15 +63,13 @@ sub load_classes {
     
     return $schema->load_classes(@defer) if ($class =~ /^#/);
     
-    my $moniker = $class;
+    (my $moniker = $class) =~ s/^\Q$schema\E:://;
     
     my $warn;
     eval {
         Class::MOP::load_class(join('::', $schema, $class));
-        $moniker = $class;
         $class = join('::', $schema, $class);
     } or do { $warn = $@; } and eval {
-        
         Class::MOP::load_class($class);
     } or do {
         die $warn || $@;
@@ -79,13 +77,9 @@ sub load_classes {
     
     $schema->add_loaded_class($class);
     
-    unless($class->isa('Moose::Object')) {
-        warn $moniker, ' isa DBIx::Class';
-        $schema->next::method($moniker);
-        return $schema->load_classes(@defer);
-    }
-    
-    my $result = $class->does('MooseX::DBIC::Role::Result') ? $class : $schema->create_result_class($moniker);
+    my $result = $class;
+    Moose->throw_error('Use a MooseX::DBIC::Loader to load non MooseX::DBIC class ', $moniker, '.') 
+        unless($class->isa('Moose::Object') && $class->does('MooseX::DBIC::Role::Result'));
     $result->moniker($moniker);
     $result->_orig($result);
     $schema->load_classes(@defer);
@@ -94,54 +88,6 @@ sub load_classes {
     
     $schema->class_mappings->{$result} = $moniker;
     $schema->register_source( $moniker => $source );
-}
-
-
-sub create_result_class {
-    my ( $schema, $class ) = @_;
-
-    my $result =  $schema . '::' . $class ;
-    
-    my $result_metaclass = $class->meta->create_anon_class(
-        superclasses => [ $class->meta->meta->name ],
-        roles => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)],
-        cache        => 1,
-    )->name;
-    
-    my @superclasses = map {
-        $schema->load_classes($_)
-          unless ( $schema->is_class_loaded($_) );
-        join( '::', $schema, $_);
-    } $class->meta->superclasses;
-    $result_metaclass->create(
-        $result,
-        superclasses => [ $class, @superclasses,  ],
-        roles => ['MooseX::DBIC::Role::Result'],
-        cache        => 1,
-    );
-
-    foreach my $attr ( $class->meta->get_attribute_list ) {
-        my $attribute           = $class->meta->get_attribute($attr);
-        my $attribute_metaclass = Moose::Meta::Class->create_anon_class(
-            superclasses => [ $attribute->meta->name ],
-            roles        => ['MooseX::DBIC::Meta::Role::Column','MooseX::Attribute::Deflator::Meta::Role::Attribute'],
-            cache        => 1,
-        );
-
-        $result->meta->add_attribute(
-            bless( $attribute, $attribute_metaclass->name ) );
-    }
-
-    foreach my $superclass ($class->meta->superclasses) {
-        $schema->load_classes($superclass)
-          unless ( $schema->is_class_loaded($superclass) );
-        my $related = join( '::', $schema, $superclass);
-        ( my $table = lc($superclass) ) =~ s/::/_/g;
-        $result->meta->add_relationship($table => ( type => 'HasSuperclass', isa => $related));
-    }
-   
-
-    return $result;
 }
 
 sub create_result_source {
