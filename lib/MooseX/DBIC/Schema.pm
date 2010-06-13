@@ -72,7 +72,7 @@ sub load_classes {
     } or do { $warn = $@; } and eval {
         Class::MOP::load_class($class);
     } or do {
-        die $warn || $@;
+        die $warn, $@;
     };
     
     $schema->add_loaded_class($class);

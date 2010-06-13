@@ -40,6 +40,8 @@ has _raw_data => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
 
 has dirty_columns => ( is => 'rw', isa => 'HashRef', clearer => 'clear_dirty_columns' );
 
+has _inflated_columns => ( is => 'rw', isa => 'HashRef', default => sub {{}} );
+
 sub _build__raw_data { return { shift->get_columns } } 
 
 sub resultset { return shift->result_source->schema->resultset(@_) }
@@ -73,8 +75,9 @@ sub BUILDARGS {
     my $handles = {};
     
     my $args = @rest > 1 ? {@rest} : shift @rest;
+    
     my $rs = $args->{'-result_source'};
-    $args->{_fix_reverse_relationship} = [];
+    
     foreach my $rel(@rels) {
         map { $handles->{$_} = $rel->name } @{$rel->handles || []};
     }
@@ -82,63 +85,23 @@ sub BUILDARGS {
         if(exists $handles->{$k}) {
             $args->{$handles->{$k}}->{$k} = delete $args->{$k};
         }
+        delete $args->{$k} if(!defined $v);
     }
     
     foreach my $rel(@rels) {
         my $name = $rel->name;
         next unless(exists $args->{$name});
         my $value = $args->{$name};
-        if($rel->type eq 'HasMany') {
-            $value = [ $value ] unless( ref $value eq 'ARRAY' );
-            my @rows = map { ref $_ eq "ARRAY" ? $_->[0] : $_ } @$value;
-            my $resultset = $rs->schema->resultset($rel->related_class);
-            @rows =  map { ref $_ eq 'HASH' ? $resultset->new_result($_) : $_ } @rows;
-            $resultset->set_cache(\@rows);
-            $args->{$name} = $resultset;
-            push(@{$args->{_fix_reverse_relationship}}, map { $rel, $_ } @rows);
-        } else {
-            $value = $value->[0] if(ref $value eq 'ARRAY' );
-            if(!defined $value) {
-                delete $args->{$name};
-                next;
-            } elsif(ref $value eq "HASH") {
-                $args->{$name} = $rs->schema->resultset($rel->related_class)->new_result($value);
-            }  elsif(!ref $value && defined $value) {
-                my $attr = $class->meta->get_column($name) || $class->meta->get_relationship($name);
-                $args->{$name} = $attr->inflate($class, $value, undef, $rs, $attr);
-                $args->{$name}->in_storage(1);
-            
-            }
-            push(@{$args->{_fix_reverse_relationship}}, $rel, $args->{$name});
-        }
+        $value = $value->[0] if(ref $value eq 'ARRAY' );
+        delete $args->{$name} if(!defined $value);
     }
     
-    while(my($k,$v) = each %$args) {
-        my $attr = $class->meta->find_attribute_by_name($k);
-        next unless($attr && $attr->does('MooseX::Attribute::Deflator::Meta::Role::Attribute'));
-        $args->{$k} = $attr->inflate($class, $v, undef, $rs, $attr) if(!ref $v);
-        delete $args->{$k} if(!defined $args->{$k});
-    }
     return $args;
 }
 
 sub BUILD {
     my $self = shift;
-    return if($self->does('MooseX::DBIC::Meta::Role::ResultProxy'));
-    my @fix = @{ $self->_fix_reverse_relationship };
-    for(my $i = 0; $i < @fix; $i+=2) {
-        my ($relationship, $fix) = ($fix[$i], $fix[$i+1]);
-        next if($fix->does('MooseX::DBIC::Meta::Role::ResultProxy'));
-        next if($relationship->associated_class && # FIXME: How can associated_class be undef?
-                $relationship->associated_class == $relationship->foreign_key->associated_class);
-        my $name = $relationship->foreign_key->set_raw_value($fix, $self);
-        #$fix->$name($self);
-        $relationship->foreign_key->_weaken_value($fix);
-        $fix->in_storage(1) if($self->in_storage);
-    }
-    $self->_clear_fix_reverse_relationship;
     $self->clear_dirty_columns;
-    #$self->_raw_data if($self->in_storage);
     return $self;
 }
 
@@ -251,7 +214,21 @@ sub update_or_insert {
 sub inflate_result {
     my ($class, $rs, $me, $more, @more) = @_;
     my $hash = DBIx::Class::ResultClass::HashRefInflator::inflate_result(@_);
-    return $class->new(%$hash, '-result_source' => $rs, in_storage => 1, _raw_data => $me);
+    $hash = $class->_set_in_storage_deep($hash);
+    return $class->new(%$hash, '-result_source' => $rs, _raw_data => $me);
+}
+
+sub _set_in_storage_deep {
+    my ($self, $data) = @_;
+    while(my($k,$v) = each %$data) {
+        if(ref $v eq 'ARRAY') {
+            $data->{$k} = [ map { $self->_set_in_storage_deep($_) } @$v ];
+        } elsif(ref $v eq 'HASH') {
+            $data->{$k} = $self->_set_in_storage_deep($v);
+        }
+    }
+    $data->{in_storage} = 1;
+    return $data;
 }
 
 sub update {

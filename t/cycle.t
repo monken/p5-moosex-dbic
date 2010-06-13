@@ -41,8 +41,14 @@ my $weak;
   my $rsrc = $weak->{resultsource} = $rs->result_source;
   memory_cycle_ok($rsrc, 'No cycles in resultsource');
 
-  my $row = $weak->{row} = $s->resultset('Artist')->create({ name => 'Nock', cds => [{title=> 'Foo'}]});
-  memory_cycle_ok($row, 'No cycles in row');
+  my $row1 = $weak->{row1} = $s->resultset('Artist')->create({ name => 'Nock', cds => [{title=> 'Foo'}]});
+  
+        warn Scalar::Util::isweak($row1->cds->first->{artist});
+        #Scalar::Util::weaken($row1->cds->first->{artist});
+  memory_cycle_ok($row1, 'No cycles in row1');
+  
+  my $row2 = $weak->{row2} = $s->resultset('CD')->create({ artist => { name => 'Nock'}, title => 'test' });
+  memory_cycle_ok($row2, 'No cycles in row2');
 
   Scalar::Util::weaken ($_) for values %$weak;
   memory_cycle_ok($weak, 'No cycles in weak object collection');

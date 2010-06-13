@@ -33,5 +33,21 @@ sub find_result_class {
     
 }
 
+sub find_related_class {
+    my ($name, $associated_class) = @_;
+    my $camel = MooseX::DBIC::Util::camelize($name);
+    my @parts = split(/::/, $associated_class);
+    my ($related_class, $done);
+    while(@parts || !$done) {
+        $done = $#parts;
+        $related_class = join('::', @parts, $camel);
+        eval { 
+            Class::MOP::load_class($related_class);
+            undef @parts;
+        };
+        pop @parts || last;
+    }
+    return $related_class;
+}
 
 1;

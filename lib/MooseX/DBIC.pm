@@ -31,7 +31,8 @@ sub init_meta {
     my %options = @_;
     Moose->init_meta(%options);
     my $meta = $package->$init_meta(%options);
-    Moose::Util::ensure_all_roles($meta, qw(MooseX::DBIC::Role::Result));
+    Moose::Util::ensure_all_roles($options{for_class}, 'MooseX::DBIC::Role::Result');
+    Moose::Util::ensure_all_roles($options{for_class}, 'MooseX::Attribute::LazyInflator::Role::Class');
     return $meta;
 }
 

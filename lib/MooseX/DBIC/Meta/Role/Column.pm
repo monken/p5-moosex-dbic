@@ -2,6 +2,7 @@ package MooseX::DBIC::Meta::Role::Column;
 
 use Moose::Role;
 with 'MooseX::DBIC::Meta::Role::Attribute';
+
 use MooseX::DBIC::TypeMap;
 
 my $REGISTRY = MooseX::DBIC::TypeMap->get_registry;

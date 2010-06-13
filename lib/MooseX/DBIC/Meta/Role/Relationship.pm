@@ -82,19 +82,7 @@ sub _build_builder {
 sub _build_related_class {
     my $self = shift;
     my ($name, $associated_class) = ref $self ? ($self->name, $self->associated_class->name) : @_;
-    my $camel = MooseX::DBIC::Util::camelize($name);
-    my @parts = split(/::/, $associated_class);
-    my ($related_class, $done);
-    while(@parts || !$done) {
-        $done = $#parts;
-        $related_class = join('::', @parts, $camel);
-        eval { 
-            Class::MOP::load_class($related_class);
-            undef @parts;
-        };
-        pop @parts || last;
-    }
-    return $related_class;
+    return MooseX::DBIC::Util::find_related_class($name, $associated_class);
 }
 
 sub _build_proxy_class {

@@ -31,7 +31,7 @@ has column_list => ( is => 'rw', default => sub {['id']} ); # TODO: Role applica
 has relationship_list => ( is => 'rw', default => sub {[]} );
 
 sub get_orig_class {
-    my $class = first { grep { $_->name eq 'MooseX::DBIC::Role::Result' } @{$_->meta->roles} } shift->class_precedence_list;
+    my $class = first { first { $_->name eq 'MooseX::DBIC::Role::Result' } @{$_->meta->roles} } shift->class_precedence_list;
     return $class->meta;
 }
 

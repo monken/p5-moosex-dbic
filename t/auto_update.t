@@ -13,7 +13,6 @@ sub _build_lazy {
     return 'lazy';
 }
 
-
 package MySchema;
 use Moose;
 extends 'MooseX::DBIC::Schema';

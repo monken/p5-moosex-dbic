@@ -6,6 +6,7 @@ with 'MooseX::DBIC::Meta::Role::Relationship::MightHave';
 use MooseX::DBIC::Types q(:all);
 use Moose::Util::TypeConstraints qw();
 use List::Util ();
+use Lingua::EN::Inflect ();
 
 has dbic_accessor => ( is => 'ro', default => 'multi' );
 
@@ -22,6 +23,16 @@ sub _build_builder {
         my $self = shift;
         $self->_build_related_resultset($self->meta->get_relationship($name));
     }
+}
+
+sub _build_related_class {
+    my $self = shift;
+    my ($name, $associated_class) = ref $self ? ($self->name, $self->associated_class->name) : @_;
+    (my $singular = $name) =~ s/s$//;
+    Moose->throw_error('Couldn\'t guess related class for relationship ', $name, ' in class ', 
+        ref $self ? ref $self : $self, '. Please specify explicitly (e.g. ( isa => \'MyClass\' ).')
+        unless(Lingua::EN::Inflect::PL_eq($singular, $name));
+    return MooseX::DBIC::Util::find_related_class($singular, $associated_class);
 }
 
 sub is_dirty {
