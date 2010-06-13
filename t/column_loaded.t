@@ -12,7 +12,8 @@ use MooseX::DBIC;
 use MooseX::DBIC::Types q(:all);
     
 
-has_column 'name';
+has_column [qw(name descr)];
+has_column address => ( required => 1 );
 has_many cds => ( isa => ResultSet['CD'] );
 
 package MySchema;
@@ -23,21 +24,25 @@ __PACKAGE__->load_classes(qw(Artist CD));
 
 package main;
 
-use Scalar::Util qw(refaddr);
+use Test::Exception;
 
-my $schema = MySchema->compose_namespace('DBIC')->connect( 'dbi:SQLite::memory:' );
-warn $schema->sources;
+my $schema = MySchema->connect( 'dbi:SQLite::memory:' );
 $schema->deploy;
+
 my $queries = 0;
 $schema->storage->debugcb(sub { print $_[1] if($ENV{DBIC_TRACE}); $queries++; });
 $schema->storage->debug(1);
 
 my $artist;
 
-{
-    ok($artist = $schema->resultset('DBIC::Artist')->create({ name => 'Mo' }));
-    $artist = $schema->resultset('DBIC::Artist')->first;
-    $artist->search_related('cds')->first;
+TODO: {
+    local $TODO = 'Use LazyRequired';
+    ok($artist = $schema->resultset('Artist')->create({ name => 'Mo', descr => 'Long text', address => 'Singapore' }));
+    lives_ok { 
+        $artist = $schema->resultset('Artist')->search(undef, { columns => [qw(name)] })->first;
+        ok(!Artist->meta->get_column('descr')->is_loaded($artist));
+        ok(!Artist->meta->get_column('address')->is_loaded($artist));
+    } '';
 }
 
 

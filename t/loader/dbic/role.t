@@ -1,20 +1,20 @@
 use Test::More;
-use Data::Dumper;
-$Data::Dumper::Indent = 1;
-$Data::Dumper::MaxDepth = 1;
-
-package Schema::DBIC::Test;
-
+package DBICUser;
+use base 'DBIx::Class::Core';
+__PACKAGE__->table('foo');
 
 package Schema;
 use Moose;
 extends 'MooseX::DBIC::Schema';
+
+use Test::Exception;
+
 with 'MooseX::DBIC::Loader::DBIC' => {
-    classes => [qw(MyApp::User)],
+    classes => [qw(DBICUser)],
     target_namespace => 'Schema'
 };
 
-__PACKAGE__->load_classes(qw(Schema::MyApp::User Schema::Moose::Object));
+lives_ok { __PACKAGE__->load_classes(qw(Schema::DBICUser)) } '';
 
 package main;
 

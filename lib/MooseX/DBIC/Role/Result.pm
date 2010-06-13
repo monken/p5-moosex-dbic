@@ -138,12 +138,8 @@ my %import = (
 
 sub has_column_loaded { 
     my ($self, $column) = @_;
-    $column = $self->meta->get_column($column);
-    return unless $column;
-    return $column->has_value($self)
-        || $column->is_required # WRONG, a column can be required but not loaded from storage
-        || !$self->in_storage
-        || ( $self->in_storage && exists $self->_raw_data->{$column->name} );
+    $column = $self->meta->get_column($column) || return;
+    return $column->is_loaded($self);
 }
 
 while(my($k,$v) = each %import) {

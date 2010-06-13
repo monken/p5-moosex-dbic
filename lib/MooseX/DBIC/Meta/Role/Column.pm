@@ -37,20 +37,29 @@ sub _build_data_type {
 }
 
 after apply_to_result_source => sub {
-    my ($self, $source) = @_;
+    my ($attr, $source) = @_;
     
     $source->add_columns(
-        $self->name => $self->column_info);
+        $attr->name => $attr->column_info);
         
-    if($self->primary_key) {
-        $source->set_primary_key($self->name);
-        $self->associated_class->name->_primaries($self->name);
+    if($attr->primary_key) {
+        $source->set_primary_key($attr->name);
+        $attr->associated_class->name->_primaries($attr->name);
     }
 };
 
 sub is_dirty {
-    my ($attr, $self) = @_;
-    return $self->dirty_columns && $self->dirty_columns->{$attr->name};
+    my ($attr, $instance) = @_;
+    return $instance->dirty_columns && $instance->dirty_columns->{$attr->name};
+}
+
+sub is_loaded {
+    my ($attr, $instance) = @_;
+    
+    return $attr->has_value($instance)
+        || $attr->is_required # WRONG, a column can be required but not loaded from storage
+        || !$instance->in_storage
+        || ( $instance->in_storage && exists $instance->_raw_data->{$attr->name} );
 }
 
 1;
