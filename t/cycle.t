@@ -43,8 +43,6 @@ my $weak;
 
   my $row1 = $weak->{row1} = $s->resultset('Artist')->create({ name => 'Nock', cds => [{title=> 'Foo'}]});
   
-        warn Scalar::Util::isweak($row1->cds->first->{artist});
-        #Scalar::Util::weaken($row1->cds->first->{artist});
   memory_cycle_ok($row1, 'No cycles in row1');
   
   my $row2 = $weak->{row2} = $s->resultset('CD')->create({ artist => { name => 'Nock'}, title => 'test' });
