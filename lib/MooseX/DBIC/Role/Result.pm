@@ -5,6 +5,7 @@ use Carp;
 use DBIx::Class::ResultClass::HashRefInflator;
 use Scalar::Util qw(weaken);
 use MooseX::DBIC::Util ();
+use List::Util ();
 
 __PACKAGE__->meta->add_column( id => (
     required    => 1,
@@ -92,7 +93,6 @@ sub BUILDARGS {
         my $name = $rel->name;
         next unless(exists $args->{$name});
         my $value = $args->{$name};
-        $value = $value->[0] if(ref $value eq 'ARRAY' );
         delete $args->{$name} if(!defined $value);
     }
     
@@ -151,13 +151,13 @@ while(my($k,$v) = each %import) {
 
 sub new_related {
   my ($self, $rel, $values, $attrs) = @_;
-  my $new = $self->search_related($rel)->new_result($values, $attrs);
   $rel = $self->meta->get_relationship($rel);
   my $rev = $rel->reverse_relationship;
   if($rev && $rev->type ne 'HasMany') {
-      my $name = $rev->name;
-      $new->$name($self);
+    my $name = $rev->name;
+    $values->{$name} = $self;
   }
+  my $new = $self->search_related($rel->name)->new_result($values, $attrs);
   return $new;
   
 }

@@ -2,7 +2,7 @@ package MooseX::DBIC::Types;
 
 use MooseX::Types -declare => [qw(Relationship Result ResultSet JoinType)];
 use MooseX::Types::Moose qw(HashRef Object Str);
-use MooseX::Attribute::Deflator 1.101600;
+use MooseX::Attribute::Deflator;
 use Moose::Util::TypeConstraints;
 use MooseX::DBIC::ResultProxy;
 use strict;
@@ -18,7 +18,7 @@ enum JoinType,
 
 inflate ResultSet.'[]', via {
     my ($attr, $constraint, undef, $obj) = @_;
-    my $value = $_;
+    my $value = $_; 
     my $rs = $obj->result_source;
     my $related_class = $attr->related_class;
     $value = [ $value ] if( ref $value eq 'HASH' );

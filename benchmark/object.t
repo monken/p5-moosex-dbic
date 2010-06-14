@@ -13,13 +13,13 @@ $schema->resultset('Release')->create({ author => { name => 'me' }, distribution
 
 
 print "Inserted 100 results", $/;
-DB::enable_profile();
+#DB::enable_profile();
 
-cmpthese(15, {
+cmpthese(50, {
     MXDBIC => sub { $schema->resultset('Release')->all; },
-    #'Moose::Object' => sub { Moose::Object->new for(1..100) },
-    #DBI => sub { $schema->storage->dbh->selectall_hashref('SELECT me.resources, me.author, me.distribution, me.uploaded, me.id FROM release me', 'id'); },
-    #DateTime => sub { DateTime->now for(1..100) }
+    'Moose::Object' => sub { Moose::Object->new for(1..100) },
+    DBI => sub { $schema->storage->dbh->selectall_hashref('SELECT me.resources, me.author, me.distribution, me.uploaded, me.id FROM release me', 'id'); },
+    DateTime => sub { DateTime->now for(1..100) }
 });
 
 done_testing;

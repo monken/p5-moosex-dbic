@@ -13,7 +13,7 @@ use MooseX::DBIC::Types q(:all);
     
 
 has_column 'name';
-has_many cds => ( isa => ResultSet['CD'] );
+has_many cds => ( isa => 'CD' );
 
 package MySchema;
 use Moose;

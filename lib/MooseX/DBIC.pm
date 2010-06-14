@@ -12,6 +12,7 @@ my ( $import, $unimport, $init_meta ) = Moose::Exporter->build_import_methods(
   class_metaroles => {
     class => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)],
     instance => [qw(MooseX::DBIC::Meta::Role::Instance)],
+    constructor => ['MooseX::Attribute::LazyInflator::Meta::Role::Method::Constructor'],
   },
   install => [qw(import unimport init_meta)]
 );

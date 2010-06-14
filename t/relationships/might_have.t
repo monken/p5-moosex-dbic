@@ -61,5 +61,12 @@ $schema->storage->debug(1);
 
 }
 
+{
+    $queries = 0;
+    ok(my $cd = $schema->resultset('CD')->create({ title => 'CD3' }) );
+    ok($cd->create_related(cover => { image => 'nice' }), 'Create CD3 with cover');
+
+}
+
 done_testing;
 
