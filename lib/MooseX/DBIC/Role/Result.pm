@@ -72,7 +72,7 @@ sub _build_related_resultset {
 
 sub BUILDARGS { 
     my ($class, @rest) = @_;
-    my @rels = map { $class->meta->get_relationship($_) } $class->meta->get_relationship_list;
+    my @rels = $class->meta->get_relationships;
     my $handles = {};
     
     my $args = @rest > 1 ? {@rest} : shift @rest;
@@ -88,14 +88,7 @@ sub BUILDARGS {
         }
         delete $args->{$k} if(!defined $v);
     }
-    
-    foreach my $rel(@rels) {
-        my $name = $rel->name;
-        next unless(exists $args->{$name});
-        my $value = $args->{$name};
-        delete $args->{$name} if(!defined $value);
-    }
-    
+
     return $args;
 }
 

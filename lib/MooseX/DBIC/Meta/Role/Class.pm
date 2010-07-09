@@ -29,6 +29,7 @@ sub application_to_class_class {
 has orig_class => ( is => 'ro', lazy => 1, builder => 'get_orig_class' );
 has column_list => ( is => 'rw', default => sub {['id']} ); # TODO: Role applicator
 has relationship_list => ( is => 'rw', default => sub {[]} );
+has relationships => ( is => 'rw', default => sub {[]} );
 
 sub get_orig_class {
     my $class = first { first { $_->name eq 'MooseX::DBIC::Role::Result' } @{$_->meta->roles} } shift->class_precedence_list;
@@ -95,6 +96,10 @@ sub get_relationship_list {
     return @{shift->orig_class->relationship_list};
 }
 
+sub get_relationships {
+    return @{shift->orig_class->relationships};
+}
+
 sub get_all_relationships {
     my $self = shift;
     return grep { $_->does('MooseX::DBIC::Meta::Role::Relationship') } $self->get_all_attributes;
@@ -128,6 +133,7 @@ sub add_relationship {
         #my %copy = $metaclass->build_options($self, $attr, %options);
         $self->relationship_list([@{$self->relationship_list}, $attr]);
         my $rel = $self->add_attribute( $metaclass->new( $attr => %options, associated_class => $self->name ) );
+        $self->relationships([@{$self->relationships}, $rel]);
         $self->column_list([@{$self->column_list}, $attr])
             if($rel->does('MooseX::DBIC::Meta::Role::Column'));
         
