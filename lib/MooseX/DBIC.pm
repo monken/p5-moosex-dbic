@@ -5,17 +5,25 @@ use MooseX::DBIC::Meta::Role::Class;
 use MooseX::DBIC::Types qw(ResultSet);
 use Moose::Exporter;
 
-my ( $import, $unimport, $init_meta ) = Moose::Exporter->build_import_methods( 
-  also => 'Moose', 
-  with_meta => [qw(has_column has_many belongs_to has_one might_have table remove with)],
-  as_is => [qw(ResultSet)],
-  class_metaroles => {
-    class => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)],
-    instance => [qw(MooseX::DBIC::Meta::Role::Instance)],
-    constructor => ['MooseX::Attribute::LazyInflator::Meta::Role::Method::Constructor'],
-  },
-  install => [qw(import unimport init_meta)]
+my ( $import, $unimport, $init_meta ) = Moose::Exporter->build_import_methods(
+    also => 'Moose',
+    with_meta =>
+      [qw(has_column has_many belongs_to has_one might_have table remove with)],
+    as_is           => [qw(ResultSet)],
+    class_metaroles => {
+        class => [
+            qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)
+        ],
+        instance => [qw(MooseX::DBIC::Meta::Role::Instance)],
+        constructor =>
+          [
+           'MooseX::Attribute::LazyInflator::Meta::Role::Method::Constructor'
+           #'MooseX::DBIC::Meta::Role::Method::Constructor'
+          ],
+    },
+    install => [qw(import unimport init_meta)]
 );
+
 
 sub with {
     my ($meta, $role) = @_;
@@ -34,6 +42,7 @@ sub init_meta {
     my $meta = $package->$init_meta(%options);
     Moose::Util::ensure_all_roles($options{for_class}, 'MooseX::DBIC::Role::Result');
     Moose::Util::ensure_all_roles($options{for_class}, 'MooseX::Attribute::LazyInflator::Role::Class');
+    $meta->meta->superclasses($meta->meta->superclasses, 'DBIx::Class::ResultSource');
     return $meta;
 }
 

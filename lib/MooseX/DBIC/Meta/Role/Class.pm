@@ -1,5 +1,7 @@
 package MooseX::DBIC::Meta::Role::Class;
 
+#use base 'DBIx::Class::ResultSource::Table';
+
 use Moose::Role;
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
@@ -26,10 +28,30 @@ sub application_to_class_class {
     return $application_to_class_class->name;
 }
 
+sub isa {
+    my ($class, $isa) = @_;
+    return 1 if($isa eq 'DBIx::Class::ResultSource::Table');
+    return UNIVERSAL::isa($class, $isa);
+}
+
 has orig_class => ( is => 'ro', lazy => 1, builder => 'get_orig_class' );
 has column_list => ( is => 'rw', default => sub {['id']} ); # TODO: Role applicator
 has relationship_list => ( is => 'rw', default => sub {[]} );
 has relationships => ( is => 'rw', default => sub {[]} );
+has resultset_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
+has result_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
+
+sub _build_resultset_class {
+    my $meta = shift;
+    my $resultset = $meta->name . '::Set';
+    eval {
+        Class::MOP::load_class($resultset);
+    } and return $resultset or return 'DBIx::Class::ResultSet';
+}
+
+sub _build_result_class { shift->name }
+
+sub from { shift->name->table_name }
 
 sub get_orig_class {
     my $class = first { first { $_->name eq 'MooseX::DBIC::Role::Result' } @{$_->meta->roles} } shift->class_precedence_list;
