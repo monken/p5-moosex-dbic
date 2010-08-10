@@ -10,6 +10,7 @@ sub _inline_check_lazy {
     my $slot_exists = $self->_inline_has($instance);
     my $code = "if(!$slot_exists && !\$attr->is_loaded($instance)) {\n";
     $code .= $self->_inline_store($instance, "\$attr->load_from_storage($instance)");
+    $code .= "delete ${instance}->{dirty_columns}->{\$attr->name};\n";
     $code .= "}\n\n";
     $code .= $self->next::method($instance);
     return $code;
