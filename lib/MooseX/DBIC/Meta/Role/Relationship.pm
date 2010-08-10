@@ -1,10 +1,12 @@
 package MooseX::DBIC::Meta::Role::Relationship;
 
 use Moose::Role;
-
+with 'MooseX::DBIC::Meta::Role::Attribute';
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
 
+use strict;
+use warnings;
 
 has type => ( is => 'rw', isa => Relationship, required => 1 );
 
