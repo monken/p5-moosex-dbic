@@ -28,12 +28,6 @@ sub application_to_class_class {
     return $application_to_class_class->name;
 }
 
-sub isa {
-    my ($class, $isa) = @_;
-    return 1 if($isa eq 'DBIx::Class::ResultSource::Table');
-    return UNIVERSAL::isa($class, $isa);
-}
-
 has orig_class => ( is => 'ro', lazy => 1, builder => 'get_orig_class' );
 has column_list => ( is => 'rw', default => sub {['id']} ); # TODO: Role applicator
 has relationship_list => ( is => 'rw', default => sub {[]} );

@@ -84,10 +84,10 @@ sub load_classes {
     $result->_orig($result);
     $schema->load_classes(@defer);
     
-    #my $source = $schema->create_result_source( $class, $result );
+    my $source = $schema->create_result_source( $class, $result );
     
     $schema->class_mappings->{$result} = $moniker;
-    $schema->register_source( $moniker => $result->meta );
+    $schema->register_source( $moniker => $source );
 }
 
 sub create_result_source {
