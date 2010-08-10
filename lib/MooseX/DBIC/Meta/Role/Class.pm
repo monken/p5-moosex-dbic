@@ -67,10 +67,9 @@ sub add_column {
   my $meta    = shift;
   my $name    = shift;
   my %options = (is => 'rw', isa => 'Str', @_);
+  $options{lazy_required} = 1 if($options{required} && !$options{lazy_build} && !$options{builder});
   $options{traits} ||= [];
-  push(@{$options{traits}}, qw(
-    MooseX::DBIC::Meta::Role::Column
-    MooseX::Attribute::Deflator::Meta::Role::Attribute));
+  push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Column));
   
   my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
   
@@ -142,9 +141,7 @@ sub add_relationship {
     my ($self, $name, %options) = @_;
     my $role = 'MooseX::DBIC::Meta::Role::Relationship::' . $options{type};
     $options{traits} ||= [];
-    push(@{$options{traits}}, 
-        qw(MooseX::DBIC::Meta::Role::Attribute
-           MooseX::Attribute::Deflator::Meta::Role::Attribute), $role);
+    push(@{$options{traits}}, $role, 'MooseX::Attribute::Deflator::Meta::Role::Attribute');
 
     my $metaclass = $self->attribute_metaclass->interpolate_class(
         { traits => $options{traits} }
@@ -152,7 +149,6 @@ sub add_relationship {
     
     my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
     foreach my $attr ( @{$attrs} ) {
-        #my %copy = $metaclass->build_options($self, $attr, %options);
         $self->relationship_list([@{$self->relationship_list}, $attr]);
         my $rel = $self->add_attribute( $metaclass->new( $attr => %options, associated_class => $self->name ) );
         $self->relationships([@{$self->relationships}, $rel]);
