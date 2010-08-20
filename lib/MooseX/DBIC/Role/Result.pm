@@ -1,6 +1,6 @@
 package MooseX::DBIC::Role::Result;
 
-use Moose::Role -traits => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Role)];
+use MooseX::DBIC::Role -traits => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Role)];
 use Carp;
 use DBIx::Class::ResultClass::HashRefInflator;
 use Scalar::Util qw(weaken);

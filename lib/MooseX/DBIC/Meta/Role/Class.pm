@@ -29,7 +29,7 @@ sub application_to_class_class {
 }
 
 has orig_class => ( is => 'ro', lazy => 1, builder => 'get_orig_class' );
-has column_list => ( is => 'rw', default => sub {['id']} ); # TODO: Role applicator
+has column_list => ( is => 'rw', default => sub {[]} );
 has relationship_list => ( is => 'rw', default => sub {[]} );
 has relationships => ( is => 'rw', default => sub {[]} );
 has resultset_class => ( is => 'rw', isa => 'Str', lazy_build => 1 );
