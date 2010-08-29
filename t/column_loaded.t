@@ -15,7 +15,7 @@ use MooseX::DBIC::Types q(:all);
 has_column [qw(name descr)];
 has_column address => ( required => 1 );
 has_column version => ( required => 1, lazy_build => 1 );
-has_column default_col => ( required => 1, default => 'FOO' );
+has_column default_col => ( required => 1, default => 0 );
 has_many cds => ( isa => ResultSet['CD'] );
 
 sub _build_version { 1 };
