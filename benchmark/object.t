@@ -18,7 +18,7 @@ $schema->deploy;
 
 my $create = { author => { name => 'me' }, distribution => { name => 'Test' },  uploaded => DateTime->now };
 $mschema->resultset('Release')->create($create);
-exit;
+
 cmpthese(200, {
  MXDBIC => sub { $mschema->resultset('Release')->create($create); },
  DBIC => sub { $dbicschema->resultset('Release')->create($create); },
