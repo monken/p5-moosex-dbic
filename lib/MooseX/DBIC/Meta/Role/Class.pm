@@ -61,7 +61,7 @@ sub add_column {
   my $meta    = shift;
   my $name    = shift;
   my %options = (is => 'rw', isa => 'Str', @_);
-  $options{lazy_required} = 1 if($options{required} && !$options{lazy_build} && !$options{builder} && !$options{default});
+  $options{lazy_required} = 1 if($options{required} && !$options{lazy_build} && !$options{builder} && !defined $options{default});
   $options{traits} ||= [];
   push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Column));
   
