@@ -8,6 +8,7 @@ use MooseX::Attribute::Deflator::Moose;
 use MooseX::Attribute::Deflator::Structured;
 use MooseX::DBIC::Util ();
 use Data::Dumper;
+use Try::Tiny;
 
 BEGIN{
 $Data::Dumper::Maxdepth = 3;
@@ -46,34 +47,42 @@ sub load_namespaces {
 }
 
 sub load_classes {
-    my ( $schema, $class, @defer ) = @_;
+    my ( $schema, @classes ) = @_;
+    while( my $class = shift @classes) {
+        next if ($class =~ /^#/);
+        if(ref $class eq "ARRAY") {
+            unshift(@classes, @$class);
+        } elsif(ref $class eq "HASH") {
+            while(my($k,$v) = each %$class) {
+                load_classes($k, $v);
+            }
+        } else {
+            $schema->load_class($class);
+        }
+    }
+}
+
+sub load_class {
+    my ( $schema, $class ) = @_;
 	$schema = ref $schema if ( ref $schema );
 
     return unless($class);
     
-    if(ref $class eq "ARRAY") {
-        unshift(@defer, @$class);
-        $class = shift(@defer);
-    } elsif(ref $class eq "HASH") {
-        while(my($k,$v) = each %$class) {
-            load_classes($k, $v);
-        }
-        return $schema->load_classes(@defer);
-    }
-    
-    return $schema->load_classes(@defer) if ($class =~ /^#/);
-    
     (my $moniker = $class) =~ s/^\Q$schema\E:://;
     
-    my $warn;
-    eval {
+    my $warn = "";
+    try {
         Class::MOP::load_class(join('::', $schema, $class));
         $class = join('::', $schema, $class);
-    } or do { $warn = $@; } and eval {
-        Class::MOP::load_class($class);
-    } or do {
-        die $warn, $@;
+    } catch {
+        die $_;
     };
+    
+    if(!$warn) { try {
+        Class::MOP::load_class($class);
+    } catch {
+        die $_;
+    }; }
     
     $schema->add_loaded_class($class);
     
@@ -82,7 +91,7 @@ sub load_classes {
         unless($class->isa('Moose::Object') && $class->does('MooseX::DBIC::Role::Result'));
     $result->moniker($moniker);
     $result->_orig($result);
-    $schema->load_classes(@defer);
+    #$schema->load_classes(@defer);
     
     my $source = $schema->create_result_source( $class, $result );
     

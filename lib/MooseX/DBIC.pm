@@ -8,7 +8,7 @@ use Moose::Exporter;
 my ( $import, $unimport, $init_meta ) = Moose::Exporter->build_import_methods(
     also => 'Moose',
     with_meta =>
-      [qw(has_column has_many belongs_to has_one might_have table remove with)],
+      [qw(has_column has_many belongs_to has_one might_have table remove with class_has)],
     as_is           => [qw(ResultSet)],
     class_metaroles => {
         class => [
@@ -43,6 +43,16 @@ sub init_meta {
     Moose::Util::ensure_all_roles($options{for_class}, 'MooseX::DBIC::Role::Result');
     Moose::Util::ensure_all_roles($options{for_class}, 'MooseX::Attribute::LazyInflator::Role::Class');
     return $meta;
+}
+
+sub class_has {
+    my $meta    = shift;
+    my $name    = shift;
+    my %options = @_;
+
+    my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
+
+    $meta->add_class_attribute( $_, %options ) for @{$attrs};
 }
 
 sub table {

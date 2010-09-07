@@ -73,12 +73,27 @@ my %dirty = ( in_storage => 1, _raw_data => 1 );
     my $year = $cd->meta->get_column('year');
     ok(!$year->is_dirty($cd), 'not fetched year column is not dirty');
     is($cd->year, 1999, 'fetch year from storage');
-    ok(!$year->is_dirty($cd), 'fetched year column sill not dirty');
+    ok(!$year->is_dirty($cd), 'fetched year column still not dirty');
     
     my $title = $cd->meta->get_column('title');
     is($title->get_value($cd), 'the rabbits', 'fetch title via get_value');
     ok(!$title->is_dirty($cd), 'title is not dirty');
     
+}
+
+
+{
+    my $cd = $schema->resultset('CD')->first;
+    my $year = $cd->meta->get_column('year');
+    $year->set_value($cd, '2000');
+    ok($year->is_dirty($cd), 'year is dirty');
+}
+
+{   
+    my $cd = $schema->resultset('CD')->first;
+    my $year = $cd->meta->get_column('year');
+    $year->set_raw_value($cd, '1998');
+    ok(!$year->is_dirty($cd), 'year is not dirty');
 }
 
 

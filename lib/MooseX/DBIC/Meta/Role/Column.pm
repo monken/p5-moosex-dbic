@@ -20,10 +20,6 @@ has auto_increment => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has primary_key => ( is => 'rw', isa => 'Bool', default => 0 );
 
-sub _build_dirty {
-    return !shift->associated_class->in_storage;
-}
-
 sub _build_column_info {
     my $self = shift;
     return {
@@ -51,10 +47,15 @@ after apply_to_result_source => sub {
 };
 
 sub is_dirty {
-    my ( $attr, $instance ) = @_;
-    return $instance->dirty_columns
-      && $instance->dirty_columns->{ $attr->name };
+    my ( $attr, $instance, $dirty ) = @_;
+    my $cols = $instance->dirty_columns || $instance->dirty_columns({});
+    return $dirty ? $cols->{ $attr->name }++ : $cols->{ $attr->name };
 }
+
+after set_value => sub {
+    my ($attr, $instance) = @_;
+    $attr->is_dirty($instance, 1);
+};
 
 sub is_loaded {
     my ( $attr, $instance ) = @_;
@@ -86,6 +87,8 @@ before get_value => sub {
     return if($self->has_value($instance) || $self->is_loaded($instance));
     $self->set_raw_value($instance, $self->load_from_storage($instance));
 };
+
+after clear_value => sub { shift->is_dirty(shift, 1); };
 
 use MooseX::DBIC::Meta::Role::Method::Accessor;
 sub accessor_metaclass { 'MooseX::DBIC::Meta::Role::Method::Accessor' }

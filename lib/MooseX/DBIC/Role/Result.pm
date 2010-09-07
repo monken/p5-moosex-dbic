@@ -39,7 +39,7 @@ has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_
 
 has _raw_data => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
 
-has dirty_columns => ( is => 'rw', isa => 'HashRef', clearer => 'clear_dirty_columns' );
+has dirty_columns => ( is => 'rw', isa => 'HashRef', clearer => 'clear_dirty_columns', default => sub {{}} );
 
 has _inflated_columns => ( is => 'rw', isa => 'HashRef', default => sub {{}} );
 
@@ -228,6 +228,7 @@ sub update {
   $self->throw_exception("Cannot safely update a row in a PK-less table")
     if ! keys %$ident_cond;
   $self->{_update_in_progress} ? return $self : ($self->{_update_in_progress} = 1);
+  $self->meta->set_columns($self, $upd) if($upd);
   my %to_update = $self->get_dirty_columns;
   if(keys %to_update) {
       my $rows = $self->result_source->storage->update(

@@ -152,4 +152,18 @@ sub add_relationship {
     }
 }
 
+sub set_columns {
+    my ($meta, $object, $values) = @_;
+    map { $meta->set_column($object, $_, $values->{$_}) } keys %$values;
+}
+
+sub set_column {
+    my ($meta, $object, $col, $val) = @_;
+    if(defined $val) {
+        $meta->get_column($col)->set_value($object, $val);
+    } else {
+        $meta->get_column($col)->clear_value($object);
+    }
+}
+
 1;

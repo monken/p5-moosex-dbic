@@ -1,5 +1,7 @@
 package MooseX::DBIC::Util;
 
+use Try::Tiny;
+
 # from String::CamelCase
 
 sub camelize {
@@ -41,10 +43,13 @@ sub find_related_class {
     while(@parts || !$done) {
         $done = $#parts;
         $related_class = join('::', @parts, $camel);
-        eval { 
+        try { 
             Class::MOP::load_class($related_class);
             undef @parts;
+        } catch {
+            die $_ if($_ !~ /^Can't locate/);
         };
+        undef $@;
         pop @parts || last;
     }
     return $related_class;
