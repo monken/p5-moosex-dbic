@@ -12,9 +12,7 @@ has_column trackid => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
 has_column position => ( isa => 'Int', accessor => 'pos' );
 has_column title => ( size => 100 );
 
-has_column [qw(last_updated_at last_updated_on)] => (isa => 'DateTime',
-    accessor => 'updated_date',
-  );
+has_column [qw(last_updated_at last_updated_on)] => (isa => 'DateTime' );
 
 has_column small_dt => ( isa => 'DateTime', # for mssql and sybase DT tests
     data_type => 'smalldatetime');

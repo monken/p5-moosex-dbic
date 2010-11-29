@@ -7,7 +7,6 @@ use MooseX::DBIC; with 'DBICTest::Compat';
 table 'self_ref_alias';
 remove 'id';
 has_column id => ( isa => 'Int', auto_increment => 1, primary_key => 1 );
-has_column [qw(alias self_ref)] => ( isa => 'Int' );
 
 belongs_to self_ref => ( isa => 'DBICTest::Schema::SelfRef' );
 belongs_to alias => ( isa => 'DBICTest::Schema::SelfRef' );

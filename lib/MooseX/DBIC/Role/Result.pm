@@ -122,7 +122,7 @@ sub search_related {
 
 # TODO: implement in this class, move stuff to meta class
 my %import = (
-    'DBIx::Class::Relationship::Base' => [qw(related_resultset find_or_new_related find_related)],
+    'DBIx::Class::Relationship::Base' => [qw(related_resultset find_or_new_related find_related update_or_create_related)],
     'DBIx::Class::PK' => [qw(ident_condition _ident_values)],
     'DBIx::Class::ResultSource' => [qw(_pri_cols )],
     'Class::Accessor::Grouped' => [qw(get_simple)],

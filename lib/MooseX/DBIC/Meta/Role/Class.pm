@@ -86,6 +86,11 @@ sub get_column {
     );
 }
 
+sub has_column {
+    my ($self, $name) = @_;
+    first { $_ eq $name } $self->get_column_list;
+}
+
 sub get_column_list {
     return @{shift->orig_class->column_list};
 }

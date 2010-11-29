@@ -97,6 +97,16 @@ my %dirty = ( in_storage => 1, _raw_data => 1 );
 }
 
 
+{   
+    my $node = $schema->resultset('TreeLike')->create({ name => "foo", children => [{ name => "bar" }]});
+    $node->update;
+    $node->children->first->update;
+    $node->children->first->parent($node);
+    $node->children->first->update;
+    
+}
+
+
 
 done_testing;
 

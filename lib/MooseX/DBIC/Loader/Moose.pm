@@ -18,6 +18,12 @@ role {
         my $result =  $schema . '::' . $class;
         Class::MOP::load_class($class);
         
+        my $instance_metaclass = $class->meta->create_anon_class(
+            superclasses => [ $class->meta->instance_metaclass ],
+            roles => [qw(MooseX::DBIC::Meta::Role::Instance)],
+            cache => 1,
+        )->name;
+
         my $result_metaclass = $class->meta->create_anon_class(
             superclasses => [ $class->meta->meta->name ],
             roles => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Class)],
@@ -29,12 +35,17 @@ role {
               unless ( $schema->is_class_loaded($_) );
             join( '::', $schema, $_);
         } $class->meta->superclasses;
+        
+        #Moose::Meta::Class->initialize($result, instance_metaclass => $instance_metaclass);
+        
         $result_metaclass->create(
             $result,
             superclasses => [ $class, @superclasses, ],
             roles => ['MooseX::DBIC::Role::Result'],
             cache        => 1,
         );
+        
+        
         
         Moose::Util::ensure_all_roles($result, 'MooseX::Attribute::LazyInflator::Role::Class');
 

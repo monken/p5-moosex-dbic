@@ -70,19 +70,13 @@ sub load_class {
     
     (my $moniker = $class) =~ s/^\Q$schema\E:://;
     
-    my $warn = "";
     try {
         Class::MOP::load_class(join('::', $schema, $class));
         $class = join('::', $schema, $class);
     } catch {
-        die $_;
-    };
-    
-    if(!$warn) { try {
+        die $_ if($_ =~ /^Couldn't load class/ );
         Class::MOP::load_class($class);
-    } catch {
-        die $_;
-    }; }
+    };
     
     $schema->add_loaded_class($class);
     
