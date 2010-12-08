@@ -230,6 +230,7 @@ sub update {
   $self->{_update_in_progress} ? return $self : ($self->{_update_in_progress} = 1);
   $self->meta->set_columns($self, $upd) if($upd);
   my %to_update = $self->get_dirty_columns;
+  
   if(keys %to_update) {
       my $rows = $self->result_source->storage->update(
                    $self->result_source, \%to_update,

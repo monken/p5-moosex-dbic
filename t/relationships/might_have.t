@@ -5,15 +5,15 @@ package Artwork;
 use MooseX::DBIC;
     
 has_column 'image';
-belongs_to cd_cover => ( isa => 'CD' );
-belongs_to cd_inlay => ( isa => 'CD' );
+belongs_to cd_cover => ( isa => 'CD', lazy => 1 );
+belongs_to cd_inlay => ( isa => 'CD', lazy => 1 );
 
 package CD;
 use MooseX::DBIC;
     
 has_column title => ( is => 'rw', isa => 'Str' );
-might_have cover => ( isa => 'Artwork', predicate => 'has_cover', foreign_key => 'cd_cover' );
-has_one inlay => ( isa => 'Artwork', predicate => 'has_inlay', foreign_key => 'cd_inlay' );
+might_have cover => ( isa => 'Artwork', predicate => 'has_cover', foreign_key => 'cd_cover', lazy => 1 );
+has_one inlay => ( isa => 'Artwork', predicate => 'has_inlay', foreign_key => 'cd_inlay', lazy => 1 );
 
 
 package MySchema;

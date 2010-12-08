@@ -11,9 +11,9 @@ package CD;
 use MooseX::DBIC;
     
 has_column 'title';
-belongs_to 'artist';
-might_have 'cover';
-might_have cover2 => ( isa => 'CD::Cover', foreign_key => 'cd2' );
+belongs_to artist => ( lazy => 1 );
+might_have cover => ( lazy => 1 );
+might_have cover2 => ( isa => 'CD::Cover', foreign_key => 'cd2', lazy => 1 );
 
 package Artist;
 use MooseX::DBIC;
@@ -25,9 +25,9 @@ package CD::Cover;
 use MooseX::DBIC;
 
 has_column 'name';
-belongs_to 'cd' => ( isa => 'CD' );
-belongs_to 'cd2' => ( isa => 'CD' );
-has_one 'cd3' => ( isa => 'CD', foreign_key => 'cover' );
+belongs_to 'cd' => ( isa => 'CD', lazy => 1 );
+belongs_to 'cd2' => ( isa => 'CD', lazy => 1 );
+has_one 'cd3' => ( isa => 'CD', foreign_key => 'cover', lazy => 1 );
 
 
 package main;

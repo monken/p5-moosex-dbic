@@ -18,7 +18,7 @@ enum JoinType,
 
 inflate ResultSet.'[]', via {
     my ($attr, $constraint, undef, $obj) = @_;
-    my $value = $_; 
+    my $value = $_;
     my $rs = $obj->result_source;
     my $related_class = $attr->related_class;
     $value = [ $value ] if( ref $value eq 'HASH' );

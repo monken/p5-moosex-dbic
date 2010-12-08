@@ -5,7 +5,7 @@ package CD;
 use MooseX::DBIC;
     
 has_column 'title';
-belongs_to artist => ( isa => 'Artist', predicate => 'has_artist' );
+belongs_to artist => ( isa => 'Artist', predicate => 'has_artist', lazy => 1 );
 
 package Artist;
 use MooseX::DBIC;

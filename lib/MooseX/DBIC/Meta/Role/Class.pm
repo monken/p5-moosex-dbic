@@ -81,9 +81,9 @@ sub remove_column {
 
 sub get_column {
     my ($self, $name) = @_;
-    return $self->find_attribute_by_name( 
-        first { $_ eq $name } $self->get_column_list
-    );
+    $name = first { $_ eq $name } $self->get_column_list;
+    return unless($name);
+    return $self->find_attribute_by_name( $name );
 }
 
 sub has_column {
@@ -164,10 +164,12 @@ sub set_columns {
 
 sub set_column {
     my ($meta, $object, $col, $val) = @_;
+    $col = $meta->get_column($col);
+    return unless($col);
     if(defined $val) {
-        $meta->get_column($col)->set_value($object, $val);
+        $col->set_value($object, $val);
     } else {
-        $meta->get_column($col)->clear_value($object);
+        $col->clear_value($object);
     }
 }
 

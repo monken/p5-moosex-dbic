@@ -62,10 +62,13 @@ around _process_options => sub {
         
     %$options = ( 
         is => 'rw',
-        lazy => 1,
-        default =>  $self->_build_builder($name),
+        #lazy => 1,
+        #default =>  $self->_build_builder($name),
         %$options
     );
+    if(defined $options->{lazy} && !defined $options->{default} && !defined $options->{builder}) {
+        $options->{default} = $self->_build_builder($name);
+    }
     $self->$orig($name, $options);
     if($options->{type_constraint}
         && (my $class = MooseX::DBIC::Util::find_result_class($options->{type_constraint}))) {

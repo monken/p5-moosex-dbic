@@ -43,7 +43,8 @@ sub reverse_relationship {
 }
 
 sub is_dirty {
-    my ($attr, $self) = @_;
+    my ($attr, $self, $value) = @_;
+    return $attr->is_column_dirty($self, $value) if($value);
     return $attr->is_column_dirty($self) || $attr->is_relationship_dirty($self);
 }
 

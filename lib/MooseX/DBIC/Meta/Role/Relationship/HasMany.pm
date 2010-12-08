@@ -12,6 +12,7 @@ has dbic_accessor => ( is => 'ro', default => 'multi' );
 
 around _process_options => sub {
     my ($orig, $self, $name, $options) = @_;
+    $options->{lazy} = 1;
     $self->$orig($name, $options);
     $options->{type_constraint} = ResultSet[$options->{type_constraint}]
         unless($options->{type_constraint}->parent eq ResultSet);

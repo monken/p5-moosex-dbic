@@ -25,7 +25,7 @@ ok( my $proxy_class = MooseX::DBIC::ResultProxy->build_proxy(
           } ) )
 );
 
-ok( my $proxy = $proxy_class->name->new( foo => 'bar' ), 'MyProxy instance' );
+ok( my $proxy = $proxy_class->name->new( -result_source => '', foo => 'bar' ), 'MyProxy instance' );
 is( $proxy->foo, 'bar');
 like( ref $proxy, qr/ANON/, 'proxy is an anon class' );
 is( $proxy->bar, 'lazy');
