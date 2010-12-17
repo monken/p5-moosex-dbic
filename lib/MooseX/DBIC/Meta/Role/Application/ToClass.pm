@@ -43,7 +43,10 @@ sub apply_relationship {
     my $attr_metaclass = $class->attribute_metaclass->interpolate_class(
         { traits => $attr->{traits} }
     );
-    my $new = $class->add_attribute( $attr->name => $attr->original_options );
+    my %options = %{$attr->original_options};
+    $options{isa} = $options{isa}->($class) if(ref $options{isa} eq 'CODE');
+    
+    my $new = $class->add_attribute( $attr->name => \%options );
     $class->relationships([@{$class->relationships}, $new]);
     $class->relationship_list([@{$class->relationship_list}, $new->name]);
     $class->column_list([@{$class->column_list}, $new->name])
