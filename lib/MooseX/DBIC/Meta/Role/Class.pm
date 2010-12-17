@@ -142,14 +142,12 @@ sub add_relationship {
     $options{traits} ||= [];
     push(@{$options{traits}}, $role, 'MooseX::Attribute::Deflator::Meta::Role::Attribute');
 
-    my $metaclass = $self->attribute_metaclass->interpolate_class(
-        { traits => $options{traits} }
-    );
     
     my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
     foreach my $attr ( @{$attrs} ) {
         $self->relationship_list([@{$self->relationship_list}, $attr]);
-        my $rel = $self->add_attribute( $metaclass->new( $attr => %options, associated_class => $self->name ) );
+        my $rel = $self->add_attribute($attr => %options, associated_class => $self->name );
+        next if($rel->isa('Moose::Meta::Role::Attribute'));
         $self->relationships([@{$self->relationships}, $rel]);
         $self->column_list([@{$self->column_list}, $attr])
             if($rel->does('MooseX::DBIC::Meta::Role::Column'));

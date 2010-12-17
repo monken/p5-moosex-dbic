@@ -20,7 +20,7 @@ before apply_attributes => sub {
         {
             next;
         }
-        elsif ( grep { $_ eq 'MooseX::DBIC::Meta::Role::Relationship' } @{$attr->{traits} || []} ) {
+        elsif ( grep { $_ =~ /^MooseX::DBIC::Meta::Role::Relationship/ } @{$attr->{traits} || []} ) {
             $self->apply_relationship( $role, $class, $attr );
         }
         elsif ( grep { $_ eq 'MooseX::DBIC::Meta::Role::Column' } @{$attr->{traits} || []} ) {
@@ -43,10 +43,11 @@ sub apply_relationship {
     my $attr_metaclass = $class->attribute_metaclass->interpolate_class(
         { traits => $attr->{traits} }
     );
-    $class->add_attribute( $attr->name => $attr->original_options );
-    $class->relationships([@{$class->relationships}, $attr]);
-    $class->column_list([@{$class->column_list}, $attr->name])
-        if($attr->does('MooseX::DBIC::Meta::Role::Column'));
+    my $new = $class->add_attribute( $attr->name => $attr->original_options );
+    $class->relationships([@{$class->relationships}, $new]);
+    $class->relationship_list([@{$class->relationship_list}, $new->name]);
+    $class->column_list([@{$class->column_list}, $new->name])
+        if($new->does('MooseX::DBIC::Meta::Role::Column'));
 
 }
 
