@@ -58,6 +58,7 @@ has [qw(cascade_delete cascade_update)] => ( is => 'rw', isa => 'Bool', default 
 
 around _process_options => sub {
     my ($orig, $self, $name, $options) = @_;
+    $options->{isa} = $options->{isa}->($self) if(ref $options->{isa} eq 'CODE');
     $options->{isa} ||= $self->_build_related_class($name, $options->{associated_class});
         
     %$options = ( 
