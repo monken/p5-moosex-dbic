@@ -1,27 +1,7 @@
 package MooseX::DBIC::Meta::Role::Method::Constructor;
-
+use strict;
+use warnings;
 use Moose::Role;
-
-# sub BUILDARGS {
-#     my ($class, @rest) = @_;
-#     my @rels = $class->meta->get_relationships;
-#     my $handles = {};
-#
-#     my $args = @rest > 1 ? {@rest} : shift @rest;
-#
-#     my $rs = $args->{'-result_source'};
-#
-#     foreach my $rel(@rels) {
-#         map { $handles->{$_} = $rel->name } @{$rel->handles || []};
-#     }
-#     while(my($k,$v) = each %$args) {
-#         if(exists $handles->{$k}) {
-#             $args->{$handles->{$k}}->{$k} = delete $args->{$k};
-#         }
-#         delete $args->{$k} if(!defined $v);
-#     }
-#     return $args;
-# }
 
 override _generate_BUILDARGS => sub {
     my ( $self, $class, $args ) = @_;
@@ -39,9 +19,10 @@ override _generate_BUILDARGS => sub {
         );
         my @rels = $meta->get_relationships;
         foreach my $rel (@rels) {
-            next unless(my $handles = $rel->handles || []);
+            next unless($rel->has_handles);
+            my %handles = $rel->_canonicalize_handles;
             my $name = $rel->name;
-            foreach my $handle (@$handles) {
+            foreach my $handle (keys %handles) {
                 push @code, "\$params->{$name}->{$handle} = delete \$params->{$handle} if(exists \$params->{$handle});";
             }
         }

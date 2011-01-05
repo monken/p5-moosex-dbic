@@ -80,7 +80,9 @@ sub BUILDARGS {
     my $rs = $args->{'-result_source'};
     
     foreach my $rel(@rels) {
-        map { $handles->{$_} = $rel->name } @{$rel->handles || []};
+        next unless($rel->has_handles);
+        my %def = $rel->_canonicalize_handles;
+        map { $handles->{$_} = $rel->name } (keys %def);
     }
     while(my($k,$v) = each %$args) {
         if(exists $handles->{$k}) {
