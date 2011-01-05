@@ -49,7 +49,15 @@ after apply_to_result_source => sub {
 sub is_dirty {
     my ( $attr, $instance, $dirty ) = @_;
     my $cols = $instance->dirty_columns || $instance->dirty_columns({});
-    return $dirty ? $cols->{ $attr->name }++ : $cols->{ $attr->name };
+    return $cols->{ $attr->name }++ if(defined $dirty);
+    my $val = $attr->get_raw_value($instance);
+    return $cols->{ $attr->name } if(!ref $val);
+    my $raw = $instance->_raw_data->{$attr->name};
+    return 1 if(!defined $raw && defined $val);
+    return 1 if(defined $raw && !defined $val);
+    return undef if(!defined $raw && !defined $val);
+    my $deflated = $attr->deflate($instance);
+    return $deflated ne $raw;
 }
 
 after set_value => sub {

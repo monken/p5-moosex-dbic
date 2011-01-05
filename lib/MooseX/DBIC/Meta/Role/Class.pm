@@ -83,7 +83,7 @@ sub get_column {
     my ($self, $name) = @_;
     $name = first { $_ eq $name } $self->get_column_list;
     return unless($name);
-    return $self->find_attribute_by_name( $name );
+    return $self->orig_class->get_attribute( $name );
 }
 
 sub has_column {
@@ -120,10 +120,7 @@ sub get_relationships {
     return @{shift->orig_class->relationships};
 }
 
-sub get_all_relationships {
-    my $self = shift;
-    return grep { $_->does('MooseX::DBIC::Meta::Role::Relationship') } $self->get_all_attributes;
-}
+*get_all_relationships = \&get_relationships;
 
 sub get_relationship {
     my ($self, $rel) = @_;

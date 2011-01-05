@@ -88,7 +88,6 @@ sub BUILDARGS {
         }
         delete $args->{$k} if(!defined $v);
     }
-
     return $args;
 }
 
@@ -124,7 +123,7 @@ sub search_related {
 my %import = (
     'DBIx::Class::Relationship::Base' => [qw(related_resultset find_or_new_related find_related update_or_create_related)],
     'DBIx::Class::PK' => [qw(ident_condition _ident_values)],
-    'DBIx::Class::ResultSource' => [qw(_pri_cols )],
+    'DBIx::Class::ResultSource' => [qw(_pri_cols resultset_attributes)],
     'Class::Accessor::Grouped' => [qw(get_simple)],
     'DBIx::Class::Row' => [qw(throw_exception)],
 );

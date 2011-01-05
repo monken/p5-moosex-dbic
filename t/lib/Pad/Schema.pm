@@ -21,6 +21,6 @@ map_type 'File::stat' => 'ArrayRef';
 
 no MooseX::DBIC::TypeMap;
 
-__PACKAGE__->load_classes(qw(Module Distribution Release Dependency Author File));
+__PACKAGE__->load_classes(qw(Distribution Release Author));
 
 __PACKAGE__->meta->make_immutable;

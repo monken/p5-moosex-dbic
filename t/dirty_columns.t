@@ -11,7 +11,7 @@ my $schema = DBICTest::Schema->connect( 'dbi:SQLite::memory:' );
 
 $schema->deploy;
 my $queries = 0;
-$schema->storage->debugcb(sub { print $_[1] if($ENV{DBIC_TRACE}); $queries++; });
+$schema->storage->debugcb(sub { diag $_[1] if($ENV{DBIC_TRACE}); $queries++; });
 $schema->storage->debug(1);
 
 my $cd;
@@ -62,9 +62,10 @@ my %dirty = ( in_storage => 1, _raw_data => 1 );
 
 {
     my $genre = $schema->resultset('Genre')->search(undef, { prefetch => 'model_cd' })->first;
-    my $rel = $genre->model_cd->meta->get_relationship('genre');
-    ok(!$rel->is_column_dirty($genre->model_cd), 'Column is not dirty');
-    ok(!$rel->is_relationship_dirty($genre->model_cd), 'Relationship is not dirty');
+    my $cd = $genre->model_cd;
+    my $rel = $cd->meta->get_relationship('genre');
+    ok(!$rel->is_column_dirty($cd), 'Column is not dirty');
+    ok(!$rel->is_relationship_dirty($cd), 'Relationship is not dirty');
     
 }
 

@@ -9,6 +9,10 @@ use Moose::Release;
 use strict;
 use warnings;
 
+BEGIN {
+    delete $ENV{DBIC_TRACE};
+};
+
 my $mschema = Pad::Schema->connect( 'dbi:SQLite::memory:' );
 my $dbicschema = DBIC::Schema->connect( 'dbi:SQLite::memory:' );
 
@@ -17,7 +21,6 @@ $schema->deploy;
 }
 
 my $create = { author => { name => 'me' }, distribution => { name => 'Test' },  uploaded => DateTime->now };
-$mschema->resultset('Release')->create($create);
 
 cmpthese(200, {
  MXDBIC => sub { $mschema->resultset('Release')->create($create); },
@@ -26,6 +29,8 @@ cmpthese(200, {
 
 print "Inserted 100 results", $/;
 #DB::enable_profile();
+#$mschema->resultset('Release')->all;
+#die;
 
 cmpthese(50, {
     MXDBIC => sub { $mschema->resultset('Release')->all; },
@@ -33,4 +38,15 @@ cmpthese(50, {
     Moose => sub { Moose::Release->new( id => 1, author => 1, distribtution => 1, uploaded => 1 ) for(1..100) },
     DBI => sub { $mschema->storage->dbh->selectall_hashref('SELECT me.resources, me.author, me.distribution, me.uploaded, me.id FROM release me', 'id'); },
     DateTime => sub { DateTime->now for(1..200) }
+});
+
+
+my @mxall = $mschema->resultset('Release')->all;
+my @dbicall = $dbicschema->resultset('Release')->all;
+
+#DB::enable_profile();
+
+cmpthese(50, {
+    MXDBIC => sub { map { $_->update } @mxall; },
+    DBIC => sub { map { $_->update } @dbicall; },
 });
