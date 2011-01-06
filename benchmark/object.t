@@ -29,7 +29,7 @@ cmpthese(200, {
 
 print "Inserted 100 results", $/;
 #DB::enable_profile();
-#$mschema->resultset('Release')->all;
+#$mschema->resultset('Release')->all for(1..50);
 #die;
 
 cmpthese(50, {

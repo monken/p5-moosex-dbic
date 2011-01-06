@@ -33,7 +33,7 @@ __PACKAGE__->meta->add_class_attribute( _primaries => (
 
 has result_source => ( is => 'rw', init_arg => '-result_source', required => 1, handles => [qw(primary_columns relationship_info)] );
 
-has in_storage => ( is => 'rw', isa => 'Bool', default => 0 );
+has in_storage => ( is => 'rw', default => 0 );
 
 has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_relationship', weak_ref => 1, default => sub {[]} );
 
