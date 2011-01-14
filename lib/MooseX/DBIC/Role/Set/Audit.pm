@@ -4,13 +4,12 @@ use Moose::Role;
 
 sub current {
     my $self = shift;
-    $self->{attrs}->{where} = { %{$self->{attrs}->{where}||{}}, $self->current_source_alias . '.current' => undef };
-    return $self;
+    return $self if($self->{attrs}->{_audit_loop});
+    return $self->search( { $self->current_source_alias . '.current' => undef}, { _audit_loop => 1 } );
 }
 
 override new => sub {
-    my $self = super();
-    return $self->current;
+    super()->current;
 };
 
 1;
