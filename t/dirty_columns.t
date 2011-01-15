@@ -4,6 +4,7 @@ use strict;
 
 use lib q(t/lib);
 use DBICTest::Schema;
+use DateTime;
 
 use Scalar::Util qw(refaddr);
 
@@ -97,16 +98,47 @@ my %dirty = ( in_storage => 1, _raw_data => 1 );
     ok(!$year->is_dirty($cd), 'year is not dirty');
 }
 
+{
+    use DateTime;
 
-{   
-    my $node = $schema->resultset('TreeLike')->create({ name => "foo", children => [{ name => "bar" }]});
-    $node->update;
-    $node->children->first->update;
-    $node->children->first->parent($node);
-    $node->children->first->update;
-    
+    use DateTime::Format::Pg;
+    use MooseX::Attribute::Deflator;
+
+    inflate 'DateTime', via { DateTime::Format::Pg->parse_datetime( $_ ) };
+    deflate 'DateTime', via { DateTime::Format::Pg->format_datetime($_); }; 
+
+    no MooseX::Attribute::Deflator;
+
+    package Artist;
+    use MooseX::DBIC;
+    has_column time => ( isa => 'DateTime' );
+
+    __PACKAGE__->meta->make_immutable;
+
+    package MySchema;
+    use Moose;
+    extends 'MooseX::DBIC::Schema';
+
+    __PACKAGE__->load_classes(qw(Artist));
+
+    package main;
+
+    my $schema = MySchema->connect('dbi:SQLite::memory:');
+    $schema->deploy;
+    my $rs = $schema->resultset('Artist');
+    ok( $rs->create({ time => DateTime->now  }) );
+
+    my $artist = $rs->first;
+    my $oldtime = $artist->time->clone;
+    $artist->time($artist->time->set_time_zone( 'America/Chicago' ));
+
+    ok($artist->meta->get_column('time')->deflate($artist) ne $artist->_raw_data->{time}, 'deflated values do not match');
+
+    is($artist->time, $oldtime, 'objects compare ok');
+
+    ok(!$artist->meta->get_column('time')->is_dirty($artist), 'column is not dirty');
+
 }
-
 
 
 done_testing;

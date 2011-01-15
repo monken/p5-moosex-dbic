@@ -37,11 +37,11 @@ has in_storage => ( is => 'rw', default => 0 );
 
 has _fix_reverse_relationship => ( is => 'rw', predicate => '_clear_fix_reverse_relationship', weak_ref => 1, default => sub {[]} );
 
-has _raw_data => ( is => 'rw', isa => 'HashRef', lazy_build => 1 );
+has _raw_data => ( is => 'rw', lazy_build => 1 );
 
-has dirty_columns => ( is => 'rw', isa => 'HashRef', clearer => 'clear_dirty_columns', default => sub {{}} );
+has dirty_columns => ( is => 'rw', clearer => 'clear_dirty_columns', default => sub {{}} );
 
-has _inflated_columns => ( is => 'rw', isa => 'HashRef', default => sub {{}} );
+has _inflated_columns => ( is => 'rw', default => sub {{}} );
 
 sub _build__raw_data { return { shift->get_columns } } 
 
@@ -50,10 +50,11 @@ sub resultset { return shift->result_source->schema->resultset(@_) }
 sub _build_table_name { 
     (my $table = MooseX::DBIC::Util::decamelize(shift->moniker)) =~ s/::/_/g; $table }
 
+my @chars = ( 'A' .. 'N', 'P' .. 'Z', 0 .. 9 );
+
 sub _build_id {
-    my @chars = ( 'A' .. 'N', 'P' .. 'Z', 0 .. 9 );
     my $id;
-    $id .= $chars[ int( rand(@chars) ) ] for ( 1 .. 10 );
+    $id .= $chars[ int( rand(35) ) ] for ( 1 .. 10 );
     return $id;
 }
 

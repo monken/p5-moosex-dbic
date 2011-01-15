@@ -53,11 +53,13 @@ sub is_dirty {
     my $val = $attr->get_raw_value($instance);
     return $cols->{ $attr->name } if(!ref $val);
     my $raw = $instance->_raw_data->{$attr->name};
-    return 1 if(!defined $raw && defined $val);
-    return 1 if(defined $raw && !defined $val);
-    return undef if(!defined $raw && !defined $val);
+    return 1 if(defined $raw ^ defined $val); # either one is undefined
+    return 0 if(!defined $raw && !defined $val);
+    my $inflated = $attr->inflate($instance, $raw);
+    return 0 if($val eq $inflated);
     my $deflated = $attr->deflate($instance);
-    return $deflated ne $raw;
+    return 0 if($deflated eq $raw);
+    return 1;
 }
 
 after set_value => sub {

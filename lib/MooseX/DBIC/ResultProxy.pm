@@ -32,17 +32,16 @@ sub build_proxy {
 
     map {
         $proxy_class->add_attribute(
-            $_->clone_and_inherit_options( required => 0 ) )
-    } map {
-        $proxy_class->remove_attribute( $_->name )
+            $_->name => %$_, required => 0)
     }
     $superclass->meta->get_all_attributes;
+    
     my @methods =
       map { $_->name }
-      map { @{ $_->associated_methods } } $proxy_class->get_all_columns;
+      map { @{ $_->associated_methods } } $proxy_class->get_all_columns, $proxy_class->get_all_relationships;
     foreach my $method (@methods) {
         next if ( first { $method eq $_ } @$copy );
-        #$proxy_class->remove_method($method);
+        $proxy_class->remove_method($method);
         $proxy_class->add_method(
             $method => sub { shift->_build_class( $method, @_ ) } );
     }

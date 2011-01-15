@@ -110,9 +110,11 @@ sub _build_proxy_class_builder {
 
 sub is_dirty {
     my ($attr, $self) = @_;
+    return 0 if(!ref $attr->get_raw_value($self));
     return 0 unless($attr->has_value($self));
     my $rel = $attr->get_value($self);
     return 0 if($rel->does('MooseX::DBIC::Meta::Role::ResultProxy'));
+    return 0 if($rel->{_update_in_progress});
     return $rel->meta->is_dirty($rel);
 }
 

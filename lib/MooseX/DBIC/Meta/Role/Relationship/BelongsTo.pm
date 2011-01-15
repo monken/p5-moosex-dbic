@@ -8,6 +8,16 @@ use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
 use MooseX::DBIC::Util ();
 
+has size => ( is => 'rw', isa => 'Int', lazy => 1, builder => '_build_size' );
+
+sub _build_data_type {
+    shift->related_class->meta->get_primary_key->data_type;
+};
+
+sub _build_size {
+    shift->related_class->meta->get_primary_key->size || 0;
+}
+
 sub _build_foreign_key {
     shift
 }
@@ -45,6 +55,8 @@ sub reverse_relationship {
 sub is_dirty {
     my ($attr, $self, $value) = @_;
     return $attr->is_column_dirty($self, $value) if($value);
+    my $rel = $attr->get_raw_value($self);
+    return 0 if(ref $rel && $rel->{_update_in_progress});
     return $attr->is_relationship_dirty($self) || $attr->is_column_dirty($self);
 }
 

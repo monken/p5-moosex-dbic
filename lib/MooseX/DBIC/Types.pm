@@ -76,8 +76,9 @@ map_type 'Str', 'VARCHAR';
 map_type 'Bool', 'BOOL';
 map_type 'Int', 'INTEGER';
 map_type 'Num', 'REAL';
-map_type 'Any', '';
+map_type 'Any', 'CHARACTER VARYING';
 map_type Result, 'CHARACTER';
+map_type 'DateTime', 'DATETIME';
 
 no MooseX::DBIC::TypeMap;
 

@@ -41,6 +41,7 @@ sub is_dirty {
     return 0 unless($attr->has_value($self));
     my $rows = $attr->get_value($self)->get_cache;
     List::Util::first { $_ && $_->meta->is_dirty($_) } @$rows;
+    return 0;
 }
 
 1;
