@@ -40,7 +40,7 @@ sub _build_resultset_class {
     my $resultset = $meta->name . '::Set';
     eval {
         Class::MOP::load_class($resultset);
-    } and return $resultset or return 'DBIx::Class::ResultSet';
+    } and return $resultset or return 'MooseX::DBIC::Set';
 }
 
 sub _build_result_class { shift->name }

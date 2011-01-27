@@ -109,11 +109,7 @@ sub create_result_source {
         $attribute->apply_to_result_source($source);
     }
     
-    my $resultset = $class . '::Set';
-    eval {
-        Class::MOP::load_class($resultset);
-        $source->resultset_class($resultset);
-    } or do { die $@ if($@ !~ /^Can't locate/) };
+    $source->resultset_class($moose->meta->resultset_class);
     
     return $source;
 }
