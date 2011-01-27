@@ -58,19 +58,19 @@ sub get_all_columns {
 }
 
 sub add_column {
-  my $meta    = shift;
-  my $name    = shift;
-  my %options = (is => 'rw', isa => 'Str', @_);
-  $options{lazy_required} = 1 if($options{required} && !$options{lazy_build} && !$options{builder} && !defined $options{default});
-  $options{traits} ||= [];
-  push(@{$options{traits}}, qw(MooseX::DBIC::Meta::Role::Column));
-  
-  my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
-  
-  foreach my $attr ( @{$attrs} ) {
-      $meta->add_attribute( $attr => %options );
-      $meta->column_list([@{$meta->column_list}, $attr]);
-  }
+    my $meta    = shift;
+    my $name    = shift;
+    my %options = ( is => 'rw', isa => 'Str', @_ );
+
+    $options{traits} ||= [];
+    push( @{ $options{traits} }, qw(MooseX::DBIC::Meta::Role::Column) );
+
+    my $attrs = ref $name eq 'ARRAY' ? $name : [$name];
+
+    foreach my $attr ( @{$attrs} ) {
+        $meta->add_attribute( $attr => %options );
+        $meta->column_list( [ @{ $meta->column_list }, $attr ] );
+    }
 }
 
 sub remove_column {

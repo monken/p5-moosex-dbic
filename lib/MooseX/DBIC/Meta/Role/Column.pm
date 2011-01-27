@@ -2,7 +2,6 @@ package MooseX::DBIC::Meta::Role::Column;
 
 use Moose::Role;
 with 'MooseX::DBIC::Meta::Role::Attribute';
-with 'MooseX::LazyRequire::Meta::Attribute::Trait::LazyRequire';
 with 'MooseX::Attribute::Deflator::Meta::Role::Attribute';
 
 use MooseX::DBIC::TypeMap;

@@ -13,7 +13,6 @@ use Try::Tiny;
 BEGIN{
 $Data::Dumper::Maxdepth = 3;
 $Data::Dumper::Indent = 1;
-$Carp::Verbose = 1;
 }
 extends 'DBIx::Class::Schema';
 

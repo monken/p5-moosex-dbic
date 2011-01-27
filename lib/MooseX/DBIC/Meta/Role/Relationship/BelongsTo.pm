@@ -1,8 +1,11 @@
 package MooseX::DBIC::Meta::Role::Relationship::BelongsTo;
 
 use Moose::Role;
-with 'MooseX::DBIC::Meta::Role::Relationship' => { -alias    => { is_dirty => 'is_relationship_dirty' } };
-with 'MooseX::DBIC::Meta::Role::Column' => { -alias    => { is_dirty => 'is_column_dirty' } };
+with 'MooseX::DBIC::Meta::Role::Relationship' =>
+  { -alias => { is_dirty => 'is_relationship_dirty' } };
+with 'MooseX::DBIC::Meta::Role::Column' =>
+  { -alias => { is_dirty => 'is_column_dirty' } };
+
 
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
