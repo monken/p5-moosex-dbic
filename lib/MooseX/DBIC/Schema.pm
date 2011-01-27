@@ -9,6 +9,7 @@ use MooseX::Attribute::Deflator::Structured;
 use MooseX::DBIC::Util ();
 use Data::Dumper;
 use Try::Tiny;
+use Module::Find ();
 
 BEGIN{
 $Data::Dumper::Maxdepth = 3;
@@ -42,7 +43,13 @@ sub _build_result_source_class {
 }
 
 sub load_namespaces {
-    croak 'not yet implemented';
+    my $class = shift;
+    my $namespace = shift || $class;
+    my @found = Module::Find::findallmod($namespace);
+    map { Class::MOP::load_class($_) } @found;
+    @found = grep { $_->isa('Moose::Object') && $_->does('MooseX::DBIC::Role::Result') } @found;
+    map { s/^\Q$class\E::// } @found;
+    $class->load_classes( @found);
 }
 
 sub load_classes {

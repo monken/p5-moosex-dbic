@@ -1,8 +1,6 @@
 package # hide from PAUSE
     DBICTest::Schema::ArtistSubclass;
 
-use base 'DBICTest::Schema::Artist';
-
-__PACKAGE__->table(__PACKAGE__->table);
+use MooseX::DBIC; extends 'DBICTest::Schema::Artist';
 
 1;

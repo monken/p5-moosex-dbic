@@ -26,16 +26,16 @@ has_column updated_on => ( isa => 'DateTime' );
 has_many cds => ( isa => ResultSet['DBICTest::Schema::CD'], cascade_delete => 1 );
 #    { order_by => 'year' },
 
-has_many cds_unordered => ( isa => ResultSet['DBICTest::Schema::CD'] );
-has_many cds_very_very_very_long_relationship_name => ( isa => ResultSet['DBICTest::Schema::CD'] );
+has_many cds_unordered => ( isa => ResultSet['DBICTest::Schema::CD'], foreign_key => 'artist' );
+has_many cds_very_very_very_long_relationship_name => ( isa => ResultSet['DBICTest::Schema::CD'], foreign_key => 'artist' );
 
 #__PACKAGE__->has_many( twokeys => 'DBICTest::Schema::TwoKeys' );
 #__PACKAGE__->has_many( onekeys => 'DBICTest::Schema::OneKey' );
 
-has_many artist_undirected_maps => ( isa => ResultSet['DBICTest::Schema::ArtistUndirectedMap'] );
+#has_many artist_undirected_maps => ( isa => ResultSet['DBICTest::Schema::ArtistUndirectedMap'] );
 #  { cascade_copy => 0 } # this would *so* not make sense
 
-has_many artwork_to_artist => ( isa => ResultSet['DBICTest::Schema::Artwork_to_Artist'] );
+#has_many artwork_to_artist => ( isa => ResultSet['DBICTest::Schema::Artwork_to_Artist'] );
 
 #__PACKAGE__->many_to_many('artworks', 'artwork_to_artist', 'artwork');
 
