@@ -45,7 +45,8 @@ sub _build_result_source_class {
 sub load_namespaces {
     my $class = shift;
     my $namespace = shift || $class;
-    my @found = Module::Find::findallmod($namespace);
+    my %stash = Class::MOP::get_all_metaclasses;
+    my @found = (Module::Find::findallmod($namespace), grep { /^\Q$namespace\E::/} keys %stash);
     map { Class::MOP::load_class($_) } @found;
     @found = grep { $_->isa('Moose::Object') && $_->does('MooseX::DBIC::Role::Result') } @found;
     map { s/^\Q$class\E::// } @found;
