@@ -32,14 +32,14 @@ sub hri {
     {
         *{$attr} = sub {
             my $self = shift;
-            shift->search( undef, { $attr => @_ > 1 ? [@_] : @_ } );
+            $self->search( undef, { $attr => @_ > 1 ? [@_] : @_ } );
           }
     }
 
     foreach my $attr (qw(cache distinct)) {
         *{$attr} = sub {
             my $self = shift;
-            shift->search( undef, { $attr => defined $_[0] ? $_[0] : 1 } );
+            $self->search( undef, { $attr => defined $_[0] ? $_[0] : 1 } );
           }
     }
 }

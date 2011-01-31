@@ -19,6 +19,8 @@ has auto_increment => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has primary_key => ( is => 'rw', isa => 'Bool', default => 0 );
 
+has indexed => ( is => 'rw', isa => 'Bool', default => 0 );
+
 sub _build_column_info {
     my $self = shift;
     return {
@@ -43,6 +45,7 @@ after apply_to_result_source => sub {
         $source->set_primary_key( $attr->name );
         $attr->associated_class->name->_primaries( $attr->name );
     }
+
 };
 
 sub is_dirty {
