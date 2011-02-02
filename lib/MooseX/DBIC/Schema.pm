@@ -91,8 +91,6 @@ sub load_class {
     Moose->throw_error('Use a MooseX::DBIC::Loader to load non MooseX::DBIC class ', $moniker, '.') 
         unless($class->isa('Moose::Object') && $class->does('MooseX::DBIC::Role::Result'));
     $result->moniker($moniker);
-    $result->_orig($result);
-    #$schema->load_classes(@defer);
     
     my $source = $schema->create_result_source( $class, $result );
     

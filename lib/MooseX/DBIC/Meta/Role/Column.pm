@@ -19,7 +19,7 @@ has auto_increment => ( is => 'rw', isa => 'Bool', default => 0 );
 
 has primary_key => ( is => 'rw', isa => 'Bool', default => 0 );
 
-has indexed => ( is => 'rw', isa => 'Bool', default => 0 );
+has indexed => ( is => 'rw', default => 0 );
 
 sub _build_column_info {
     my $self = shift;

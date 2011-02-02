@@ -169,3 +169,69 @@ sub set_column {
 }
 
 1;
+
+__END__
+
+=head1 METHODS
+
+=head2 from
+
+Returns the table name.
+
+
+
+=head1 ATTRIBUTES
+
+=head2 column_list
+
+Contains the column names.
+
+=head2 relationship_list
+
+Contains the relationship names.
+
+=head2 relationship
+
+Contains the relationship meta classes.
+
+=head2 result_class
+
+The result class. Defaults to the name of the class.
+
+=head2 resultset_class
+
+Name of the resultset class. If a class exists, that has C<::Set> appended 
+to the L</result_class> name, it is used (e.g. a class MySchema::User will
+have MyApp::User::Set as resultset class, if it exists). Otherwise 
+L<MooseX::DBIC::Set> is used as resultset class.
+
+=head2 get_all_columns
+
+Filters L<Moose::Meta::Class/get_all_attributes> for attributes with the
+L<MooseX::DBIC::Meta::Role::Column> role applied.
+
+B<< Note: This returns all columns in the inheritance hierarchy. This is probably not what you want.
+See L</get_column_list> instead. >>
+
+=head2 get_all_relationships
+
+Filters L<Moose::Meta::Class/get_all_attributes> for attributes with the
+L<MooseX::DBIC::Meta::Role::Column> role applied.
+
+B<< Note: This returns all columns in the inheritance hierarchy. This is probably not what you want.
+See L</get_relationship_list> instead. >>
+
+=head1 INTERNAL ATTRIBUTES
+
+=head2 orig_class
+
+This attribute contains the name of the original class. L<DBIx::Class::Schema/compose_namespace>
+creates a subclass of each result class and gives it a new name. To have methods like
+L</get_attribute> still working, we need to call them on the original class since the subclass
+will have no direct attributes.
+
+=head1 INTERNAL METHODS
+
+=head2 get_orig_class
+
+Builder for L</orig_class>.

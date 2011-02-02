@@ -89,23 +89,23 @@ __END__
 
 =head1 SYNOPSIS
 
- package CD;
+ package MySchema::CD;
  use MooseX::DBIC;
     
  has_column 'title';
  belongs_to artist => ( isa => 'Artist' );
  
- package Artist;
+ package MySchema::Artist;
  use MooseX::DBIC;    
  
  has_column 'name';
- has_many cds => ( isa => ResultSet['CD'] );
+ has_many cds => ( isa => 'CD' );
  
  package MySchema;
  use Moose;
  extends 'MooseX::DBIC::Schema';
  
- __PACKAGE__->load_classes(qw(Artist CD));
+ __PACKAGE__->load_namespaces();
  
  package main;
  
@@ -119,6 +119,8 @@ __END__
       cds => [ { title => 'Sound of Moose' } ]
     }
  );
+ 
+ my @artists = $schema->resultset('Artist')->order_by('name')->prefetch('cd')->all;
 
 =head1 PRINCIPLES
 
@@ -126,16 +128,12 @@ __END__
 
 =item B<Convention over Configuration>
 
-=item B<Mandatory Primary Key>
+=item B<Mandatory Single Primary Key>
 
 All tables you create using L<MooseX::DBIC> have a primary key C<id>.
-It is not an auto incrementing integer but a random string.
+It is not an auto incrementing integer but a random string (thoguh this can be changed).
 
-Creating tables without a primary key is not supported.
-
-=item B<Single Primary Keys>
-
-Tables with multiple primary keys are not supported.
+Creating tables with more than one or none primary key is not supported.
 
 =back
 
@@ -143,6 +141,10 @@ Tables with multiple primary keys are not supported.
 
  package MyApp::Artist;
  use MooseX::DBIC;
+ 
+ # column and realtionship definition
+ 
+ __PACKAGE__->meta->make_immutable; # speed
 
 =over 4
 
@@ -167,12 +169,13 @@ further details.
 =item B<< remove >>
 
  remove 'id';
+ has_column mypk => ( primary_key => 1, auto_increment => 1, isa => 'Int' );
 
 Remove a previously added column. Can be used to remove the default primary key column C<id>.
 
 =item B<< has_many >>
 
- has_many cds => ( isa => ResultSet['MyApp::CD'] );
+ has_many cds => ( isa => 'MyApp::CD' );
 
 See L<MooseX::DBIC::Meta::Role::Relationship::HasMany>.
 
@@ -202,10 +205,16 @@ See L<MooseX::DBIC::Meta::Role::Relationship::HasOne>.
 This is the preferred way to apply roles to the class. L<with|Moose/EXPORTED FUNCTIONS>
 has been overridden to allow for a shorter syntax.
 
+See the L<MooseX::DBIC::Role::> namespace for more roles.
+
 =back
 
 =head1 INTROSPECTION
 
+One of the big advantages that come with Moose is the ability to introspect 
+classes, attributes and pretty much everything. MooseX::DBIC adds methods to
+the meta class to get easy access to columns, relationships and more.
+
   my $meta = MyApp::Artist->meta;
   
-See L<MooseX::DBIC::Meta::Role::Class>.
+Check out L<MooseX::DBIC::Meta::Role::Class> to get started.

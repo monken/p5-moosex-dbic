@@ -23,10 +23,6 @@ __PACKAGE__->meta->add_class_attribute( moniker => (
     is => 'rw', isa => 'Str', default => sub { shift->name }
 ) );
 
-__PACKAGE__->meta->add_class_attribute( _orig => (
-    is => 'rw', isa => 'Str'
-) );
-
 __PACKAGE__->meta->add_class_attribute( _primaries => (
     is => 'rw', isa => 'Str', default => 'id'
 ) );
@@ -118,17 +114,13 @@ sub get_dirty_columns {
     map { $_ => $self->meta->get_column($_)->deflate($self) } $self->meta->get_dirty_column_list($self);
 }
 
-sub search_related {
-  return shift->related_resultset(shift)->search(@_);
-}
-
 # TODO: implement in this class, move stuff to meta class
 my %import = (
-    'DBIx::Class::Relationship::Base' => [qw(related_resultset find_or_new_related find_related update_or_create_related)],
+    'DBIx::Class::Relationship::Base' => [qw(create_related search_related related_resultset find_or_new_related find_related update_or_create_related)],
     'DBIx::Class::PK' => [qw(ident_condition _ident_values)],
     'DBIx::Class::ResultSource' => [qw(_pri_cols resultset_attributes)],
     'Class::Accessor::Grouped' => [qw(get_simple)],
-    'DBIx::Class::Row' => [qw(throw_exception)],
+    'DBIx::Class::Row' => [qw(insert_or_update update_or_insert throw_exception)],
 );
 
 sub has_column_loaded { 
@@ -145,20 +137,18 @@ while(my($k,$v) = each %import) {
 }
 
 sub new_related {
-  my ($self, $rel, $values, $attrs) = @_;
-  $rel = $self->meta->get_relationship($rel);
-  my $rev = $rel->reverse_relationship;
-  if($rev && $rev->type ne 'HasMany') {
-    my $name = $rev->name;
-    $values->{$name} = $self;
-  }
-  my $new = $self->search_related($rel->name)->new_result($values, $attrs);
-  return $new;
-  
+    my ( $self, $rel, $values, $attrs ) = @_;
+    $rel = $self->meta->get_relationship($rel);
+    my $rev = $rel->reverse_relationship;
+    if ( $rev && $rev->type ne 'HasMany' ) {
+        my $name = $rev->name;
+        $values->{$name} = $self;
+    }
+    my $new =
+      $self->search_related( $rel->name )->new_result( $values, $attrs );
+    return $new;
+
 }
-
-sub create_related { return shift->new_related(@_)->insert; }
-
 
 sub insert {
     my ($self) = @_;
@@ -194,13 +184,6 @@ sub insert {
     delete $self->{_update_in_progress};
     return $self;
 }
-
-sub update_or_insert {
-    my $self = shift;
-    return ( $self->in_storage ? $self->update : $self->insert );
-}
-
-*insert_or_update = \&update_or_insert;
 
 sub inflate_result {
     my ($class, $rs, $me, $more, @more) = @_;
@@ -275,9 +258,126 @@ sub delete {
 sub sqlt_deploy_hook {
     my ($self, $sqlt_table) = @_;
     my $table_name = $self->table_name;
-    $sqlt_table->add_index(name => $table_name . '_idx_' . $_->name, fields => [$_->name])
+    $sqlt_table->add_index(name => $table_name . '_idx_' . $_->name, fields => ref $_->indexed eq 'ARRAY' ? $_->indexed : [$_->name])
        for(grep { $_->indexed } map { $self->meta->get_column($_) } $self->meta->get_column_list );
 }
 
-
 1;
+
+=head1 ATTRIBUTES
+
+=head2 in_storage
+
+This row is stored and can be updated or deleted.
+
+=head1 METHODS
+
+In order of appearance.
+
+=head2 insert
+
+=head2 update
+
+C<insert> and C<update> work differently in MX::DBIC than they do in DBIC. Instead of working
+on the row only, they traverse all relationships and update or insert them as well.
+
+ my $cd = $schema->resultset('CD')->create({ title => 'Big Band Compilation' });
+ $cd->artist->name('Mr. Blues'); # will create an artist object
+ $cd->update;                    # stores the artist and updates foreign key on $cd
+
+=head2 delete
+
+=head2 new_related
+
+=head2 sqlt_deploy_hook
+
+Iterates over all columns and adds an index to the L<SQL::Translator::Schema::Table> object
+if L<MooseX::DBIC::Meta::Role::Column/indexed> has been set.
+
+Add an C<after> modifier to add more thing:
+
+ after sqlt_deploy_hook => sub {
+     my ($self, $sqlt_table) = @_;
+     $sqlt_table->add_constraint( ... );
+ };
+ 
+=head1 IMPORTED METHODS
+
+These methods have been imported from DBIC
+
+=head2 related_resultset 
+
+See L<DBIx::Class::Relationship::Base/related_resultset>.
+
+=head2 search_related
+
+See L<DBIx::Class::Relationship::Base/search_related>.
+
+=head2 create_related
+
+See L<DBIx::Class::Relationship::Base/create_related>.
+
+=head2 find_or_new_related 
+
+See L<DBIx::Class::Relationship::Base/find_or_new_related>.
+
+=head2 find_related 
+
+See L<DBIx::Class::Relationship::Base/find_related>.
+
+=head2 update_or_create_related
+
+See L<DBIx::Class::Relationship::Base/update_or_create_related>.
+
+=head2 ident_condition 
+
+See L<DBIx::Class::PK/ident_condition>.
+
+=head2 _ident_values
+
+See L<DBIx::Class::PK/_ident_values>.
+
+=head2 _pri_cols 
+
+See L<DBIx::Class::ResultSource/_pri_cols>.
+
+=head2 resultset_attributes
+
+See L<DBIx::Class::ResultSource/resultset_attributes>.
+
+=head2 get_simple
+
+See L<Class::Accessor::Grouped/get_simple>.
+
+=head2 insert_or_update
+
+=head2 update_or_insert
+
+See L<DBIx::Class::Row/insert_or_update>.
+
+=head2 throw_exception
+
+See L<DBIx::Class::Row/throw_exception>.
+
+
+=head1 COMPATIBILITY METHODS
+
+Those methods were added to make DBIC work with the result class.
+They usually call a method on the meta class. They might go away in future releases
+so call them on the meta class.
+
+=head2 get_column
+
+=head2 get_columns
+
+=head2 get_dirty_columns
+
+=head2 has_column_loaded
+
+See L<MooseX::DBIC::Meta::Role::Column/is_loaded>.
+
+=head1 INTERNAL METHODS
+
+=head2 inflate_result
+
+=head2 _set_in_storage_deep

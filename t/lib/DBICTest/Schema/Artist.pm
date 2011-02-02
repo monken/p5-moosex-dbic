@@ -40,14 +40,13 @@ has_many cds_very_very_very_long_relationship_name => ( isa => ResultSet['DBICTe
 #__PACKAGE__->many_to_many('artworks', 'artwork_to_artist', 'artwork');
 
 
-sub sqlt_deploy_hook {
+after sqlt_deploy_hook => sub {
   my ($self, $sqlt_table) = @_;
-
   if ($sqlt_table->schema->translator->producer_type =~ /SQLite$/ ) {
     $sqlt_table->add_index( name => 'artist_name_hookidx', fields => ['name'] )
       or die $sqlt_table->error;
   }
-}
+};
 
 sub _set_name {
     my ($self, $new, $old) = @_;
