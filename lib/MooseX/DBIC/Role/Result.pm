@@ -91,9 +91,8 @@ sub BUILDARGS {
 }
 
 sub BUILD {
-    my $self = shift;
-    $self->clear_dirty_columns;
-    return $self;
+    delete $_[0]->{dirty_columns};
+    return $_[0];
 }
 
 sub get_column {
@@ -116,7 +115,7 @@ sub get_dirty_columns {
 
 # TODO: implement in this class, move stuff to meta class
 my %import = (
-    'DBIx::Class::Relationship::Base' => [qw(create_related search_related related_resultset find_or_new_related find_related update_or_create_related)],
+    'DBIx::Class::Relationship::Base' => [qw( search_related related_resultset find_or_new_related find_related update_or_create_related)],
     'DBIx::Class::PK' => [qw(ident_condition _ident_values)],
     'DBIx::Class::ResultSource' => [qw(_pri_cols resultset_attributes)],
     'Class::Accessor::Grouped' => [qw(get_simple)],
@@ -135,6 +134,8 @@ while(my($k,$v) = each %import) {
         __PACKAGE__->meta->add_method( $method => \&{$k.'::'.$method} );
     }
 }
+
+sub create_related { shift->new_related(@_)->insert }
 
 sub new_related {
     my ( $self, $rel, $values, $attrs ) = @_;

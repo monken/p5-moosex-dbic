@@ -6,9 +6,14 @@ use MooseX::DBIC::Role;
 has_column 'role';
 belongs_to hasmany => ( isa => 'HasMany' );
 
+package SecondRole;
+use MooseX::DBIC::Role;
+
+has_column 'second';
+
 package MyClass;
 use MooseX::DBIC;
-with 'MyRole';
+with qw(MyRole SecondRole);
 
 has_column foo => ( is => 'rw' );
 has_column bar => ( is => 'rw', required => 1 );
@@ -36,8 +41,11 @@ ok( MyClass->meta->get_relationship('hasmany') );
 ok( HasMany->meta->get_relationship('classes')->foreign_key );
 
 ok( MyClass->meta->get_column('id')->primary_key );
-
-
+TODO: {
+    local $TODO = 'role composition';
+    ok(MyClass->meta->get_attribute('second'), 'attribute exists');
+    ok(MyClass->meta->get_column('second'), 'composite role works');
+}
 my $foo = MyClass->new( -result_source => 1 );
 ok( $foo->id );
 done_testing;

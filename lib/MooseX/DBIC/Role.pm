@@ -9,7 +9,7 @@ my ( $import, $unimport, $init_meta ) = Moose::Exporter->build_import_methods(
       [qw(has_column has_many belongs_to has_one might_have table remove)],
     role_metaroles => {
         role => [
-            qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Role)
+            qw(MooseX::DBIC::Meta::Role::Role MooseX::ClassAttribute::Trait::Role)
         ],
         application_to_class => ['MooseX::DBIC::Meta::Role::Application::ToClass']
     },
