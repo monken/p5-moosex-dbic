@@ -2,7 +2,7 @@ package MooseX::DBIC::Meta::Role::Column;
 
 use Moose::Role;
 with 'MooseX::DBIC::Meta::Role::Attribute';
-with 'MooseX::Attribute::Deflator::Meta::Role::Attribute';
+#with 'MooseX::Attribute::Deflator::Meta::Role::Attribute';
 
 use MooseX::DBIC::TypeMap;
 
@@ -103,7 +103,7 @@ before get_value => sub {
 after clear_value => sub { shift->is_dirty(shift, 1); };
 
 use MooseX::DBIC::Meta::Role::Method::Accessor;
-sub accessor_metaclass { 'MooseX::DBIC::Meta::Role::Method::Accessor' }
+override accessor_metaclass => sub { 'MooseX::DBIC::Meta::Role::Method::Accessor' };
 
 
 1;
