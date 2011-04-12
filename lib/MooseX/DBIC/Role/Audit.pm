@@ -1,6 +1,4 @@
 package MooseX::DBIC::Role::Audit;
-use strict;
-use warnings;
 
 use Moose::Role;
 use MooseX::DBIC;

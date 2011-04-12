@@ -88,12 +88,14 @@ __END__
 =head1 SYNOPSIS
 
  package MySchema::CD;
+ use Moose;
  use MooseX::DBIC;
     
  has_column 'title';
  belongs_to artist => ( isa => 'Artist' );
  
  package MySchema::Artist;
+ use Moose;
  use MooseX::DBIC;    
  
  has_column 'name';
