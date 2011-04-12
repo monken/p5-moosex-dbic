@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::TypedObject;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 table 'typed_object';

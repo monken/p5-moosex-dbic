@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::Image;
 
+use Moose;
 use MooseX::DBIC;
 
 has_column name => (size => 100 );

@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::SelfRef;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 table 'self_ref';

@@ -1,5 +1,6 @@
 package Pad::Schema::File;
 
+use Moose;
 use MooseX::DBIC;
 use File::stat ();
 

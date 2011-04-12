@@ -2,11 +2,13 @@ use Test::More;
 use SQL::Translator;
 
 package Index;
+use Moose;
 use MooseX::DBIC;
 has_many 'artists';
 belongs_to 'artist';
 
 package Artist;
+use Moose;
 use MooseX::DBIC;
 has_many 'indices' => ( isa => 'Index' );
 belongs_to 'index';

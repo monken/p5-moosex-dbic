@@ -1,5 +1,6 @@
 package Pad::Schema::Dependency;
 
+use Moose;
 use MooseX::DBIC;
 
 has_column version => ( required => 1 );

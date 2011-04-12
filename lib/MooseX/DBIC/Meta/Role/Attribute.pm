@@ -18,10 +18,9 @@ after _process_options => sub {
     }
 };
 
-sub apply_to_result_source {}
+sub apply_to_result_source { }
 
 1;
-
 
 __END__
 

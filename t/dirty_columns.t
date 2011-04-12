@@ -110,7 +110,8 @@ my %dirty = ( in_storage => 1, _raw_data => 1 );
     no MooseX::Attribute::Deflator;
 
     package Artist;
-    use MooseX::DBIC;
+    use Moose;
+use MooseX::DBIC;
     has_column time => ( isa => 'DateTime' );
 
     __PACKAGE__->meta->make_immutable;

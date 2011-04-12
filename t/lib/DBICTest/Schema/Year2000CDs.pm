@@ -1,6 +1,7 @@
 package # hide from PAUSE
     DBICTest::Schema::Year2000CDs;
 
+use Moose;
 use MooseX::DBIC; extends qw/DBICTest::Schema::CD/;
 
 # __PACKAGE__->table_class('DBIx::Class::ResultSource::View');

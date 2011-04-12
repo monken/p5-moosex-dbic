@@ -1,6 +1,7 @@
 package Pad::Schema::Release;
 
 use MooseX::Attribute::LazyInflator;
+use Moose;
 use MooseX::DBIC;
 
 has_column uploaded   => ( isa => 'DateTime', required => 1 );

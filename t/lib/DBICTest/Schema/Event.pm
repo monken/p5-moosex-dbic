@@ -1,5 +1,6 @@
 package DBICTest::Schema::Event;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 has_column id => ( isa => 'Int', auto_increment => 1 );

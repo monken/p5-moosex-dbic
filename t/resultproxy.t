@@ -1,6 +1,7 @@
 use MooseX::Attribute::Deflator::Moose;
 
 package MyClass;
+use Moose;
 use MooseX::DBIC;
 
 

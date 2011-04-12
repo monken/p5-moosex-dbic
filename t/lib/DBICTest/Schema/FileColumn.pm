@@ -1,6 +1,7 @@
 package 
 DBICTest::Schema::FileColumn;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 use File::Temp qw/tempdir/;
 

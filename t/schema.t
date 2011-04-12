@@ -4,6 +4,7 @@ use warnings;
 use lib qw(t/lib);
 
 package DBICTest::Schema::AAA;
+use Moose;
 use MooseX::DBIC;
 
 package DBICTest::Schema;

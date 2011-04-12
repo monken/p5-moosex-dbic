@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::Artist;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 # __PACKAGE__->source_info({

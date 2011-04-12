@@ -8,6 +8,7 @@ $Data::Dumper::Indent = 1;
 }
 
 package CD;
+use Moose;
 use MooseX::DBIC;
     
 has_column 'title';
@@ -16,12 +17,14 @@ might_have cover => ( lazy => 1 );
 might_have cover2 => ( isa => 'CD::Cover', foreign_key => 'cd2', lazy => 1 );
 
 package Artist;
+use Moose;
 use MooseX::DBIC;
 
 has_column 'name';
 has_many cds => ( isa => 'CD' );
 
 package CD::Cover;
+use Moose;
 use MooseX::DBIC;
 
 has_column 'name';

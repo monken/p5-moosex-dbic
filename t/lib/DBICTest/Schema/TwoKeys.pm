@@ -1,6 +1,7 @@
 package # hide from PAUSE
     DBICTest::Schema::TwoKeys;
 
+use Moose;
 use MooseX::DBIC;
 
 remove 'id';

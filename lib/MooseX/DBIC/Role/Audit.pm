@@ -2,7 +2,8 @@ package MooseX::DBIC::Role::Audit;
 use strict;
 use warnings;
 
-use MooseX::DBIC::Role;
+use Moose::Role;
+use MooseX::DBIC;
 
 has_column revision => ( isa => 'Int', default => 0, required => 1 );
 belongs_to current => ( isa => sub { shift->name } );

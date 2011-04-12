@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::FourKeys_to_TwoKeys;
 
+use Moose;
 use MooseX::DBIC;
 
 has_column [qw(f_foo f_bar f_hello f_goodbye t_artist t_cd autopilot pilot_sequence)];

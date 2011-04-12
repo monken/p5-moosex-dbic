@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::Money;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 table 'money_test';

@@ -2,6 +2,7 @@ package # hide from PAUSE
     DBICTest::Schema::SelfRefAlias;
 
     
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 table 'self_ref_alias';

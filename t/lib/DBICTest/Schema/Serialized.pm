@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::Serialized;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 table 'books';

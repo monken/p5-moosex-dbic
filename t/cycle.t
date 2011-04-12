@@ -2,11 +2,13 @@ use Test::More;
 use SQL::Translator;
 
 package CD;
+use Moose;
 use MooseX::DBIC;
 has_column title => ( is => 'rw', isa => 'Str' );
 belongs_to artist => ( is => 'rw', isa => 'Artist', predicate => 'has_artist' );
 
 package Artist;
+use Moose;
 use MooseX::DBIC;
 use MooseX::DBIC::Types q(:all);
 

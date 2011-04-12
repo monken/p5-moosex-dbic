@@ -1,6 +1,9 @@
 package MooseX::DBIC::Role::Result;
 
-use MooseX::DBIC::Role -traits => [qw(MooseX::DBIC::Meta::Role::Class MooseX::ClassAttribute::Trait::Role)];
+use Moose::Role;
+use MooseX::Attribute::LazyInflator;
+use MooseX::DBIC;
+use MooseX::ClassAttribute;
 use Carp;
 use DBIx::Class::ResultClass::HashRefInflator;
 use Scalar::Util qw(weaken);
@@ -15,17 +18,17 @@ __PACKAGE__->meta->add_column( id => (
     primary_key => 1,
 ) );
 
-__PACKAGE__->meta->add_class_attribute( table_name => (
+class_has table_name => (
     is => 'rw', isa => 'Str', lazy => 1, builder => '_build_table_name'
-) );
+);
 
-__PACKAGE__->meta->add_class_attribute( moniker => (
+class_has moniker => (
     is => 'rw', isa => 'Str', default => sub { shift->name }
-) );
+);
 
-__PACKAGE__->meta->add_class_attribute( _primaries => (
+class_has _primaries => (
     is => 'rw', isa => 'Str', default => 'id'
-) );
+);
 
 has result_source => ( is => 'rw', init_arg => '-result_source', required => 1, handles => [qw(primary_columns relationship_info)] );
 

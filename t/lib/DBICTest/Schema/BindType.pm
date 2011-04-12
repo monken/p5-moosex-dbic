@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::BindType;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 table 'bindtype_test';

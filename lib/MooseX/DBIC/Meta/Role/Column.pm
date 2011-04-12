@@ -102,9 +102,20 @@ before get_value => sub {
 
 after clear_value => sub { shift->is_dirty(shift, 1); };
 
-use MooseX::DBIC::Meta::Role::Method::Accessor;
-override accessor_metaclass => sub { 'MooseX::DBIC::Meta::Role::Method::Accessor' };
-
+override _inline_check_lazy => sub {
+    my ( $self, $instance ) = @_;
+    my $name        = $self->name;
+    my $slot_exists = $self->_inline_instance_has($instance);
+    my @code = ( "if(!$slot_exists && !\$attr->is_loaded($instance)) {",
+                 $self->_inline_instance_set( $instance,
+                                        "\$attr->load_from_storage($instance)" )
+                   . ";",
+                 "delete ${instance}->{dirty_columns}->{\""
+                   . quotemeta($name) . "\"};",
+                 "}",
+                 super() );
+    return @code;
+};
 
 1;
 

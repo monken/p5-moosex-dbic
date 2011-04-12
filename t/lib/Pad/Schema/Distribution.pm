@@ -1,5 +1,6 @@
 package Pad::Schema::Distribution;
 
+use Moose;
 use MooseX::DBIC;
 
 has_column name       => ( required => 1 );

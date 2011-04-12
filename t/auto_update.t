@@ -3,6 +3,7 @@ use Test::Exception;
 use SQL::Translator;
 
 package Artwork;
+use Moose;
 use MooseX::DBIC;
 with 'AutoUpdate';
     

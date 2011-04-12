@@ -2,6 +2,7 @@ package # hide from PAUSE
     DBICTest::Plain::Test;
 
 use Moose;
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
     
 

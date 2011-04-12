@@ -2,6 +2,7 @@ use Test::More;
 use SQL::Translator;
 
 package Artwork;
+use Moose;
 use MooseX::DBIC;
     
 has_column 'image';
@@ -9,6 +10,7 @@ belongs_to cd_cover => ( isa => 'CD', lazy => 1 );
 belongs_to cd_inlay => ( isa => 'CD', lazy => 1 );
 
 package CD;
+use Moose;
 use MooseX::DBIC;
     
 has_column title => ( is => 'rw', isa => 'Str' );

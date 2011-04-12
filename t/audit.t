@@ -2,15 +2,18 @@ use Test::More;
 use SQL::Translator;
 
 package Label;
+use Moose;
 use MooseX::DBIC;
 
 package CD;
+use Moose;
 use MooseX::DBIC;
     
 has_column 'title';
 belongs_to artist => ( isa => 'Artist', predicate => 'has_artist' );
 
 package Artist;
+use Moose;
 use MooseX::DBIC;
 use DateTime;
 with 'Audit';

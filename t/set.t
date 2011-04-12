@@ -3,6 +3,7 @@ use strict;
 use warnings;
 
 package CD;
+use Moose;
 use MooseX::DBIC;
     
 has_column 'title';

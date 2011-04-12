@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::CollectionObject;
 
+use Moose;
 use MooseX::DBIC;
 
 remove 'id';

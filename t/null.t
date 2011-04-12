@@ -1,4 +1,5 @@
 package MySchema::MyClass;
+use Moose;
 use MooseX::DBIC;
 
 has_column foo => ( is => 'rw', clearer => 'clear_foo' );

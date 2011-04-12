@@ -1,6 +1,7 @@
 package    # hide from PAUSE
   DBICTest::Schema::Encoded;
 
+use Moose;
 use MooseX::DBIC;
 with 'DBICTest::Compat';
 

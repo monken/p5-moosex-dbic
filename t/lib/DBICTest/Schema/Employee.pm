@@ -1,7 +1,8 @@
 package # hide from PAUSE 
     DBICTest::Schema::Employee;
 
-    use MooseX::DBIC; with 'DBICTest::Compat';
+    use Moose;
+use MooseX::DBIC; with 'DBICTest::Compat';
 
 # __PACKAGE__->load_components(qw( Ordered ));
 

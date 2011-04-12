@@ -1,6 +1,7 @@
 package # hide from PAUSE
     DBICTest::Schema::Bookmark;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 remove 'id';

@@ -1,5 +1,6 @@
 package DBICTest::Schema::Genre;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 remove 'id';

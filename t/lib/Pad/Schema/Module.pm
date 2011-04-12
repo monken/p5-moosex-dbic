@@ -1,5 +1,6 @@
 package Pad::Schema::Module;
 
+use Moose;
 use MooseX::DBIC;
 use List::MoreUtils qw(uniq);
 

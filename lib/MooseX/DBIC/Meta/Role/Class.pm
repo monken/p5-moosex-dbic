@@ -1,32 +1,9 @@
 package MooseX::DBIC::Meta::Role::Class;
 
-#use base 'DBIx::Class::ResultSource::Table';
-
 use Moose::Role;
 use MooseX::DBIC::Types q(:all);
 use List::Util qw(first);
 use List::MoreUtils ();
-
-my $application_to_class_class = Moose::Meta::Class->create_anon_class( 
-    superclasses => ['Moose::Meta::Role::Application::ToClass'], 
-    cache => 1 );
-$application_to_class_class->add_after_method_modifier(apply_attributes => sub {
-    my ($self , $role, $class) = @_;
-    my $attr_metaclass = $class->attribute_metaclass;
-    foreach my $attribute_name ( $role->get_class_attribute_list() ) {
-        next if ( $class->has_class_attribute($attribute_name)
-            && $class->get_class_attribute($attribute_name)
-            != $role->get_class_attribute($attribute_name) );
-
-        $class->add_class_attribute(
-            $role->get_class_attribute($attribute_name)
-                ->attribute_for_class($attr_metaclass) );
-    }
-});
-
-sub application_to_class_class { 
-    return $application_to_class_class->name;
-}
 
 has orig_class => ( is => 'ro', lazy => 1, builder => 'get_orig_class' );
 has column_list => ( is => 'rw', default => sub {[]} );
@@ -48,8 +25,9 @@ sub _build_result_class { shift->name }
 sub from { shift->name->table_name }
 
 sub get_orig_class {
-    my $class = first { first { $_->name eq 'MooseX::DBIC::Role::Result' } @{$_->meta->roles} } shift->class_precedence_list;
-    return $class->meta;
+    my $class = shift;
+    my $orig = first { first { $_->name eq 'MooseX::DBIC::Role::Result' } @{$_->meta->roles} } $class->class_precedence_list;
+    return $orig ? $orig->meta : $class;
 }
 
 sub get_all_columns {
@@ -167,6 +145,41 @@ sub set_column {
         $col->clear_value($object);
     }
 }
+
+# around _inline_BUILDARGS => sub {
+#     my ( $orig, $self, $class, $args ) = @_;
+#     my $meta = $self->associated_metaclass;
+#     my $buildargs =
+#       $meta->find_method_by_name("BUILDARGS");
+#     if (
+#         $args eq '@_'
+#         and ( !$buildargs
+#             or $buildargs->body == \&MooseX::DBIC::Role::Result::BUILDARGS )
+#       )
+#     {
+#         my @code = ( 'do {',
+#         'my $params = @_ > 1 ? {@_} : $_[0];',
+#         );
+#         my @rels = $meta->get_relationships;
+#         foreach my $rel (@rels) {
+#             next unless($rel->has_handles);
+#             my %handles = $rel->_canonicalize_handles;
+#             my $name = $rel->name;
+#             foreach my $handle (keys %handles) {
+#                 push @code, "\$params->{$name}->{$handle} = delete \$params->{$handle} if(exists \$params->{$handle});";
+#             }
+#         }
+#         push @code, (
+#             'map { delete $params->{$_} } grep { !defined $params->{$_} } keys %$params;',
+#             '$params', 
+#         '}');
+#         return join("\n", @code);
+#         
+#     }
+#     else {
+#         return $class . "->BUILDARGS($args)";
+#     }
+# };
 
 1;
 

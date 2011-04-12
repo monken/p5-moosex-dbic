@@ -5,6 +5,7 @@ use Moose;
 extends 'DBIx::Class::ResultSet';
 
 package MyClass;
+use Moose;
 use MooseX::DBIC;
 
 

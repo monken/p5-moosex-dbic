@@ -1,6 +1,7 @@
 package # hide from PAUSE 
     DBICTest::Schema::CD_to_Producer;
 
+use Moose;
 use MooseX::DBIC; with 'DBICTest::Compat';
 
 remove 'id';
