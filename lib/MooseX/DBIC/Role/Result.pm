@@ -261,6 +261,7 @@ sub delete {
 
 sub sqlt_deploy_hook {
     my ($self, $sqlt_table) = @_;
+    $self = $self->result_class;
     my $table_name = $self->table_name;
     $sqlt_table->add_index(name => $table_name . '_idx_' . $_->name, fields => ref $_->indexed eq 'ARRAY' ? $_->indexed : [$_->name])
        for(grep { $_->indexed } map { $self->meta->get_column($_) } $self->meta->get_column_list );
