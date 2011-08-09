@@ -119,7 +119,7 @@ sub get_dirty_columns {
 # TODO: implement in this class, move stuff to meta class
 my %import = (
     'DBIx::Class::Relationship::Base' => [qw( search_related related_resultset find_or_new_related find_related update_or_create_related)],
-    'DBIx::Class::PK' => [qw(ident_condition _ident_values)],
+    'DBIx::Class::PK' => [qw(ident_condition _ident_values _mk_ident_cond)],
     'DBIx::Class::ResultSource' => [qw(_pri_cols resultset_attributes)],
     'Class::Accessor::Grouped' => [qw(get_simple)],
     'DBIx::Class::Row' => [qw(insert_or_update update_or_insert throw_exception)],
