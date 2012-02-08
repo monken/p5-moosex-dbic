@@ -92,14 +92,14 @@ __END__
  use MooseX::DBIC;
     
  has_column 'title';
- belongs_to artist => ( isa => 'Artist' );
+ belongs_to artist => ( is => 'ro', isa => 'MySchema::Artist' );
  
  package MySchema::Artist;
  use Moose;
  use MooseX::DBIC;    
  
  has_column 'name';
- has_many cds => ( isa => 'CD' );
+ has_many cds => ( is => 'ro', isa => 'MySchema::CD' );
  
  package MySchema;
  use Moose;
@@ -130,19 +130,21 @@ __END__
 
 =item B<Mandatory Single Primary Key>
 
-All tables you create using L<MooseX::DBIC> have a primary key C<id>.
-It is not an auto incrementing integer but a random string (thoguh this can be changed).
+By default, all result classes have a primary key attribute, named C<id>. For maximum portability,
+a random string is genereated instead of using an incrementing integer.
 
-Creating tables with more than one or none primary key is not supported.
+=item B<Single Column Primary Key Tables Only>
+
+Primary keys consisting of more than one column are not (yet) supported.
 
 =back
 
 =head1 RESULT DEFINITION
 
- package MyApp::Artist;
+ package MySchema::Artist;
  use MooseX::DBIC;
  
- # column and realtionship definition
+ # column and relationship definition
  
  __PACKAGE__->meta->make_immutable; # speed
 
@@ -153,7 +155,8 @@ Creating tables with more than one or none primary key is not supported.
   table 'mytable';
   
 Specifying a table name is optional. By default MooseX::DBIC will use the package name as 
-table name. A package C<MyApp::User> will lead to a table name of C<myapp_user>.
+table name. Given the name of the schema is C<MySchema>, a result class C<MySchema::Artist>
+will lead to a table named C<artist>.
 
 =item B<< has_column >>
 
@@ -205,7 +208,7 @@ See L<MooseX::DBIC::Meta::Role::Relationship::HasOne>.
 This is the preferred way to apply roles to the class. L<with|Moose/EXPORTED FUNCTIONS>
 has been overridden to allow for a shorter syntax.
 
-See the L<MooseX::DBIC::Role::> namespace for more roles.
+See the C<MooseX::DBIC::Role::> namespace for more roles.
 
 =back
 
