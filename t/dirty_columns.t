@@ -111,7 +111,7 @@ my %dirty = ( in_storage => 1, _raw_data => 1 );
 
     package Artist;
     use Moose;
-use MooseX::DBIC;
+    use MooseX::DBIC;
     has_column time => ( isa => 'DateTime' );
 
     __PACKAGE__->meta->make_immutable;
@@ -132,7 +132,7 @@ use MooseX::DBIC;
     my $artist = $rs->first;
     my $oldtime = $artist->time->clone;
     $artist->time($artist->time->set_time_zone( 'America/Chicago' ));
-
+    
     ok($artist->meta->get_column('time')->deflate($artist) ne $artist->_raw_data->{time}, 'deflated values do not match');
 
     is($artist->time, $oldtime, 'objects compare ok');

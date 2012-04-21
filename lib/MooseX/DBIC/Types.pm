@@ -5,6 +5,7 @@ use MooseX::Types::Moose qw(HashRef Object Str);
 use MooseX::Attribute::Deflator;
 use Moose::Util::TypeConstraints;
 use MooseX::DBIC::ResultProxy;
+use Scalar::Util qw(blessed);
 use strict;
 use warnings;
 
@@ -93,7 +94,7 @@ $REGISTRY->add_type_constraint(
         constraint_generator => sub {
             my $type_parameter = shift;
             my $check          = $type_parameter->_compiled_type_constraint;
-            return sub { 1; }
+            return sub { blessed $_ }
         }
     )
 );
@@ -106,11 +107,10 @@ $REGISTRY->add_type_constraint(
         name               => Result,
         package_defined_in => __PACKAGE__,
         parent             => find_type_constraint('Object'),
-        constraint         => sub { $_->does('MooseX::DBIC::Role::Result') },
         constraint_generator => sub {
             my $type_parameter = shift;
             my $check          = $type_parameter->_compiled_type_constraint;
-            return sub { 1; }
+            return sub { blessed $_ && $_->does('MooseX::DBIC::Role::Result') }
         }
     )
 );

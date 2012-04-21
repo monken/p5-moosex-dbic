@@ -2,8 +2,6 @@ package MooseX::DBIC::Meta::Role::Attribute;
 
 use Moose::Role;
 
-with 'MooseX::Attribute::LazyInflator::Meta::Role::Attribute';
-
 after _process_options => sub {
     my ( $class, $name, $options ) = @_;
     if (    $options->{required}

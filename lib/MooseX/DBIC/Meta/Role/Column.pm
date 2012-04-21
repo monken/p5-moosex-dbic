@@ -5,6 +5,7 @@ with 'MooseX::DBIC::Meta::Role::Attribute';
 #with 'MooseX::Attribute::Deflator::Meta::Role::Attribute';
 
 use MooseX::DBIC::TypeMap;
+use Eval::Closure;
 
 my $REGISTRY = MooseX::DBIC::TypeMap->get_registry;
 
@@ -63,6 +64,34 @@ sub is_dirty {
     return 0 if($deflated eq $raw);
     return 1;
 }
+
+# needs some more thought
+# since the BelongsTo relationship imports is_dirty but then is
+# overridden by after install_accessors
+
+# after install_accessors => sub {
+#     my $self = shift;
+#     my $code = eval { eval_closure(
+#         source => join("\n",   'sub {',
+#             'my ( $attr, $instance, $dirty ) = @_;',
+#             'my $cols = $instance->{dirty_columns} || $instance->dirty_columns({});',
+#             'return $cols->{"' . quotemeta($self->name) . '"}++ if(defined $dirty);',
+#             'my $val = ' . $self->_inline_instance_get('$_[1]') . ';',
+#             'return $cols->{"' . quotemeta( $self->name ) . '"} if(!ref $val);',
+#             'my $raw = $instance->{_raw_data}->{"' . quotemeta( $self->name ) . '"};',
+#             'return 1 if(defined $raw ^ defined $val);', # either one is undefined
+#             'return 0 if(!defined $raw && !defined $val);',
+#             'my $inflated = $attr->inflate($instance, $raw);',
+#             'return 0 if($val eq $inflated);',
+#             'my $deflated = $attr->deflate($instance);',
+#             'return 0 if($deflated eq $raw);',
+#             'return 1;',
+#             '}',)) } or do { warn $@ };
+#     $self->meta->add_method(
+#         'is_dirty' => $code
+#     );
+# };
+
 
 after set_value => sub {
     my ($attr, $instance) = @_;

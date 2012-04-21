@@ -36,8 +36,14 @@ $schema->storage->debugcb(sub { print $_[1] if($ENV{DBIC_TRACE}); $queries++; })
 $schema->storage->debug(1);
 
 {
-    ok(my $cd = $schema->resultset('CD')->create({ title => 'CD1' }), 'Create CD1 without cover');
+    ok(my $cd = $schema->resultset('CD')->new_result({ title => 'CD1' }), 'Create CD1 without cover');
     ok(!$cd->has_cover, 'CD1 has no cover');
+    ok(my $rel = $cd->meta->get_relationship('cover'), 'get attribute');
+    ok(!$rel->is_dirty($cd), 'not dirty');
+    ok(!$rel->is_required, 'not required');
+    ok(!$rel->has_value($cd), 'has no value');
+    ok($cd->insert, 'insert CD1');
+    ok(!$cd->has_cover, 'CD1 has still no cover');
     ok($cd->cover->id, 'Create cover');
     is($cd->cover->cd_cover->id, $cd->id, 'Cover has the CD id set'); 
     is(refaddr $cd->cover->cd_cover, refaddr $cd, 'Cover has cd object set');

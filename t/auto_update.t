@@ -43,6 +43,7 @@ is($schema->resultset('Artwork')->first->image, 'peter');
     $queries = 0;
     ok(my $artwork = $schema->resultset('Artwork')->first);
     $artwork->lazy;
+    ok(Artwork->meta->get_column('lazy')->is_dirty($artwork), 'lazy is dirty');
 }
 
 is($queries, 2);

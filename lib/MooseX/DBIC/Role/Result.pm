@@ -106,15 +106,32 @@ sub get_column {
 }
 
 sub get_columns {
-    my $self = shift;
+    my $self    = shift;
     my @columns = $self->meta->get_column_list;
-    return map { $_ => $self->meta->get_column($_)->deflate($self) } @columns;
+    return map {
+        $_->get_value($self);
+        ( $_->name => $_->deflate($self) )
+        } grep {
+        $_->has_value($self)
+            || $_->is_required
+            || $_->is_dirty($self)
+        } map { $self->meta->get_column($_) } @columns;
 }
 
 sub get_dirty_columns {
     my $self = shift;
-    map { $_ => $self->meta->get_column($_)->deflate($self) } $self->meta->get_dirty_column_list($self);
+    return map {
+        $_->get_value($self);
+        ( $_->name => $_->deflate($self) )
+        } grep {
+        $_->has_value($self)
+            || $_->is_required
+            || $_->is_dirty($self)
+        } map { $self->meta->get_column($_) }
+        $self->meta->get_dirty_column_list($self);
 }
+
+
 
 # TODO: implement in this class, move stuff to meta class
 my %import = (
@@ -151,7 +168,10 @@ sub new_related {
     my $new =
       $self->search_related( $rel->name )->new_result( $values, $attrs );
     return $new;
+}
 
+sub result_class {
+    return shift;
 }
 
 sub insert {
@@ -167,7 +187,6 @@ sub insert {
     my $set_pk = ($pk && $pk->auto_increment && !$pk->has_value($self));
     
     delete $to_insert{$pk->name} if($set_pk);
-    
     my $updated_cols = $source->storage->insert($source, { %to_insert });
     $self->in_storage(1);
 
@@ -182,7 +201,7 @@ sub insert {
         $to_insert{$pk->name} = $id;
     }
 
-    map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
+    map { $_->deflate($self) } grep { $_->has_value($self) || $_->is_required } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
     $self->_raw_data({%to_insert});
     $self->clear_dirty_columns;
     delete $self->{_update_in_progress};
@@ -231,7 +250,7 @@ sub update {
         $self->throw_exception("Can't update ${self}: updated more than one row");
       }
   }
-  map { $_->deflate($self) } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
+  map { $_->deflate($self) } grep { $_->has_value($self) || $_->is_required } grep { $_->foreign_key ne $_ } $self->meta->get_all_relationships;
   $self->_raw_data({%{$self->_raw_data}, %to_update});
   $self->clear_dirty_columns;
   delete $self->{_update_in_progress};
