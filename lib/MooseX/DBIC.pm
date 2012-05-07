@@ -1,46 +1,46 @@
 package MooseX::DBIC;
+
 # ABSTRACT: DBIC result class based on Moose
 use Moose ();
 use MooseX::DBIC::Meta::Role::Class;
 use MooseX::DBIC::Types qw(ResultSet);
 use Moose::Exporter;
 
-my (undef, undef, $init) = Moose::Exporter->build_import_methods(
-    with_meta =>
-      [qw(has_column has_many belongs_to has_one might_have table remove with class_has)],
-    as_is           => [qw(ResultSet)],
-    class_metaroles => {
-        class => [
-            qw(MooseX::DBIC::Meta::Role::Class)
-        ],
-        instance => [qw(MooseX::DBIC::Meta::Role::Instance)],
-    },
-    role_metaroles => {
-        role => [
-            qw(MooseX::DBIC::Meta::Role::Class)
-        ],
-        application_to_class => ['MooseX::DBIC::Meta::Role::Application::ToClass']
-    },
+my ( undef, undef, $init ) = Moose::Exporter->build_import_methods(
+    with_meta => [
+        qw(has_column has_many belongs_to has_one might_have table remove with class_has)
+    ],
+    as_is   => [qw(ResultSet)],
     install => [qw(import unimport)]
 );
 
-
 sub init_meta {
     my $class = shift;
-    my $meta = $class->$init(@_);
-    Moose::Util::ensure_all_roles($meta->name, 'MooseX::DBIC::Role::Result')
-        unless($meta->isa('Moose::Meta::Role'));
+    my (%opts) = @_;
+    Moose::Util::MetaRole::apply_metaroles(
+        for             => $opts{for_class},
+        class_metaroles => {
+            class    => [ qw(MooseX::DBIC::Meta::Role::Class) ],
+            instance => [qw(MooseX::DBIC::Meta::Role::Instance)],
+        },
+        role_metaroles => {
+            role => [ qw(MooseX::DBIC::Meta::Role::Class) ],
+            application_to_class =>
+                ['MooseX::DBIC::Meta::Role::Application::ToClass']
+        },
+    );
+    my $meta = Class::MOP::class_of( $opts{for_class} );
+    Moose::Util::ensure_all_roles( $meta->name, 'MooseX::DBIC::Role::Result' )
+        unless ( $meta->isa('Moose::Meta::Role') );
     return $meta;
 }
 
 sub with {
-    my ($meta, $role) = @_;
-    eval {
-        Moose::with($meta, 'MooseX::DBIC::Role::' . $role);
-    } or do {
-        die $@ if($@ !~ /^Can't locate/);
-        Moose::with($meta, $role);
-    }
+    my ( $meta, $role ) = @_;
+    eval { Moose::with( $meta, 'MooseX::DBIC::Role::' . $role ); } or do {
+        die $@ if ( $@ !~ /^Can't locate/ );
+        Moose::with( $meta, $role );
+        }
 }
 
 sub class_has {
@@ -54,7 +54,7 @@ sub class_has {
 }
 
 sub table {
-    shift->set_class_attribute_value( 'table_name', shift);
+    shift->set_class_attribute_value( 'table_name', shift );
 }
 
 sub has_column {
@@ -66,19 +66,19 @@ sub remove {
 }
 
 sub has_many {
-    shift->add_relationship(@_, type => 'HasMany');
+    shift->add_relationship( @_, type => 'HasMany' );
 }
 
 sub belongs_to {
-    shift->add_relationship(@_, type => 'BelongsTo');
+    shift->add_relationship( @_, type => 'BelongsTo' );
 }
 
 sub might_have {
-    shift->add_relationship(@_, type => 'MightHave');
+    shift->add_relationship( @_, type => 'MightHave' );
 }
 
 sub has_one {
-    shift->add_relationship(@_, type => 'HasOne');
+    shift->add_relationship( @_, type => 'HasOne' );
 }
 
 1;
