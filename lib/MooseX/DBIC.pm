@@ -91,15 +91,15 @@ __END__
  use Moose;
  use MooseX::DBIC;
     
- has_column 'title';
+ has_column title  => ( is => 'ro', isa => 'Str' );
  belongs_to artist => ( is => 'ro', isa => 'MySchema::Artist' );
  
  package MySchema::Artist;
  use Moose;
  use MooseX::DBIC;    
  
- has_column 'name';
- has_many cds => ( is => 'ro', isa => 'MySchema::CD' );
+ has_column name => ( is => 'ro', isa => 'Str' );;
+ has_many cds    => ( is => 'ro', isa => 'MySchema::CD' );
  
  package MySchema;
  use Moose;
@@ -116,11 +116,14 @@ __END__
  my $artist = $schema->resultset('Artist')->create(
     { 
       name => 'Mo',
-      cds => [ { title => 'Sound of Moose' } ]
+      cds => [ { title => 'Sound of Moose' } ],
     }
  );
  
- my @artists = $schema->resultset('Artist')->order_by('name')->prefetch('cd')->all;
+ my @artists = $schema->resultset('Artist')
+                      ->order_by('name')
+                      ->prefetch('cds')
+                      ->all;
 
 =head1 PRINCIPLES
 
@@ -154,7 +157,7 @@ Primary keys consisting of more than one column are not (yet) supported.
 
   table 'mytable';
   
-Specifying a table name is optional. By default MooseX::DBIC will use the package name as 
+B<Specifying a table name is optional.> By default MooseX::DBIC will use the package name as 
 table name. Given the name of the schema is C<MySchema>, a result class C<MySchema::Artist>
 will lead to a table named C<artist>.
 
@@ -164,7 +167,7 @@ will lead to a table named C<artist>.
   
  use MooseX::Types::Email qw(EmailAddress);
   
- has_column email => ( isa => EmailAddress );
+ has_column email => ( is => 'ro', isa => EmailAddress );
 
 Add a column to the result class. See L<MooseX::DBIC::Meta::Role::Column> for
 further details. 
@@ -178,25 +181,25 @@ Remove a previously added column. Can be used to remove the default primary key 
 
 =item B<< has_many >>
 
- has_many cds => ( isa => 'MyApp::CD' );
+ has_many cds => ( is => 'ro', isa => 'MyApp::CD' );
 
 See L<MooseX::DBIC::Meta::Role::Relationship::HasMany>.
 
 =item B<< belongs_to >>
 
- belongs_to producer => ( isa => 'MyApp::Producer' );
+ belongs_to producer => ( is => 'ro', isa => 'MyApp::Producer' );
 
 See L<MooseX::DBIC::Meta::Role::Relationship::BelongsTo>.
 
 =item B<< might_have >>
 
- might_have artwork => ( isa => 'MyApp::Artwork' );
+ might_have artwork => ( is => 'ro', isa => 'MyApp::Artwork' );
 
 See L<MooseX::DBIC::Meta::Role::Relationship::MightHave>.
 
 =item B<< has_one >>
 
- has_one mandatory_artwork => ( isa => 'MyApp::Artwork' );
+ has_one mandatory_artwork => ( is => 'ro', isa => 'MyApp::Artwork' );
 
 See L<MooseX::DBIC::Meta::Role::Relationship::HasOne>.
 
