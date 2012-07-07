@@ -47,7 +47,7 @@ sub find_related_class {
             Class::MOP::load_class($related_class);
             undef @parts;
         } catch {
-            die $_ if($_ !~ /^Can't locate/);
+            die $_ if($_ !~ /^Can't locate/ || $_ =~ /syntax error/i);
         };
         undef $@;
         pop @parts || last;

@@ -77,11 +77,12 @@ sub load_class {
     
     (my $moniker = $class) =~ s/^\Q$schema\E:://;
     
-    try {
+    local $@;
+    eval {
         Class::MOP::load_class(join('::', $schema, $class));
         $class = join('::', $schema, $class);
-    } catch {
-        die $_ if($_ =~ /^Couldn't load class/ );
+    } or do {
+        die $@ if($@ =~ /^Couldn't load class/ || $@ =~ /^syntax error/ );
         Class::MOP::load_class($class);
     };
     
