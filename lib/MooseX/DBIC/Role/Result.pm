@@ -166,7 +166,7 @@ sub new_related {
         $values->{$name} = $self;
     }
     my $new =
-      $self->search_related( $rel->name )->new_result( $values, $attrs );
+      $self->search_related( $rel->name )->new_result( $values );
     return $new;
 }
 
